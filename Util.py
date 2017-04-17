@@ -2,21 +2,18 @@ import numpy as np
 import pandas as pd
 import MySQLdb
 import sys
-from db_info import db_info
-
-from keras.layers import Dense, Activation
-from keras.models import Sequential
-from sklearn.metrics import mean_squared_error, mean_absolute_error
-from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, SimpleRNN, GRU, Merge
+from DB_info import DB_info
 
 
 
-class util:
+
+
+class Util:
 
     feat_table = 'features'
 
     def main(self):
-        my_db_info = db_info()
+        my_db_info = DB_info()
         data_frame = self.retrieve_input(my_db_info)
         # for index , row in data_frame.iterrows():
         #     print index, ' , ', row
@@ -55,5 +52,5 @@ class util:
                 return data_frame
 
 
-utility = util()
+utility = Util()
 utility.main()
