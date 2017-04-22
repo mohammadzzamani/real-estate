@@ -25,7 +25,7 @@ class NeuralNetwork:
         derived_features = np.diff(features)
 
         # Concatenate the actual features, and their differences
-        X = np.concatenate((features, derived_features), axis = 0)
+        X = np.concatenate((features, derived_features), axis = 1)
 
         return X
 
@@ -70,4 +70,13 @@ class NeuralNetwork:
         score = model.evaluate(xTest, yTest, batch_size = 100)
         prediction = model.predict(xTest, batch_size = 100, verbose = 1)
 
-        result = [(yTest[i], prediction[i][0] for i in xrange(0, 30))]
+        result = [(yTest[i], prediction[i][0]) for i in xrange(0, 30)]
+
+
+def helper():
+#if __name__ == "__main__":
+    # get dataframe for train and test
+    # get xTrain and xTest from these dataframes (get_features())
+    # get yTrain and yTest from these dataframes (get_labels())
+    # build neural network (build_neural_network())
+    print "--- Completed ---"
