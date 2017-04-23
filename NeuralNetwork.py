@@ -4,8 +4,18 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, SimpleRNN, GRU, Merge
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
+from sqlalchemy import create_engine
+from sqlalchemy.engine.url import URL
+
+DATABASE = 'mztwitter'
+TRAIN_TABLE_NAME = 'NLP_train_features'
+TEST_TABLE_NAME = 'NLP_test_features'
+
 class NeuralNetwork:
-    ID_SIZE = 2
+    ID_SIZE = 1
+
+    # Change this depending on whatever is the number of features
+    # in the dataframe.
     NUM_FEATURES = 50
 
     # Returns the ID columns as numpy ndarray
@@ -32,7 +42,7 @@ class NeuralNetwork:
 
     # Returns the labels as a numpy ndarray
     def get_labels(self, dataframe):
-        return dataframe[dateframe.columns[-1]].values
+        return dataframe[dataframe.columns[-1]].values
 
 
     # Standardize a given numpy ndarray (makes mean = 0)
@@ -72,11 +82,49 @@ class NeuralNetwork:
 
         result = [(yTest[i], prediction[i][0]) for i in xrange(0, 30)]
 
+    def __init__(self):
+        print "-- Created NeuralNetwork Object --"
 
-def helper():
-#if __name__ == "__main__":
+
+def get_dataframe(db, table):
+    # Create SQL engine
+    myDB = URL(drivername='mysql', database=db, query={
+            'read_default_file' : '/home/pratheek/.my.cnf' })
+    engine = create_engine(name_or_url=myDB)
+    engine1 = engine
+    connection = engine.connect()
+
+    query = connection.execute('select * from %s' % table)
+    df_feat = pd.DataFrame(query.fetchall())
+    df_feat.columns = query.keys()
+
+    return df_feat
+
+#def helper():
+if __name__ == "__main__":
     # get dataframe for train and test
     # get xTrain and xTest from these dataframes (get_features())
     # get yTrain and yTest from these dataframes (get_labels())
     # build neural network (build_neural_network())
+
+    dataframe_train = get_dataframe(DATABASE, TRAIN_TABLE_NAME)
+    #dataframe_test = get_dataframe(DATABASE, TEST_TABLE_NAME)
+
+    # generating random labels for now <-- This is not required though
+    # labels will be part of table, so use the main dataframe
+    label_frame = pd.DataFrame(np.random.uniform(-1, 1, size = (len(dataframe_train), 1)))
+    dataframe_train = pd.concat([dataframe_train, label_frame], axis = 1)
+
+    train_size = 10000
+
+    train_set = dataframe_train.ix[0: train_size, :]
+    test_set = dataframe_train.txt[train_size:, :]
+
+    Network = NeuralNetwork()
+    xTrain = Network.get_features(train_set)
+    yTrain = Network.get_labels(train_set)
+    xTest = Network.get_features(test_set)
+    yTest = Network.get_labels(test_set)
+
+    Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
