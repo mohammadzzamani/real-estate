@@ -7,12 +7,13 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
+from DB_info import DB_info
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 
 DATABASE_NAME = 'mztwitter'
-TABLE_NAME = 'saf_interp'
+
 
 # Initially 8 columns
 # columns from 2008/07 to 2016/09 = 6 + 84 + 9 = 99 columns
@@ -25,14 +26,14 @@ MONTH_COLUMNS = 45
 COUNTY_COLUMN_NUMBER = 107
 
 
-def get_dataframe(db, table):
+def get_dataframe(db_info):
     # Create SQL engine
-    myDB = URL(drivername='mysql', database=db, query={
-                'read_default_file' : '/home/pratheek/.my.cnf' })
+    myDB = URL(drivername='mysql', database=db_info.DB, query={
+                'read_default_file' : db_info.CONF_FILE })
     engine = create_engine(name_or_url=myDB)
     connection = engine.connect()
 
-    query = connection.execute('select * from %s' % table)
+    query = connection.execute('select * from %s' % db_info.TABLE_NAME)
     df_feat = pd.DataFrame(query.fetchall())
     df_feat.columns = query.keys()
 
@@ -56,7 +57,8 @@ np.random.seed(7)
 
 
 # load the dataset
-dataframe = get_dataframe(DATABASE_NAME, TABLE_NAME)
+db_info = DB_info()
+dataframe = get_dataframe(db_info)
 dataset = dataframe.values
 
 # Get only county, month values
@@ -94,6 +96,7 @@ trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
 testX = np.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 
 
+    # def build_lstm()
 # create and fit the LSTM network
 batch_size = 1
 model = Sequential()
