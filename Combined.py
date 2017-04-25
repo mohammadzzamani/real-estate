@@ -101,7 +101,7 @@ dataset = dataset.astype('float32')
 look_back = 12
 num_of_months = month.shape[1]
 train_test_split = 0.67
-dataX, dataY = create_dataset(dataset,  train_test_split= num_of_months * train_test_split, look_back)
+trainX, trainY, testX , testY = create_dataset(dataset,  train_test_split= num_of_months * train_test_split, look_back)
 
 # split into train and test sets
 train_size = int(len(dataset) * 0.67)
@@ -118,15 +118,15 @@ test_size = len(dataset) - train_size
 ########### swap split and create_dataset
 
 # split into train and test sets
-train_size = int(len(dataset) * 0.67)
-test_size = len(dataset) - train_size
-train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
+# train_size = int(len(dataset) * 0.67)
+# test_size = len(dataset) - train_size
+# train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
 
 
 # reshape into X=t and Y=t+1
-look_back = 3
-trainX, trainY = create_dataset(train, look_back)
-testX, testY = create_dataset(test, look_back)
+# look_back = 3
+# trainX, trainY = create_dataset(train, look_back)
+# testX, testY = create_dataset(test, look_back)
 #trainX
 
 
