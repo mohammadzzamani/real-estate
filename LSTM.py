@@ -27,7 +27,7 @@ TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
 COUNTY_COLUMN_NUMBER = 107
-LOOK_BACK = 3
+LOOK_BACK = 20
 
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, start , end, num_of_counties):
@@ -186,7 +186,6 @@ def build_lstm_on_labels():
     train_size = TRAIN_MONTHS
     test_size = len(dataset) - train_size
 
-    look_back = LOOK_BACK
     trainX, trainY, testX, testY = get_train_and_test(dataset, train_size)
     build_LSTM(trainX, trainY, testX, testY)
 
