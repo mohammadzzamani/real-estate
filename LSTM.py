@@ -89,7 +89,7 @@ def normalize(dataset, train_size):
 
 
 def build_LSTM(trainX, trainY, testX, testY):
-    batch_size = 25
+    batch_size = 10
     model = Sequential()
     model.add(LSTM(2, batch_input_shape=(batch_size, LOOK_BACK, 1), stateful=True))
     model.add(Dense(1))
