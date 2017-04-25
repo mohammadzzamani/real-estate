@@ -176,8 +176,8 @@ def get_train_and_test(dataset, train_size):
         for j in xrange(shape1):
             if trainX[i,j] is None or trainX[i,j] == 0:
                 remove = 1
-                # print ' i , j : ' , i, j
-                # print trainX[i,:]
+                print ' i , j : ' , i, j
+                print trainX[i,:]
         if remove == 1:
             np.delete(trainX, i, axis=0)
             np.delete(trainY, i, axis=0)
