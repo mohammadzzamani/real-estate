@@ -91,7 +91,7 @@ def normalize(dataset, train_size):
 def build_LSTM(trainX, trainY, testX, testY, look_back):
     batch_size = 1
     model = Sequential()
-    model.add(LSTM(4, batch_input_shape=(batch_size, look_back, 1), stateful=True))
+    model.add(LSTM(5, batch_input_shape=(batch_size, look_back, 1), stateful=True))
     model.add(Dense(1))
 
     model.compile(loss='mean_squared_error', optimizer='adam')
@@ -101,9 +101,11 @@ def build_LSTM(trainX, trainY, testX, testY, look_back):
     print "TestX: ", testX.shape
     print "TestY: ", testY.shape
 
-    for i in range(100):
-        model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
-        model.reset_states()
+    model.fit(trainX, trainY, nb_epoch=20, batch_size=batch_size, verbose=1, shuffle=True)
+
+    # for i in range(100):
+    #     model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
+    #     model.reset_states()
 
     # make predictions
     trainPredict = model.predict(trainX, batch_size=batch_size)
