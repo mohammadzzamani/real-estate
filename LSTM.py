@@ -171,7 +171,7 @@ def get_train_and_test(dataset, train_size):
     print trainX.shape
     shape0 = trainX.shape[0]
     shape1 = trainX.shape[1]
-    for i in xrange(shape0):
+    for i in reversed(xrange(shape0)):
         remove = 0
         for j in xrange(shape1):
             if trainX[i,j] is None or trainX[i,j] == 0:
