@@ -156,9 +156,9 @@ def get_train_and_test(dataset, train_size):
     # trainX, trainY = create_dataset(train, look_back)
     # testX, testY = create_dataset(test, look_back)
 
-    trainX = trainX[2000:4000, :]
+    trainX = trainX[:2000, :]
     testX = testX[0:100, :]
-    trainY = trainY[2000:4000]
+    trainY = trainY[:2000]
     testY = testY[0:100]
 
     print "TrainX: ", trainX.shape
@@ -178,7 +178,7 @@ def get_train_and_test(dataset, train_size):
                 remove = 1
                 # print ' i , j : ' , i, j
                 # print trainX[i,:]
-        if remove == 0:
+        if remove == 1:
             np.delete(trainX, i, axis=0)
             np.delete(trainY, i, axis=0)
     print trainX.shape
