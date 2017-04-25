@@ -147,7 +147,7 @@ def build_lstm_on_labels():
     test_size = len(dataset) - train_size
 
     look_back = LOOK_BACK
-    trainX, trainY, testX, testY = get_train_and_test(dataset, train_size, test_size)
+    trainX, trainY, testX, testY = get_train_and_test(dataset, train_size)
     build_LSTM(trainX, trainY, testX, testY, look_back)
 
 
