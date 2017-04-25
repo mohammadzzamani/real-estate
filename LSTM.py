@@ -111,6 +111,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     model = Sequential()
     model.add(LSTM(4, batch_input_shape=(batch_size, LOOK_BACK, 1), stateful=True))
     model.add(layers.core.Dropout(0.5))
+    model.add(Dense(10))
     model.add(Dense(1))
 
     # optimizers.adam(lr=0.01, clipnorm=1)
