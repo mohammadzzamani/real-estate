@@ -62,7 +62,7 @@ def get_county_month(dataset):
     month = dataset[:, INIT_SKIP: INIT_SKIP + MONTH_COLUMNS]
 
     dataset = np.concatenate((county, month), axis = 1)
-    dataset = np.transpose(dataset)
+    # dataset = np.transpose(dataset)
     dataset = dataset.astype('float32')
     return dataset
 
