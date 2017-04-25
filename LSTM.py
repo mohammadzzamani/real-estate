@@ -171,8 +171,9 @@ def get_train_and_test(dataset, train_size):
         for j in xrange(trainX.shape[1]):
             if trainX[i,j] is None or trainX[i,j] == 0:
                 print ' i , j : ' , i, j
+                print trainX[i,:]
 
-    print trainX[0:100,0:25]
+    # print trainX[0:100,0:25]
 
 
     # for i in xrange(testX.shape[0]):
