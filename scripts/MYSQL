@@ -1,0 +1,25 @@
+To select random messages from each month
+
+select id, cnty from ( select id, cnty, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM msgs_2011_11 ORDER BY RAND()) a, (select @rn := 0, @name:= NULL) r ORDER BY cnty) s WHERE rn > 2 and rn < 20  limit 20
+
+update NLP_test_data set month_id = TIMESTAMPDIFF(MONTH, '2011-11-07', date(created_time));
+
+./dlatkInterface.py -d mztwitter -t NLP_test_data -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 10000
+
+ update NLP_test_data set cnty_month = CONCAT(cnty,'_',month_id);
+
+show create table NLP_train_data; - To get table index details
+
+alter table NLP_train_data drop index cnty; - to drop the index
+
+ alter table NLP_test_data add index(cnty, month_id);
+
+python dlatkInterface.py -d mztwitter -t NLP_train_data -c cnty_month -f 'feat$1to3gram$NLP_train_data$cnty_month$16to16$0_01' 'feat$1to3gram$NLP_train_data$cnty_month$16to1$0_01' 'feat$cat_met_a30_2000_cp_w$NLP_train_data$cnty_month$16to16' --group_freq_thresh 200 --outcome_table housing_outcomes --outcomes saf --train_regression --model ridgecv --save_model --picklefile pickles/PCA.pickle
+
+# Adding saf labels to train features
+update NLP_train_features JOIN housing_outcomes ON NLP_train_features.cnty_month = housing_outcomes.cnty_month set NLP_train_features.saf = housing_outcomes.saf;
+
+
+df.merge(s.to_frame(), left_index=True, right_index=True)
+
+
