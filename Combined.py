@@ -104,8 +104,8 @@ train_test_split = 0.67
 trainX, trainY, testX , testY = create_dataset(dataset,  train_test_split= num_of_months * train_test_split, look_back)
 
 # split into train and test sets
-train_size = int(len(dataset) * 0.67)
-test_size = len(dataset) - train_size
+# train_size = int(len(dataset) * 0.67)
+# test_size = len(dataset) - train_size
 # split on dataX and dataY
 # train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
 
