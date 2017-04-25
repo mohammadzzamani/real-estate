@@ -120,7 +120,7 @@ def get_train_and_test(dataset, train_size, num_of_months):
 
 def build_lstm_on_labels():
     db_wrapper = DB_wrapper()                       
-    dataframe = db_wrapper.retrieve_data(DB_info.TABLE_NAME) #get_dataframe()
+    dataframe = db_wrapper.retrieve_data(DB_info.SAF_TABLE) #get_dataframe()
     dataset = normalize(get_county_month(dataframe.values), TRAIN_MONTHS)
 
     print "Dataset shape: ", dataset.shape
