@@ -61,7 +61,8 @@ np.random.seed(7)
 # load the dataset
 # db_info = DB_info()
 
-dataframe = DB_wrapper.retrieve_data(TABLE_NAME) #get_dataframe()
+db_wrapper = DB_wrapper()
+dataframe = db_wrapper.retrieve_data(TABLE_NAME) #get_dataframe()
 dataset = dataframe.values
 
 # Get only county, month values

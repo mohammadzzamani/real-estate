@@ -41,8 +41,8 @@ class DB_wrapper:
     #         print index, ' , ', row
     #     return  train_data , test_data
 
-    def connectMysqlDB(self, db_info):
-                myDB = URL(drivername='mysql', database=db_info.DB, query={'read_default_file' : db_info.CONF_FILE })
+    def connectMysqlDB(self):
+                myDB = URL(drivername='mysql', database=DB_info.DB, query={'read_default_file' : DB_info.CONF_FILE })
                 self.engine = create_engine(name_or_url=myDB)
                 # connection = engine.connect()
                 # conn = MySQLdb.connect(db_info.host, db_info.user, db_info.password, db_info.database)
@@ -62,12 +62,12 @@ class DB_wrapper:
                                 columns = []
                                 sql = "show columns from {0}".format(table)
                                 print 'sql: ' , sql
-                                connection.execute(sql)
-                                columns_name = connection.fetchall()
+                                query = connection.execute(sql)
+                                columns_name = query.fetchall()
                                 for row in columns_name:
                                         columns.append(row[0])
                                 sql = "select * from {0}".format(table)
-                                connection.execute(sql)
-                                result = connection.fetchall()
+                                query = connection.execute(sql)
+                                result = query.fetchall()
                                 data_frame = pd.DataFrame(data = result, columns = columns)
                 return data_frame
