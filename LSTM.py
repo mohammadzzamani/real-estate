@@ -111,8 +111,8 @@ def build_LSTM(trainX, trainY, testX, testY):
     model.add(Dense(1))
 
     # optimizers.adam(lr=0.01, clipnorm=1)
-    # sgd = optimizers.SGD(lr=0.01, clipnorm=1)
-    model.compile(loss='mean_squared_error', optimizer='adam')
+    sgd = optimizers.SGD(lr=0.01, clipnorm=1)
+    model.compile(loss='mean_squared_error', optimizer=sgd)
 
     print "TrainX: ", trainX.shape
     print "TrainY: ", trainY.shape
