@@ -37,22 +37,24 @@ LOOK_BACK = 12
 #         dataY.append(dataset[i + look_back, 0])
 #
 #     return np.array(dataX), np.array(dataY)
-def create_dataset(dataset, train_test_split):
+def create_dataset(dataset, start, end):
 
-    trainX, trainY, testX , testY = [], [], [], []
+    dataX, dataY = [], [],
 
     for j in xrange(len(dataset)):
-        X = [ dataset[j,i:(i+LOOK_BACK)] for i in xrange(len(dataset[j])-LOOK_BACK-1)]
-        Y = [ dataset[j, i + LOOK_BACK] for i  in xrange(len(dataset[j])-LOOK_BACK-1) ]
 
-        if j < train_test_split:
-            trainX.extend(X)
-            trainY.extend(Y)
-        else:
-            testX.extend(X)
-            testY.extend(Y)
+        X = [ dataset[j,i:(i+LOOK_BACK)] for i in xrange(start, end)] # len(dataset[j])-LOOK_BACK-1)]
+        Y = [ dataset[j, i + LOOK_BACK] for i  in xrange(start , end)]
 
-    return np.array(trainX), np.array(trainY), np.array(testX) , np.array(testY)
+        # X = [ dataset[j,i:(i+LOOK_BACK)] for i in xrange(len(dataset[j])-LOOK_BACK-1)]
+        # Y = [ dataset[j, i + LOOK_BACK] for i  in xrange(len(dataset[j])-LOOK_BACK-1) ]
+        dataX.extend(X)
+        dataY.extend(Y)
+        # else:
+        #     testX.extend(X)
+        #     testY.extend(Y)
+
+    return np.array(dataX), np.array(dataY) #, np.array(testX) , np.array(testY)
 
 
 # Get only county, month values
@@ -109,7 +111,9 @@ def build_LSTM(trainX, trainY, testX, testY, look_back):
 def get_train_and_test(dataset, train_size, num_of_months):
 
     # reshape into X=t and Y=t+1
-    trainX, trainY, testX , testY = create_dataset(dataset,  train_test_split= train_size)
+
+    trainX, trainY = create_dataset(dataset,  start= 0 , end = train_size - LOOK_BACK-1)
+    testX, testY = create_dataset(dataset,  start= train_size - LOOK_BACK-1 , end = len(dataset) - LOOK_BACK-1)
 
     # reshape input to be [samples, time steps, features]
     trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
