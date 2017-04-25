@@ -12,6 +12,8 @@ from DB_info import DB_info
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 
+import DB_info
+
 DATABASE_NAME = 'mztwitter'
 
 
@@ -26,14 +28,14 @@ MONTH_COLUMNS = 45
 COUNTY_COLUMN_NUMBER = 107
 
 
-def get_dataframe(db_info):
+def get_dataframe():
     # Create SQL engine
-    myDB = URL(drivername='mysql', database=db_info.DB, query={
-                'read_default_file' : db_info.CONF_FILE })
+    myDB = URL(drivername='mysql', database=DB_info.DB, query={
+                'read_default_file' : DB_info.CONF_FILE })
     engine = create_engine(name_or_url=myDB)
     connection = engine.connect()
 
-    query = connection.execute('select * from %s' % db_info.TABLE_NAME)
+    query = connection.execute('select * from %s' % DB_info.TABLE_NAME)
     df_feat = pd.DataFrame(query.fetchall())
     df_feat.columns = query.keys()
 
@@ -57,8 +59,8 @@ np.random.seed(7)
 
 
 # load the dataset
-db_info = DB_info()
-dataframe = get_dataframe(db_info)
+# db_info = DB_info()
+dataframe = get_dataframe()
 dataset = dataframe.values
 
 # Get only county, month values
