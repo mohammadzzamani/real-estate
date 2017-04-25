@@ -25,18 +25,34 @@ TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
 COUNTY_COLUMN_NUMBER = 107
-LOOK_BACK = 3
+LOOK_BACK = 12
 
 # convert an array of values into a dataset matrix
-def create_dataset(dataset, look_back=1):
-    dataX, dataY = [], []
+# def create_dataset(dataset, look_back=1):
+#     dataX, dataY = [], []
+#
+#     for i in range(len(dataset)-look_back-1):
+#         a = dataset[i:(i+look_back), 0]
+#         dataX.append(a)
+#         dataY.append(dataset[i + look_back, 0])
+#
+#     return np.array(dataX), np.array(dataY)
+def create_dataset(dataset, train_test_split):
 
-    for i in range(len(dataset)-look_back-1):
-        a = dataset[i:(i+look_back), 0]
-        dataX.append(a)
-        dataY.append(dataset[i + look_back, 0])
+    trainX, trainY, testX , testY = [], [], [], []
 
-    return np.array(dataX), np.array(dataY)
+    for j in xrange(len(dataset)):
+        X = [ dataset[j,i:(i+LOOK_BACK)] for i in xrange(len(dataset[j])-LOOK_BACK-1)]
+        Y = [ dataset[j, i + LOOK_BACK] for i  in xrange(len(dataset[j])-LOOK_BACK-1) ]
+
+        if j < train_test_split:
+            trainX.extend(X)
+            trainY.extend(Y)
+        else:
+            testX.extend(X)
+            testY.extend(Y)
+
+    return trainX, trainY, testX , testY
 
 
 # Get only county, month values
@@ -90,13 +106,10 @@ def build_LSTM(trainX, trainY, testX, testY, look_back):
     testPredict = model.predict(testX, batch_size=batch_size)
 
 
-def get_train_and_test(dataset, train_size, test_size):
+def get_train_and_test(dataset, train_size, num_of_months):
+
     # reshape into X=t and Y=t+1
-    look_back = LOOK_BACK
-    train, test = dataset[0: train_size, :], dataset[train_size: len(dataset), :]
-    
-    trainX, trainY = create_dataset(train, look_back)
-    testX, testY = create_dataset(test, look_back)
+    trainX, trainY, testX , testY = create_dataset(dataset,  train_test_split= train_size)
 
     # reshape input to be [samples, time steps, features]
     trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
@@ -114,11 +127,9 @@ def build_lstm_on_labels():
                              
     # split into train and test sets
     train_size = TRAIN_MONTHS
-    test_size = len(dataset) - train_size
-
-    look_back = LOOK_BACK
-    trainX, trainY, testX, testY = get_train_and_test(dataset, train_size, test_size)
-    build_LSTM(trainX, trainY, testX, testY, look_back)
+    num_of_months = dataset.shape[1]-1
+    trainX, trainY, testX, testY = get_train_and_test(dataset, train_size, num_of_months)
+    build_LSTM(trainX, trainY, testX, testY, LOOK_BACK)
 
 
 if __name__ == "__main__":
