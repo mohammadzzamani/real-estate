@@ -88,6 +88,21 @@ def normalize(dataset, train_size):
     dataset = (dataset - mean)/standard_deviation
     return dataset
 
+def normalize(dataset, train_size):
+    minimum = np.min(dataset[1: train_size], axis = 0)
+    maximum = np.max(dataset[1: train_size], axis = 0)
+    print 'minimum'
+    print minimum[1:20]
+    print 'maximum'
+    print maximum[1:20]
+    print 'min: ' , minimum.shape
+    # standard_deviation = np.std(dataset[1: train_size], axis = 0)
+    # print 'standard_deviation: ' , standard_deviation.shape
+    # print 'dataset: ' , dataset.shape
+    dataset = (dataset - minimum)/ (maximum-minimum)
+    # dataset = (dataset - mean)/standard_deviation
+    return dataset
+
 
 def build_LSTM(trainX, trainY, testX, testY):
     batch_size = 10
