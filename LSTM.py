@@ -179,8 +179,8 @@ def get_train_and_test(dataset, train_size):
                 print ' i , j : ' , i, j
                 print trainX[i,:]
         if remove == 1:
-            np.delete(trainX, (i), axis=0)
-            np.delete(trainY, (i), axis=0)
+            trainX = np.delete(trainX, (i), axis=0)
+            trainY = np.delete(trainY, (i), axis=0)
     print trainX.shape
 
 
