@@ -159,9 +159,9 @@ def get_train_and_test(dataset, train_size):
     print 'data:'
     print trainX[1680,:]
     print trainX[1681,:]
-    trainX = trainX[:1680, :]
+    trainX = trainX[:2000, :]
     testX = testX[0:100, :]
-    trainY = trainY[:1680]
+    trainY = trainY[:2000]
     testY = testY[0:100]
 
     print "TrainX: ", trainX.shape
@@ -177,7 +177,7 @@ def get_train_and_test(dataset, train_size):
     for i in reversed(xrange(shape0)):
         remove = 0
         for j in xrange(shape1):
-            if trainX[i,j] is None or trainX[i,j] == 0:
+            if trainX[i,j] is None or math.isnan(trainX[i,j]):
                 remove = 1
                 print ' i , j : ' , i, j
                 print trainX[i,:]
