@@ -27,7 +27,7 @@ TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
 COUNTY_COLUMN_NUMBER = 107
-LOOK_BACK = 20
+LOOK_BACK = 5
 
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, start , end, num_of_counties):
