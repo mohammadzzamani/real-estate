@@ -8,6 +8,7 @@ from keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 from DB_wrapper import DB_wrapper
+from keras import optimizers
 
 
 from sqlalchemy import create_engine
@@ -94,7 +95,9 @@ def build_LSTM(trainX, trainY, testX, testY):
     model.add(LSTM(2, batch_input_shape=(batch_size, LOOK_BACK, 1), stateful=True))
     model.add(Dense(1))
 
-    model.compile(loss='mean_squared_error', optimizer='adam')
+    # optimizers.adam(lr=0.01, clipnorm=1)
+    sgd = optimizers.SGD(lr=0.01, clipnorm=1)
+    model.compile(loss='mean_squared_error', optimizer=sgd)
 
     print "TrainX: ", trainX.shape
     print "TrainY: ", trainY.shape
@@ -129,10 +132,10 @@ def get_train_and_test(dataset, train_size):
     # trainX, trainY = create_dataset(train, look_back)
     # testX, testY = create_dataset(test, look_back)
 
-    trainX = trainX[0:200, :]
-    testX = testX[0:100, :]
-    trainY = trainY[0:200]
-    testY = testY[0:100]
+    # trainX = trainX[0:200, :]
+    # testX = testX[0:100, :]
+    # trainY = trainY[0:200]
+    # testY = testY[0:100]
 
     print "TrainX: ", trainX.shape
     print "TestX: ", testX.shape
