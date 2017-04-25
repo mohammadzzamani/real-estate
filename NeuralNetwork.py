@@ -6,6 +6,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
+from DB_wrapper import  DB_wrapper
 
 DATABASE = 'mztwitter'
 TRAIN_TABLE_NAME = 'NLP_train_features'
@@ -86,19 +87,19 @@ class NeuralNetwork:
         print "-- Created NeuralNetwork Object --"
 
 
-def get_dataframe(db, table):
-    # Create SQL engine
-    myDB = URL(drivername='mysql', database=db, query={
-            'read_default_file' : '/home/pratheek/.my.cnf' })
-    engine = create_engine(name_or_url=myDB)
-    engine1 = engine
-    connection = engine.connect()
-
-    query = connection.execute('select * from %s' % table)
-    df_feat = pd.DataFrame(query.fetchall())
-    df_feat.columns = query.keys()
-
-    return df_feat
+# def get_dataframe(db, table):
+#     # Create SQL engine
+#     myDB = URL(drivername='mysql', database=db, query={
+#             'read_default_file' : '/home/pratheek/.my.cnf' })
+#     engine = create_engine(name_or_url=myDB)
+#     engine1 = engine
+#     connection = engine.connect()
+#
+#     query = connection.execute('select * from %s' % table)
+#     df_feat = pd.DataFrame(query.fetchall())
+#     df_feat.columns = query.keys()
+#
+#     return df_feat
 
 #def helper():
 if __name__ == "__main__":
@@ -106,9 +107,9 @@ if __name__ == "__main__":
     # get xTrain and xTest from these dataframes (get_features())
     # get yTrain and yTest from these dataframes (get_labels())
     # build neural network (build_neural_network())
-
-    dataframe_train = get_dataframe(DATABASE, TRAIN_TABLE_NAME)
-    #dataframe_test = get_dataframe(DATABASE, TEST_TABLE_NAME)
+    db_wrapper = DB_wrapper()
+    dataframe_train = db_wrapper.retrieve_data(TRAIN_TABLE_NAME) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
+    #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
     # generating random labels for now <-- This is not required though
     # labels will be part of table, so use the main dataframe

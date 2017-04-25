@@ -7,15 +7,15 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
-from DB_info import DB_info
+from DB_wrapper import DB_wrapper
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 
 import DB_info
 
-DATABASE_NAME = 'mztwitter'
 
+TABLE_NAME = 'saf_interp'
 
 # Initially 8 columns
 # columns from 2008/07 to 2016/09 = 6 + 84 + 9 = 99 columns
@@ -28,18 +28,18 @@ MONTH_COLUMNS = 45
 COUNTY_COLUMN_NUMBER = 107
 
 
-def get_dataframe():
-    # Create SQL engine
-    myDB = URL(drivername='mysql', database=DB_info.DB, query={
-                'read_default_file' : DB_info.CONF_FILE })
-    engine = create_engine(name_or_url=myDB)
-    connection = engine.connect()
-
-    query = connection.execute('select * from %s' % DB_info.TABLE_NAME)
-    df_feat = pd.DataFrame(query.fetchall())
-    df_feat.columns = query.keys()
-
-    return df_feat
+# def get_dataframe():
+#     # Create SQL engine
+#     myDB = URL(drivername='mysql', database=DB_info.DB, query={
+#                 'read_default_file' : DB_info.CONF_FILE })
+#     engine = create_engine(name_or_url=myDB)
+#     connection = engine.connect()
+#
+#     query = connection.execute('select * from %s' % DB_info.TABLE_NAME)
+#     df_feat = pd.DataFrame(query.fetchall())
+#     df_feat.columns = query.keys()
+#
+#     return df_feat
 
 
 # convert an array of values into a dataset matrix
@@ -60,7 +60,8 @@ np.random.seed(7)
 
 # load the dataset
 # db_info = DB_info()
-dataframe = get_dataframe()
+
+dataframe = DB_wrapper.retrieve_data(TABLE_NAME) #get_dataframe()
 dataset = dataframe.values
 
 # Get only county, month values
