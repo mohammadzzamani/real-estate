@@ -1,14 +1,3 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import math
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_squared_error
-from DB_wrapper import DB_wrapper
-
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 
@@ -25,36 +14,18 @@ TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
 COUNTY_COLUMN_NUMBER = 107
-LOOK_BACK = 12
+LOOK_BACK = 5
 
 # convert an array of values into a dataset matrix
-# def create_dataset(dataset, look_back=1):
-#     dataX, dataY = [], []
-#
-#     for i in range(len(dataset)-look_back-1):
-#         a = dataset[i:(i+look_back), 0]
-#         dataX.append(a)
-#         dataY.append(dataset[i + look_back, 0])
-#
-#     return np.array(dataX), np.array(dataY)
-def create_dataset(dataset, start, end, num_of_counties):
+def create_dataset(dataset, look_back=1):
+    dataX, dataY = [], []
 
-    dataX, dataY = [], [],
+    for i in range(len(dataset)-look_back-1):
+        a = dataset[i:(i+look_back), 0]
+        dataX.append(a)
+        dataY.append(dataset[i + look_back, 0])
 
-    for j in xrange(num_of_counties):
-
-        X = [ dataset[i:(i+LOOK_BACK), j] for i in xrange(start, end)] # len(dataset[j])-LOOK_BACK-1)]
-        Y = [ dataset[ i + LOOK_BACK, j] for i  in xrange(start , end)]
-
-        # X = [ dataset[j,i:(i+LOOK_BACK)] for i in xrange(len(dataset[j])-LOOK_BACK-1)]
-        # Y = [ dataset[j, i + LOOK_BACK] for i  in xrange(len(dataset[j])-LOOK_BACK-1) ]
-        dataX.extend(X)
-        dataY.extend(Y)
-        # else:
-        #     testX.extend(X)
-        #     testY.extend(Y)
-
-    return np.array(dataX), np.array(dataY) #, np.array(testX) , np.array(testY)
+    return np.array(dataX), np.array(dataY)
 
 
 # Get only county, month values
@@ -67,7 +38,6 @@ def get_county_month(dataset):
     dataset = np.transpose(dataset)
     dataset = dataset.astype('float32')
     return dataset
-
 
 # This method normalizes the data using the mean and
 # standard deviation, obtained using the train data
@@ -90,7 +60,7 @@ def build_LSTM(trainX, trainY, testX, testY, look_back):
     model = Sequential()
     model.add(LSTM(4, batch_input_shape=(batch_size, look_back, 1), stateful=True))
     model.add(Dense(1))
-    
+
     model.compile(loss='mean_squared_error', optimizer='adam')
 
     print "TrainX: ", trainX.shape
@@ -107,35 +77,38 @@ def build_LSTM(trainX, trainY, testX, testY, look_back):
     model.reset_states()
     testPredict = model.predict(testX, batch_size=batch_size)
 
-
-def get_train_and_test(dataset, train_size):
-
+def get_train_and_test(dataset, train_size, test_size):
     # reshape into X=t and Y=t+1
+    look_back = LOOK_BACK
+    train, test = dataset[0: train_size, :], dataset[train_size: len(dataset), :]
 
-    num_of_months = dataset.shape[1]-1
-    num_of_counties = dataset.shape[0]
+    trainX, trainY = create_dataset(train, look_back)
+    testX, testY = create_dataset(test, look_back)
 
-    trainX, trainY = create_dataset(dataset,  start= 0 , end = train_size - LOOK_BACK-1, num_of_counties = num_of_counties )
-    testX, testY = create_dataset(dataset,  start= train_size - LOOK_BACK-1 , end = num_of_months - LOOK_BACK-1, num_of_counties = num_of_counties)
 
+    print "TrainX: ", trainX.shape
+    print "TestX: ", testX.shape
     # reshape input to be [samples, time steps, features]
     trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
     testX = np.reshape(testX, (testX.shape[0], testX.shape[1], 1))
-  
+
     return trainX, trainY, testX, testY
 
 
 def build_lstm_on_labels():
-    db_wrapper = DB_wrapper()                       
-    dataframe = db_wrapper.retrieve_data(DB_info.SAF_TABLE) #get_dataframe()
+    db_wrapper = DB_wrapper()
+    dataframe = db_wrapper.retrieve_data(DB_info.TABLE_NAME) #get_dataframe()
     dataset = normalize(get_county_month(dataframe.values), TRAIN_MONTHS)
 
     print "Dataset shape: ", dataset.shape
-                             
+
     # split into train and test sets
     train_size = TRAIN_MONTHS
-    trainX, trainY, testX, testY = get_train_and_test(dataset, train_size)
-    build_LSTM(trainX, trainY, testX, testY, LOOK_BACK)
+    test_size = len(dataset) - train_size
+
+    look_back = LOOK_BACK
+    trainX, trainY, testX, testY = get_train_and_test(dataset, train_size, test_size)
+    build_LSTM(trainX, trainY, testX, testY, look_back)
 
 
 if __name__ == "__main__":
