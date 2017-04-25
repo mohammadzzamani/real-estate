@@ -80,7 +80,10 @@ def get_county_month(dataset):
 # MonthN ......
 def normalize(dataset, train_size):
     mean = np.mean(dataset[1: train_size], axis = 0)
+    print 'mean: ' , mean.shape
     standard_deviation = np.std(dataset[1: train_size], axis = 0)
+    print 'standard_deviation: ' , standard_deviation.shape
+    print 'dataset: ' , dataset.shape
     dataset = (dataset - mean)/standard_deviation
     return dataset
 
@@ -137,8 +140,8 @@ def get_train_and_test(dataset, train_size):
 def build_lstm_on_labels():
     db_wrapper = DB_wrapper()
     dataframe = db_wrapper.retrieve_data(DB_info.SAF_TABLE) #get_dataframe()
-    dataset = get_county_month(dataframe.values)
-    # dataset = normalize(get_county_month(dataframe.values), TRAIN_MONTHS)
+    # dataset = get_county_month(dataframe.values)
+    dataset = normalize(get_county_month(dataframe.values), TRAIN_MONTHS)
 
     print "Dataset shape: ", dataset.shape
 
