@@ -64,7 +64,7 @@ def get_county_month(dataset):
     month = dataset[:, INIT_SKIP: INIT_SKIP + MONTH_COLUMNS]
 
     dataset = np.concatenate((county, month), axis = 1)
-    # dataset = np.transpose(dataset)
+    dataset = np.transpose(dataset)
     dataset = dataset.astype('float32')
     return dataset
 
@@ -114,7 +114,7 @@ def get_train_and_test(dataset, train_size):
 
     num_of_months = dataset.shape[1]-1
     num_of_counties = dataset.shape[0]
-    
+
     trainX, trainY = create_dataset(dataset,  start= 0 , end = train_size - LOOK_BACK-1, num_of_counties = num_of_counties )
     testX, testY = create_dataset(dataset,  start= train_size - LOOK_BACK-1 , end = num_of_months - LOOK_BACK-1, num_of_counties = num_of_counties)
 
