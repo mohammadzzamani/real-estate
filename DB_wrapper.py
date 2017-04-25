@@ -13,33 +13,10 @@ import DB_info
 
 class DB_wrapper:
 
-    # tables = ['features', 'features']
-
-
     def __init__(self):
         self.connectMysqlDB()
 
 
-    # def get_dataframe(db_info):
-    # # Create SQL engine
-    # myDB = URL(drivername='mysql', database=db_info.DB, query={
-    #             'read_default_file' : db_info.CONF_FILE })
-    # engine = create_engine(name_or_url=myDB)
-    # connection = engine.connect()
-    #
-    # query = connection.execute('select * from %s' % db_info.TABLE_NAME)
-    # df_feat = pd.DataFrame(query.fetchall())
-    # df_feat.columns = query.keys()
-    #
-    # return df_feat
-
-
-
-    # def main(self):
-    #     train_data , test_data = self.retrieve_input(DB_info)
-    #     for index , row in data_frame.iterrows():
-    #         print index, ' , ', row
-    #     return  train_data , test_data
 
     def connectMysqlDB(self):
                 myDB = URL(drivername='mysql', database=DB_info.DB, query={'read_default_file' : DB_info.CONF_FILE })
