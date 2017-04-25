@@ -10,6 +10,7 @@ from sklearn.metrics import mean_squared_error
 from DB_wrapper import DB_wrapper
 from keras import optimizers
 from keras import layers
+from keras.layers.normalization import BatchNormalization
 
 
 
@@ -110,12 +111,14 @@ def build_LSTM(trainX, trainY, testX, testY):
     batch_size = 10
     model = Sequential()
     model.add(LSTM(4, batch_input_shape=(batch_size, LOOK_BACK, 1), stateful=True))
+    model.add(BatchNormalization())
     model.add(layers.core.Dropout(0.5))
     model.add(Dense(10))
+    model.add(BatchNormalization())
     model.add(Dense(1))
 
     # optimizers.adam(lr=0.01, clipnorm=1)
-    sgd = optimizers.SGD(lr=0.01, clipnorm=1)
+    sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=sgd)
 
     print "TrainX: ", trainX.shape
