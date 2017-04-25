@@ -26,7 +26,7 @@ TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
 COUNTY_COLUMN_NUMBER = 107
-LOOK_BACK = 5
+LOOK_BACK = 3
 
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, start , end, num_of_counties):
@@ -88,10 +88,10 @@ def normalize(dataset, train_size):
     return dataset
 
 
-def build_LSTM(trainX, trainY, testX, testY, look_back):
+def build_LSTM(trainX, trainY, testX, testY):
     batch_size = 25
     model = Sequential()
-    model.add(LSTM(5, batch_input_shape=(batch_size, look_back, 1), stateful=True))
+    model.add(LSTM(2, batch_input_shape=(batch_size, LOOK_BACK, 1), stateful=True))
     model.add(Dense(1))
 
     model.compile(loss='mean_squared_error', optimizer='adam')
@@ -153,7 +153,7 @@ def build_lstm_on_labels():
 
     look_back = LOOK_BACK
     trainX, trainY, testX, testY = get_train_and_test(dataset, train_size)
-    build_LSTM(trainX, trainY, testX, testY, look_back)
+    build_LSTM(trainX, trainY, testX, testY)
 
 
 if __name__ == "__main__":
