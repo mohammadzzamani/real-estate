@@ -148,6 +148,8 @@ def get_train_and_test(dataset, train_size):
             if trainX[i,j] is None:
                 print ' i , j : ' , i, j
 
+    print trainX[10,0:25]
+
 
     # for i in xrange(testX.shape[0]):
     #     for j in xrange(testX.shape[1]):
