@@ -9,6 +9,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 from DB_wrapper import DB_wrapper
 from keras import optimizers
+from keras import layers
+
 
 
 from sqlalchemy import create_engine
@@ -107,7 +109,8 @@ def normalize(dataset, train_size):
 def build_LSTM(trainX, trainY, testX, testY):
     batch_size = 10
     model = Sequential()
-    model.add(LSTM(4, batch_input_shape=(batch_size, LOOK_BACK, 1), stateful=True))
+    model.add(LSTM(4, batch_input_shape=(batch_size, LOOK_BACK, 1), stateful=True, show_accuracy=True))
+    model.add(layers.core.Dropout(0.5))
     model.add(Dense(1))
 
     # optimizers.adam(lr=0.01, clipnorm=1)
