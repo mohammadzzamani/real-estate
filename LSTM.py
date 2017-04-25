@@ -156,9 +156,9 @@ def get_train_and_test(dataset, train_size):
     # trainX, trainY = create_dataset(train, look_back)
     # testX, testY = create_dataset(test, look_back)
 
-    trainX = trainX[:1600, :]
+    trainX = trainX[:1800, :]
     testX = testX[0:100, :]
-    trainY = trainY[:1600]
+    trainY = trainY[:1800]
     testY = testY[0:100]
 
     print "TrainX: ", trainX.shape
