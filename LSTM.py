@@ -37,14 +37,14 @@ LOOK_BACK = 12
 #         dataY.append(dataset[i + look_back, 0])
 #
 #     return np.array(dataX), np.array(dataY)
-def create_dataset(dataset, start, end):
+def create_dataset(dataset, start, end, num_of_counties):
 
     dataX, dataY = [], [],
 
-    for j in xrange(len(dataset)):
+    for j in xrange(num_of_counties):
 
-        X = [ dataset[j,i:(i+LOOK_BACK)] for i in xrange(start, end)] # len(dataset[j])-LOOK_BACK-1)]
-        Y = [ dataset[j, i + LOOK_BACK] for i  in xrange(start , end)]
+        X = [ dataset[i:(i+LOOK_BACK), j] for i in xrange(start, end)] # len(dataset[j])-LOOK_BACK-1)]
+        Y = [ dataset[ i + LOOK_BACK, j] for i  in xrange(start , end)]
 
         # X = [ dataset[j,i:(i+LOOK_BACK)] for i in xrange(len(dataset[j])-LOOK_BACK-1)]
         # Y = [ dataset[j, i + LOOK_BACK] for i  in xrange(len(dataset[j])-LOOK_BACK-1) ]
@@ -108,12 +108,15 @@ def build_LSTM(trainX, trainY, testX, testY, look_back):
     testPredict = model.predict(testX, batch_size=batch_size)
 
 
-def get_train_and_test(dataset, train_size, num_of_months):
+def get_train_and_test(dataset, train_size):
 
     # reshape into X=t and Y=t+1
 
-    trainX, trainY = create_dataset(dataset,  start= 0 , end = train_size - LOOK_BACK-1)
-    testX, testY = create_dataset(dataset,  start= train_size - LOOK_BACK-1 , end = len(dataset) - LOOK_BACK-1)
+    num_of_months = dataset.shape[1]-1
+    num_of_counties = dataset.shape[0]
+    
+    trainX, trainY = create_dataset(dataset,  start= 0 , end = train_size - LOOK_BACK-1, num_of_counties = num_of_counties )
+    testX, testY = create_dataset(dataset,  start= train_size - LOOK_BACK-1 , end = num_of_months - LOOK_BACK-1, num_of_counties = num_of_counties)
 
     # reshape input to be [samples, time steps, features]
     trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
@@ -131,8 +134,7 @@ def build_lstm_on_labels():
                              
     # split into train and test sets
     train_size = TRAIN_MONTHS
-    num_of_months = dataset.shape[1]-1
-    trainX, trainY, testX, testY = get_train_and_test(dataset, train_size, num_of_months)
+    trainX, trainY, testX, testY = get_train_and_test(dataset, train_size)
     build_LSTM(trainX, trainY, testX, testY, LOOK_BACK)
 
 
