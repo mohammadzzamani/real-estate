@@ -143,6 +143,17 @@ def get_train_and_test(dataset, train_size):
     trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
     testX = np.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 
+    for i in xrange(trainX.shape[0]):
+        for j in xrange(trainX.shape[1]):
+            if trainX[i,j] is None:
+                print ' i , j : ' , i, j
+
+
+    # for i in xrange(testX.shape[0]):
+    #     for j in xrange(testX.shape[1]):
+    #         if testX[i,j] is None:
+    #             print ' i , j : ' , i, j
+
     return trainX, trainY, testX, testY
 
 
