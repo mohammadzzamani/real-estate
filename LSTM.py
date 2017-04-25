@@ -52,7 +52,7 @@ def create_dataset(dataset, train_test_split):
             testX.extend(X)
             testY.extend(Y)
 
-    return trainX, trainY, testX , testY
+    return np.array(trainX), np.array(trainY), np.array(testX) , np.array(testY)
 
 
 # Get only county, month values
