@@ -30,7 +30,7 @@ TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
 COUNTY_COLUMN_NUMBER = 107
-LOOK_BACK = 20
+LOOK_BACK = 25
 
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, start , end, num_of_counties):
@@ -110,7 +110,7 @@ def normalize(dataset, train_size):
 def build_LSTM(trainX, trainY, testX, testY):
     batch_size = 20
     model = Sequential()
-    model.add(LSTM(10, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = False))
+    model.add(LSTM(15, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = False))
     model.add(BatchNormalization())
     model.add(layers.core.Dropout(0.2))
     # model.add(LSTM(2,return_sequences=False))
