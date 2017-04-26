@@ -108,6 +108,7 @@ def normalize(dataset, train_size):
 
 
 def build_LSTM(trainX, trainY, testX, testY):
+    print 'baseline: ', mean_squared_error(testY, testX[:, -1])
     batch_size = 20
     model = Sequential()
     model.add(LSTM(20, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = True))
@@ -120,9 +121,9 @@ def build_LSTM(trainX, trainY, testX, testY):
     # model.add(BatchNormalization())
     model.add(Dense(1))
 
-    # optimizers.adam(lr=0.01, clipnorm=1)
-    sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
-    model.compile(loss='mean_squared_error', optimizer=sgd)
+    adam = optimizers.adam(lr=0.01)
+    # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
+    model.compile(loss='mean_squared_error', optimizer=adam)
 
     print "TrainX: ", trainX.shape
     print "TrainY: ", trainY.shape
