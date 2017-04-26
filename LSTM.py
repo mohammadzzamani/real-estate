@@ -224,7 +224,7 @@ def remove_nan(X, Y):
 
 def build_lstm_on_labels():
     db_wrapper = DB_wrapper()
-    dataframe = db_wrapper.retrieve_data(DB_info.IP_TABLE) #get_dataframe()
+    dataframe = db_wrapper.retrieve_data(DB_info.SAF_TABLE) #get_dataframe()
     # dataset = get_county_month(dataframe.values)
     dataset = normalize(get_county_month(dataframe.values), TRAIN_MONTHS)
 
