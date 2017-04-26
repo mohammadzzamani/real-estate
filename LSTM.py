@@ -12,6 +12,7 @@ from keras import optimizers
 from keras import layers
 from keras.layers.normalization import BatchNormalization
 import keras.backend as K
+import random
 
 
 from sqlalchemy import create_engine
@@ -133,7 +134,11 @@ def build_LSTM(trainX, trainY, testX, testY):
     print "TestY: ", testY.shape
 
     for i in range(nb_epoch):
-        adam.lr.set_value(lr)
+        rd = random.random()
+        if rd <0.9:
+            adam.lr.set_value(lr)
+        else:
+            adam.lr.set_value(lr*5)
         print 'i: ' , i , ' lr: ' , adam.lr.get_value()
         model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_split= 0.15 ) #validation_data=(testX, testY))
         # model.reset_states()
