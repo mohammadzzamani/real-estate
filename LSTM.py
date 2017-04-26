@@ -133,12 +133,11 @@ def build_LSTM(trainX, trainY, testX, testY):
     print "TestY: ", testY.shape
 
     for i in range(nb_epoch):
-	# model.fit(trainX, trainY, epochs=1, batch_size=batch_size, verbose=2, shuffle=False)
-	# model.reset_states()
-        lr *= decay
         adam.lr.set_value(lr)
         print 'lr: ' , adam.lr.get_value()
         model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_data=(testX, testY))
+        model.reset_states()
+        lr *= decay
 
     # for i in range(100):
     #     model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
@@ -146,7 +145,7 @@ def build_LSTM(trainX, trainY, testX, testY):
 
     # make predictions
     trainPredict = model.predict(trainX, batch_size=batch_size, verbose = 1)
-    # model.reset_states()
+    model.reset_states()
     testPredict = model.predict(testX, batch_size=batch_size, verbose = 1)
 
 
