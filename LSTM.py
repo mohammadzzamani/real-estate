@@ -102,7 +102,7 @@ def normalize(dataset, train_size):
     # standard_deviation = np.std(dataset[1: train_size], axis = 0)
     # print 'standard_deviation: ' , standard_deviation.shape
     # print 'dataset: ' , dataset.shape
-    dataset = (dataset - minimum)/ (100.0 * (maximum-minimum))
+    dataset = ((dataset - minimum)* 100.0)/ (maximum-minimum)
     # dataset = (dataset - mean)/standard_deviation
     return dataset
 
