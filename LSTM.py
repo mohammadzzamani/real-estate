@@ -138,7 +138,9 @@ def build_LSTM(trainX, trainY, testX, testY):
     trainPredict = model.predict(trainX, batch_size=batch_size, verbose = 1)
     # model.reset_states()
     testPredict = model.predict(testX, batch_size=batch_size, verbose = 1)
-    print np.sum(np.abs(testY))
+
+    print 'baseline: ', mean_squared_error(testY, testX[:, -1])
+    print 'avg(abs(.)): ', np.average(np.abs(testY))
 
 def get_train_and_test(dataset, train_size):
     # reshape into X=t and Y=t+1
@@ -196,7 +198,7 @@ def remove_nan(X, Y):
         for j in xrange(shape1):
             if X[i,j] is None or math.isnan(X[i,j]):
                 remove = 1
-                print ' i , j : ' , i, j
+                # print ' i , j : ' , i, j
                 # print X[i,:]
         if remove == 1:
             X = np.delete(X, (i), axis=0)
