@@ -130,7 +130,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     print "TestX: ", testX.shape
     print "TestY: ", testY.shape
 
-    model.fit(trainX, trainY, nb_epoch=20, batch_size=batch_size, verbose=1, shuffle=True, validation_data=(testX, testY)])
+    model.fit(trainX, trainY, nb_epoch=20, batch_size=batch_size, verbose=1, shuffle=True, validation_data=(testX, testY))
 
     # for i in range(100):
     #     model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
