@@ -122,7 +122,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     model.add(Dense(1))
     lr = 0.005
     decay = 0.9
-    nb_epoch = 30
+    nb_epoch = 20
     adam = optimizers.adam(lr=lr)
     # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=adam)
