@@ -121,7 +121,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     # model.add(BatchNormalization())
     model.add(Dense(1))
 
-    adam = optimizers.adam(lr=0.002)
+    adam = optimizers.adam(lr=0.002, decay=1e-6)
     # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=adam)
 
@@ -130,7 +130,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     print "TestX: ", testX.shape
     print "TestY: ", testY.shape
 
-    model.fit(trainX, trainY, nb_epoch=20, batch_size=batch_size, verbose=1, shuffle=True, validation_data=(testX, testY))
+    model.fit(trainX, trainY, nb_epoch=20, batch_size=batch_size, verbose=1, shuffle=True, validation_data=(testX, testY)])
 
     # for i in range(100):
     #     model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
