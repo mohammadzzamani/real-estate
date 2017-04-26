@@ -115,8 +115,8 @@ def build_LSTM(trainX, trainY, testX, testY):
     model.add(layers.core.Dropout(0.2))
     # model.add(LSTM(2,return_sequences=False))
     # model.add(layers.core.Dropout(0.2))
-    model.add(Dense(5))
-    model.add(layers.core.Dropout(0.2))
+    # model.add(Dense(5))
+    # model.add(layers.core.Dropout(0.2))
     # model.add(BatchNormalization())
     model.add(Dense(1))
 
