@@ -13,11 +13,6 @@ from keras import layers
 from keras.layers.normalization import BatchNormalization
 import keras.backend as K
 
-class SGDLearningRateTracker(Callback):
-    def on_epoch_end(self, epoch, logs={}):
-        optimizer = self.model.optimizer
-        lr = K.eval(optimizer.lr * (1. / (1. + optimizer.decay * optimizer.iterations)))
-        print('\nLR: {:.6f}\n'.format(lr))
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
