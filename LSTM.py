@@ -121,7 +121,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     # model.add(BatchNormalization())
     model.add(Dense(1))
 
-    adam = optimizers.adam(lr=0.01)
+    adam = optimizers.adam(lr=0.005)
     # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=adam)
 
