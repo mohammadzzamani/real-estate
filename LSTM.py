@@ -196,10 +196,10 @@ def remove_nan(X, Y):
             if X[i,j] is None or math.isnan(X[i,j]):
                 remove = 1
                 print ' i , j : ' , i, j
-                print X[i,:]
+                # print X[i,:]
         if remove == 1:
-            trainX = np.delete(X, (i), axis=0)
-            trainY = np.delete(Y, (i), axis=0)
+            X = np.delete(X, (i), axis=0)
+            Y = np.delete(Y, (i), axis=0)
     print X.shape, ' , ', Y.shape
 
     return X, Y
