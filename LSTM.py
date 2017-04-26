@@ -135,9 +135,9 @@ def build_LSTM(trainX, trainY, testX, testY):
     #     model.reset_states()
 
     # make predictions
-    trainPredict = model.predict(trainX, batch_size=batch_size)
-    model.reset_states()
-    testPredict = model.predict(testX, batch_size=batch_size)
+    trainPredict = model.predict(trainX, batch_size=batch_size, verbose = 1)
+    # model.reset_states()
+    testPredict = model.predict(testX, batch_size=batch_size, verbose = 1)
 
 def get_train_and_test(dataset, train_size):
     # reshape into X=t and Y=t+1
@@ -171,20 +171,8 @@ def get_train_and_test(dataset, train_size):
     testX = np.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 
 
-    print trainX.shape
-    shape0 = trainX.shape[0]
-    shape1 = trainX.shape[1]
-    for i in reversed(xrange(shape0)):
-        remove = 0
-        for j in xrange(shape1):
-            if trainX[i,j] is None or math.isnan(trainX[i,j]):
-                remove = 1
-                print ' i , j : ' , i, j
-                print trainX[i,:]
-        if remove == 1:
-            trainX = np.delete(trainX, (i), axis=0)
-            trainY = np.delete(trainY, (i), axis=0)
-    print trainX.shape
+    trainX, trainY = remove_nan(trainX, trainY)
+    testX, testY = remove_nan(testX, testY)
 
 
     # print trainX[0:100,0:25]
@@ -196,6 +184,25 @@ def get_train_and_test(dataset, train_size):
     #             print ' i , j : ' , i, j
 
     return trainX, trainY, testX, testY
+
+def remove_nan(X, Y):
+
+
+    shape0 = X.shape[0]
+    shape1 = X.shape[1]
+    for i in reversed(xrange(shape0)):
+        remove = 0
+        for j in xrange(shape1):
+            if X[i,j] is None or math.isnan(X[i,j]):
+                remove = 1
+                print ' i , j : ' , i, j
+                print X[i,:]
+        if remove == 1:
+            trainX = np.delete(X, (i), axis=0)
+            trainY = np.delete(Y, (i), axis=0)
+    print X.shape, ' , ', Y.shape
+
+    return X, Y
 
 
 def build_lstm_on_labels():
