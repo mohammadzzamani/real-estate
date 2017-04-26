@@ -25,7 +25,7 @@ import DB_info
 # So skip 8 initial columns + columns from 2008/07 to 2011/10 = 8 + 6 + 12*2 + 10 = 48 columns
 INIT_SKIP = 48
 MONTH_COLUMNS = 45
-TRAIN_MONTHS = 41
+TRAIN_MONTHS = 43
 TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
