@@ -30,7 +30,7 @@ TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
 COUNTY_COLUMN_NUMBER = 107
-LOOK_BACK = 5
+LOOK_BACK = 12
 
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, start , end, num_of_counties):
@@ -110,11 +110,11 @@ def normalize(dataset, train_size):
 def build_LSTM(trainX, trainY, testX, testY):
     batch_size = 10
     model = Sequential()
-    model.add(LSTM(10, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = True))
+    model.add(LSTM(5, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = False))
     model.add(BatchNormalization())
     model.add(layers.core.Dropout(0.2))
-    model.add(LSTM(4,return_sequences=False))
-    model.add(layers.core.Dropout(0.2))
+    # model.add(LSTM(4,return_sequences=False))
+    # model.add(layers.core.Dropout(0.2))
     model.add(Dense(1))
     # model.add(BatchNormalization())
     # model.add(Dense(1))
@@ -217,10 +217,7 @@ def build_lstm_on_labels():
     print "Dataset shape: ", dataset.shape
 
     # split into train and test sets
-    train_size = TRAIN_MONTHS
-    test_size = len(dataset) - train_size
-
-    trainX, trainY, testX, testY = get_train_and_test(dataset, train_size)
+    trainX, trainY, testX, testY = get_train_and_test(dataset, TRAIN_MONTHS)
     build_LSTM(trainX, trainY, testX, testY)
 
 
