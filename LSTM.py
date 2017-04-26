@@ -121,8 +121,8 @@ def build_LSTM(trainX, trainY, testX, testY):
     # model.add(BatchNormalization())
     model.add(Dense(1))
     lr = 0.005
-    decay = 0.9
-    nb_epoch = 20
+    decay = 0.95
+    nb_epoch = 50
     adam = optimizers.adam(lr=lr)
     # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=adam)
@@ -136,7 +136,10 @@ def build_LSTM(trainX, trainY, testX, testY):
         adam.lr.set_value(lr)
         print 'i: ' , i , ' lr: ' , adam.lr.get_value()
         model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_split= 0.15 ) #validation_data=(testX, testY))
-        model.reset_states()
+        # model.reset_states()
+        if i % 5 == 0:
+            testPredict = model.predict(testX, batch_size=batch_size, verbose = 1)
+            print 'lstm_i: ' , mean_squared_error(testY, testPredict)
         lr *= decay
 
     # for i in range(100):
