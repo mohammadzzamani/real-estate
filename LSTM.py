@@ -136,7 +136,8 @@ def build_LSTM(trainX, trainY, testX, testY):
 	# model.fit(trainX, trainY, epochs=1, batch_size=batch_size, verbose=2, shuffle=False)
 	# model.reset_states()
         lr *= decay
-        adam.lr.set_value(lr)
+        # adam.lr.set_value(lr)
+        adam.__setattr__('lr',lr)
         print 'lr: ' , model.lr.get_value()
         model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_data=(testX, testY))
 
