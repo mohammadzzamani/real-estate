@@ -120,7 +120,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     # model.add(layers.core.Dropout(0.2))
     # model.add(BatchNormalization())
     model.add(Dense(1))
-    lr = 0.5
+    lr = 0.05
     decay = 0.9
     nb_epoch = 30
     adam = optimizers.adam(lr=lr)
