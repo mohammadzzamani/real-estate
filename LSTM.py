@@ -139,7 +139,9 @@ def build_LSTM(trainX, trainY, testX, testY):
     # model.reset_states()
     testPredict = model.predict(testX, batch_size=batch_size, verbose = 1)
 
+
     print 'baseline: ', mean_squared_error(testY, testX[:, -1])
+    print 'lstm: ' , mean_squared_error(testY, testPredict)
     print 'avg(abs(.)): ', np.average(np.abs(testY))
 
 def get_train_and_test(dataset, train_size):
