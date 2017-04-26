@@ -111,13 +111,14 @@ def build_LSTM(trainX, trainY, testX, testY):
     batch_size = 10
     model = Sequential()
     model.add(LSTM(5, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = False))
-    model.add(BatchNormalization())
-    model.add(layers.core.Dropout(0.2))
-    # model.add(LSTM(4,return_sequences=False))
-    # model.add(layers.core.Dropout(0.2))
-    model.add(Dense(1))
     # model.add(BatchNormalization())
-    # model.add(Dense(1))
+    model.add(layers.core.Dropout(0.2))
+    # model.add(LSTM(2,return_sequences=False))
+    # model.add(layers.core.Dropout(0.2))
+    model.add(Dense(5))
+    model.add(layers.core.Dropout(0.2))
+    # model.add(BatchNormalization())
+    model.add(Dense(1))
 
     # optimizers.adam(lr=0.01, clipnorm=1)
     sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
@@ -128,7 +129,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     print "TestX: ", testX.shape
     print "TestY: ", testY.shape
 
-    model.fit(trainX, trainY, nb_epoch=10, batch_size=batch_size, verbose=1, shuffle=True)
+    model.fit(trainX, trainY, nb_epoch=3, batch_size=batch_size, verbose=1, shuffle=True)
 
     # for i in range(100):
     #     model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
