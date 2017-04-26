@@ -111,7 +111,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     batch_size = 10
     model = Sequential()
     model.add(LSTM(5, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = False))
-    # model.add(BatchNormalization())
+    model.add(BatchNormalization())
     model.add(layers.core.Dropout(0.2))
     # model.add(LSTM(2,return_sequences=False))
     # model.add(layers.core.Dropout(0.2))
