@@ -5,17 +5,14 @@ import math
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 from DB_wrapper import DB_wrapper
+from keras import optimizers
+from keras import layers
+import random
 
-from sqlalchemy import create_engine
-from sqlalchemy.engine.url import URL
-
+import Util
 import DB_info
-
-
-TABLE_NAME = 'saf_interp'
 
 # Initially 8 columns
 # columns from 2008/07 to 2016/09 = 6 + 84 + 9 = 99 columns
@@ -23,167 +20,170 @@ TABLE_NAME = 'saf_interp'
 # So skip 8 initial columns + columns from 2008/07 to 2011/10 = 8 + 6 + 12*2 + 10 = 48 columns
 INIT_SKIP = 48
 MONTH_COLUMNS = 45
+TRAIN_MONTHS = 43
+# TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
-COUNTY_COLUMN_NUMBER = 107
-
-
-# def get_dataframe():
-#     # Create SQL engine
-#     myDB = URL(drivername='mysql', database=DB_info.DB, query={
-#                 'read_default_file' : DB_info.CONF_FILE })
-#     engine = create_engine(name_or_url=myDB)
-#     connection = engine.connect()
-#
-#     query = connection.execute('select * from %s' % DB_info.TABLE_NAME)
-#     df_feat = pd.DataFrame(query.fetchall())
-#     df_feat.columns = query.keys()
-#
-#     return df_feat
-
+#IP:
+# COUNTY_COLUMN_NUMBER = 113
+#MSP:
+COUNTY_COLUMN_NUMBER = 104
+#SAF:
+# COUNTY_COLUMN_NUMBER = 107
+LOOK_BACK = 30
 
 # convert an array of values into a dataset matrix
-def create_dataset(dataset, train_test_split, look_back=12):
-
-    trainX, trainY, testX , testY = [], [], [], []
-
-    for j in xrange(len(dataset)):
-        X = [ dataset[j,i:(i+look_back)] for i in xrange(len(dataset[j])-look_back-1)]
-        Y = [ dataset[j, i + look_back] for i  in xrange(len(dataset[j])-look_back-1) ]
-
-        if j < train_test_split:
-            trainX.extend(X)
-            trainY.extend(Y)
-        else:
-            testX.extend(X)
-            testY.extend(Y)
-
-    return trainX, trainY, testX , testY
-    #
-    #
-    # for i in range(len(dataset)-look_back-1):
-    #     a = dataset[i:(i+look_back), 0]
-    #     dataX.append(a)
-    #     dataY.append(dataset[i + look_back, 0])
-    #
-    # return np.array(dataX), np.array(dataY)
+def create_dataset(dataset, start , end, num_of_counties):
 
 
+    dataX, dataY = [], []
 
-# fix random seed for reproducibility
-np.random.seed(7)
+    for j in xrange(num_of_counties):
+
+        X = [ dataset[i:(i+LOOK_BACK), j] for i in xrange(start, end)] # len(dataset[j])-LOOK_BACK-1)]
+        Y = [ dataset[ i + LOOK_BACK, j] for i  in xrange(start , end)]
+
+        # X = [ dataset[j,i:(i+LOOK_BACK)] for i in xrange(len(dataset[j])-LOOK_BACK-1)]
+        # Y = [ dataset[j, i + LOOK_BACK] for i  in xrange(len(dataset[j])-LOOK_BACK-1) ]
+        dataX.extend(X)
+        dataY.extend(Y)
+        # else:
+        #     testX.extend(X)
+        #     testY.extend(Y)
+
+    return np.array(dataX), np.array(dataY) #, np.array(testX) , np.array(testY)
 
 
-# load the dataset
-# db_info = DB_info()
-
-db_wrapper = DB_wrapper()
-dataframe = db_wrapper.retrieve_data(TABLE_NAME)
-dataset = dataframe.values
 
 # Get only county, month values
-county = dataset[:, COUNTY_COLUMN_NUMBER]
-county = np.reshape(county, (len(county), 1))
-month = dataset[:, INIT_SKIP: INIT_SKIP + MONTH_COLUMNS]
+def get_county_month(dataset):
+    county = dataset[:, COUNTY_COLUMN_NUMBER]
+    county = np.reshape(county, (len(county), 1))
+    month = dataset[:, INIT_SKIP: INIT_SKIP + MONTH_COLUMNS]
 
-print county.shape
-print month.shape
-
-
-dataset = np.concatenate((county, month), axis = 1)
-
-
-#dataset is of size |county| *  (|months|+1)
-# dataset = np.transpose(dataset)
-dataset = dataset.astype('float32')
-
-# reshape into X=t and Y=t+1
-look_back = 12
-num_of_months = month.shape[1]
-train_test_split = 0.67
-trainX, trainY, testX , testY = create_dataset(dataset,  train_test_split= num_of_months * train_test_split, look_back)
-
-# split into train and test sets
-# train_size = int(len(dataset) * 0.67)
-# test_size = len(dataset) - train_size
-# split on dataX and dataY
-# train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
+    dataset = np.concatenate((county, month), axis = 1)
+    dataset = np.transpose(dataset)
+    dataset = dataset.astype('float32')
+    return dataset
 
 
-# normalize the dataset
-#scaler = MinMaxScaler(feature_range=(0, 1))
-#dataset = scaler.fit_transform(dataset)
 
 
-########### swap split and create_dataset
 
-# split into train and test sets
-# train_size = int(len(dataset) * 0.67)
-# test_size = len(dataset) - train_size
-# train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
+def build_LSTM(trainX, trainY, testX, testY):
+    print 'baseline: ', mean_squared_error(testY, testX[:, -1])
+    batch_size = 25
+    model = Sequential()
+    model.add(LSTM(20, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = True))
+    # model.add(BatchNormalization())
+    model.add(layers.core.Dropout(0.2))
+    model.add(LSTM(5,return_sequences=False))
+    model.add(layers.core.Dropout(0.2))
+    # model.add(Dense(5))
+    # model.add(layers.core.Dropout(0.2))
+    # model.add(BatchNormalization())
+    model.add(Dense(1))
+    lr = 0.005
+    decay = 0.95
+    nb_epoch = 100
+    adam = optimizers.adam(lr=lr)
+    # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
+    model.compile(loss='mean_squared_error', optimizer=adam)
 
+    print "TrainX: ", trainX.shape
+    print "TrainY: ", trainY.shape
+    print "TestX: ", testX.shape
+    print "TestY: ", testY.shape
 
-# reshape into X=t and Y=t+1
-# look_back = 3
-# trainX, trainY = create_dataset(train, look_back)
-# testX, testY = create_dataset(test, look_back)
-#trainX
+    for i in range(nb_epoch):
+        rd = random.random()
+        if rd <0.95:
+            # adam.__setattr__('lr', lr)
+            adam.lr.set_value(lr)
+        else:
+            # adam.__setattr__('lr', lr*5)
+            adam.lr.set_value(lr*2)
 
+        print 'i: ' , i , ' lr: ' , adam.lr.get_value() #adam.__getattribute__('lr') # adam.lr.get_value()
+        model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_split= 0.15 ) #validation_data=(testX, testY))
+        # model.reset_states()
+        if i % 5 == 0:
+            testPredict = model.predict(testX, batch_size=batch_size, verbose = 1)
+            print 'lstm_i: ' , mean_squared_error(testY, testPredict)
+        lr *= decay
 
-# reshape input to be [samples, time steps, features]
-trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
-testX = np.reshape(testX, (testX.shape[0], testX.shape[1], 1))
+    # for i in range(100):
+    #     model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
+    #     model.reset_states()
 
-
-# def build_lstm()
-# create and fit the LSTM network
-batch_size = 1
-model = Sequential()
-model.add(LSTM(4, batch_input_shape=(batch_size, look_back, 1), stateful=True))
-model.add(Dense(1))
-model.compile(loss='mean_squared_error', optimizer='adam')
-
-
-for i in range(100):
-    model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
+    # make predictions
+    trainPredict = model.predict(trainX, batch_size=batch_size, verbose = 1)
     model.reset_states()
+    testPredict = model.predict(testX, batch_size=batch_size, verbose = 1)
 
 
-# make predictions
-trainPredict = model.predict(trainX, batch_size=batch_size)
-model.reset_states()
-testPredict = model.predict(testX, batch_size=batch_size)
+    print 'baseline: ', mean_squared_error(testY, testX[:, -1])
+    print 'lstm: ' , mean_squared_error(testY, testPredict)
+    print 'avg(abs(.)): ', np.average(np.abs(testY))
+
+def get_train_and_test(dataset, train_size):
+    # reshape into X=t and Y=t+1
+    # look_back = LOOK_BACK
+    # train, test = dataset[0: train_size, :], dataset[train_size: len(dataset), :]
+
+    num_of_months = dataset.shape[0]-1
+    num_of_counties = dataset.shape[1]
+
+    print 'num_of_months: ' , num_of_months , ' , num_of_counties: ' , num_of_counties
+    print 'start: ' , 0 , ' , end: ', (train_size - LOOK_BACK-1)
+    trainX, trainY = create_dataset(dataset,  start= 0 , end = train_size - LOOK_BACK-1, num_of_counties = num_of_counties )
+    print 'start: ' , (train_size - LOOK_BACK-1), ' , end: ', ( num_of_months - LOOK_BACK-1)
+    testX, testY = create_dataset(dataset,  start= train_size - LOOK_BACK-1 , end = num_of_months - LOOK_BACK-1, num_of_counties = num_of_counties)
+
+    # trainX, trainY = create_dataset(train, look_back)
+    # testX, testY = create_dataset(test, look_back)
+
+    print 'data:'
+    print trainX[1680,:]
+    print trainX[1681,:]
+    # trainX = trainX[:2000, :]
+    # testX = testX[0:100, :]
+    # trainY = trainY[:2000]
+    # testY = testY[0:100]
+
+    print "TrainX: ", trainX.shape
+    print "TestX: ", testX.shape
+    # reshape input to be [samples, time steps, features]
+    trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
+    testX = np.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 
 
-# # invert predictions
-# trainPredict = scaler.inverse_transform(trainPredict)
-# trainY = scaler.inverse_transform([trainY])
-# testPredict = scaler.inverse_transform(testPredict)
-# testY = scaler.inverse_transform([testY])
+    trainX, trainY = Util.remove_nan(trainX, trainY)
+    testX, testY = Util.remove_nan(testX, testY)
 
 
-# # calculate root mean squared error
-# trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
-# print('Train Score: %.2f RMSE' % (trainScore))
-# testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
-# print('Test Score: %.2f RMSE' % (testScore))
+    return trainX, trainY, testX, testY
 
 
-# # shift train predictions for plotting
-# trainPredictPlot = numpy.empty_like(dataset)
-# trainPredictPlot[:, :] = numpy.nan
-# trainPredictPlot[look_back:len(trainPredict)+look_back, :] = trainPredict
 
 
-# # shift test predictions for plotting
-# testPredictPlot = numpy.empty_like(dataset)
-# testPredictPlot[:, :] = numpy.nan
-# testPredictPlot[len(trainPredict)+(look_back*2)+1:len(dataset)-1, :] = testPredict
+def build_lstm_on_labels():
+    db_wrapper = DB_wrapper()
+    dataframe = db_wrapper.retrieve_data(DB_info.MSP_TABLE) #get_dataframe()
+    # dataset = get_county_month(dataframe.values)
+    dataset = Util.normalize_min_max(get_county_month(dataframe.values), TRAIN_MONTHS)
 
-# # plot baseline and predictions
-# plt.plot(scaler.inverse_transform(dataset))
-# plt.plot(trainPredictPlot)
-# plt.plot(testPredictPlot)
-# plt.show()
+    print "Dataset shape: ", dataset.shape
 
-print "--- Completed ---"
+    # split into train and test sets
+    trainX, trainY, testX, testY = get_train_and_test(dataset, TRAIN_MONTHS)
+
+    # do_pca(trainX, trainY, testX, testY)
+    build_LSTM(trainX, trainY, testX, testY)
+
+
+if __name__ == "__main__":
+    # fix random seed for reproducibility
+    np.random.seed(7)
+    build_lstm_on_labels()
+    print "--- Completed ---"
