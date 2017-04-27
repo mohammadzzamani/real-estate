@@ -138,8 +138,6 @@ def get_train_and_test(dataset, train_size):
     print 'start: ' , (train_size - LOOK_BACK-1), ' , end: ', ( num_of_months - LOOK_BACK-1)
     testX, testY = create_dataset(dataset,  start= train_size - LOOK_BACK-1 , end = num_of_months - LOOK_BACK-1, num_of_counties = num_of_counties)
 
-
-
     # trainX = trainX[:2000, :]
     # testX = testX[0:100, :]
     # trainY = trainY[:2000]
@@ -161,8 +159,15 @@ def get_train_and_test(dataset, train_size):
 
 def build_lstm_on_labels():
     db_wrapper = DB_wrapper()
-    dataframe = db_wrapper.retrieve_data(DB_info.MSP_TABLE) #get_dataframe()
+    dataframe = db_wrapper.retrieve_data(DB_info.MSP_FEATURES) #get_dataframe()
     # dataset = get_county_month(dataframe.values)
+
+    ####### do the reshape
+    # data = dataframe.values
+
+    # for i in xrange(data.shape[0]):
+
+
     dataset = Util.normalize_min_max(get_county_month(dataframe.values), TRAIN_MONTHS)
 
     print "Dataset shape: ", dataset.shape
