@@ -125,7 +125,7 @@ if __name__ == "__main__":
     for index, row in dataframe_train.iterrows():
         splitted = index.split('_')
         cnty = splitted[0]
-        month = splitted[1]
+        month = int(splitted[1]) -1 
         print cnty , ' , ', month
         if month <> 0:
             prev_month_id =  cnty+'_'+month
