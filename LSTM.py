@@ -13,9 +13,8 @@ from keras import layers
 from keras.layers.normalization import BatchNormalization
 import keras.backend as K
 import random
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+
+import Util
 
 # from sqlalchemy import create_engine
 # from sqlalchemy.engine.url import URL
@@ -81,53 +80,12 @@ def get_county_month(dataset):
     dataset = dataset.astype('float32')
     return dataset
 
-# This method normalizes the data using the mean and
-# standard deviation, obtained using the train data
-# only.
-# Note: This happens column wise, because the data has
-# been transposed.
-# Data is in the form:
-# County ......
-# Month1 ......
-# MonthN ......
-# def normalize(dataset, train_size):
-#     mean = np.mean(dataset[1: train_size], axis = 0)
-#     print 'mean: ' , mean.shape
-#     standard_deviation = np.std(dataset[1: train_size], axis = 0)
-#     print 'standard_deviation: ' , standard_deviation.shape
-#     print 'dataset: ' , dataset.shape
-#     dataset = (dataset - mean) * 10.0/standard_deviation
-#     return dataset
-
-def normalize(dataset, train_size):
-    minimum = np.min(dataset[1: train_size], axis = 0)
-    maximum = np.max(dataset[1: train_size], axis = 0)
-    print 'minimum'
-    # print minimum[1:20]
-    print 'maximum'
-    # print maximum[1:20]
-    print 'min: ' , minimum.shape
-    # standard_deviation = np.std(dataset[1: train_size], axis = 0)
-    # print 'standard_deviation: ' , standard_deviation.shape
-    # print 'dataset: ' , dataset.shape
-    dataset = ((dataset - minimum)* 100.0)/ (maximum-minimum)
-    # dataset = (dataset - mean)/standard_deviation
-    return dataset
 
 
-def do_pca(trainX, trainY, testX, testY):
-    pca = PCA(n_components=2)
 
-    trainX = trainX.reshape(trainX.shape[0] , trainX.shape[1])
-    trainY = trainY.reshape(trainY.shape[0])
-    pca.fit(trainX)
-    trainX_pca = pca.fit_transform(trainX)
-    # testX_pca = pca.fit_transform(testX)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(trainX_pca[:,0], trainX_pca[:,1], -trainY, zdir='z', c= 'red')
-    plt.savefig("demo.png")
+
+
 
 
 def build_LSTM(trainX, trainY, testX, testY):
@@ -135,7 +93,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     batch_size = 25
     model = Sequential()
     model.add(LSTM(20, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = True))
-    model.add(BatchNormalization())
+    # model.add(BatchNormalization())
     model.add(layers.core.Dropout(0.2))
     model.add(LSTM(5,return_sequences=False))
     model.add(layers.core.Dropout(0.2))
@@ -145,7 +103,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     model.add(Dense(1))
     lr = 0.005
     decay = 0.95
-    nb_epoch = 50
+    nb_epoch = 100
     adam = optimizers.adam(lr=lr)
     # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=adam)
@@ -218,40 +176,25 @@ def get_train_and_test(dataset, train_size):
     testX = np.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 
 
-    trainX, trainY = remove_nan(trainX, trainY)
-    testX, testY = remove_nan(testX, testY)
+    trainX, trainY = Util.remove_nan(trainX, trainY)
+    testX, testY = Util.remove_nan(testX, testY)
 
 
     return trainX, trainY, testX, testY
-
-def remove_nan(X, Y):
-    print 'remove_nan'
-    shape0 = X.shape[0]
-    shape1 = X.shape[1]
-    for i in reversed(xrange(shape0)):
-        remove = 0
-        for j in xrange(shape1):
-            if X[i,j] is None or math.isnan(X[i,j]):
-                remove = 1
-        if remove == 1:
-            X = np.delete(X, (i), axis=0)
-            Y = np.delete(Y, (i), axis=0)
-    print X.shape, ' , ', Y.shape
-    return X, Y
 
 
 def build_lstm_on_labels():
     db_wrapper = DB_wrapper()
     dataframe = db_wrapper.retrieve_data(DB_info.MSP_TABLE) #get_dataframe()
     # dataset = get_county_month(dataframe.values)
-    dataset = normalize(get_county_month(dataframe.values), TRAIN_MONTHS)
+    dataset = Util.normalize_min_max(get_county_month(dataframe.values), TRAIN_MONTHS)
 
     print "Dataset shape: ", dataset.shape
 
     # split into train and test sets
     trainX, trainY, testX, testY = get_train_and_test(dataset, TRAIN_MONTHS)
 
-    # do_pca(trainX, trainY, testX, testY)
+    # Util.do_pca(trainX, trainY, testX, testY)
     build_LSTM(trainX, trainY, testX, testY)
 
 
