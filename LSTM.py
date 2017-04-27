@@ -90,29 +90,29 @@ def get_county_month(dataset):
 # County ......
 # Month1 ......
 # MonthN ......
-def normalize(dataset, train_size):
-    mean = np.mean(dataset[1: train_size], axis = 0)
-    print 'mean: ' , mean.shape
-    standard_deviation = np.std(dataset[1: train_size], axis = 0)
-    print 'standard_deviation: ' , standard_deviation.shape
-    print 'dataset: ' , dataset.shape
-    dataset = (dataset - mean) * 10.0/standard_deviation
-    return dataset
-
 # def normalize(dataset, train_size):
-#     minimum = np.min(dataset[1: train_size], axis = 0)
-#     maximum = np.max(dataset[1: train_size], axis = 0)
-#     print 'minimum'
-#     # print minimum[1:20]
-#     print 'maximum'
-#     # print maximum[1:20]
-#     print 'min: ' , minimum.shape
-#     # standard_deviation = np.std(dataset[1: train_size], axis = 0)
-#     # print 'standard_deviation: ' , standard_deviation.shape
-#     # print 'dataset: ' , dataset.shape
-#     dataset = ((dataset - minimum)* 100.0)/ (maximum-minimum)
-#     # dataset = (dataset - mean)/standard_deviation
+#     mean = np.mean(dataset[1: train_size], axis = 0)
+#     print 'mean: ' , mean.shape
+#     standard_deviation = np.std(dataset[1: train_size], axis = 0)
+#     print 'standard_deviation: ' , standard_deviation.shape
+#     print 'dataset: ' , dataset.shape
+#     dataset = (dataset - mean) * 10.0/standard_deviation
 #     return dataset
+
+def normalize(dataset, train_size):
+    minimum = np.min(dataset[1: train_size], axis = 0)
+    maximum = np.max(dataset[1: train_size], axis = 0)
+    print 'minimum'
+    # print minimum[1:20]
+    print 'maximum'
+    # print maximum[1:20]
+    print 'min: ' , minimum.shape
+    # standard_deviation = np.std(dataset[1: train_size], axis = 0)
+    # print 'standard_deviation: ' , standard_deviation.shape
+    # print 'dataset: ' , dataset.shape
+    dataset = ((dataset - minimum)* 100.0)/ (maximum-minimum)
+    # dataset = (dataset - mean)/standard_deviation
+    return dataset
 
 
 def do_pca(trainX, trainY, testX, testY):
