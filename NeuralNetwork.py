@@ -8,14 +8,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from DB_wrapper import  DB_wrapper
 
+import Util
+
 DATABASE = 'mztwitter'
-TRAIN_TABLE_NAME = 'NLP_train_features_saf'
+TRAIN_TABLE_NAME = 'NLP_features_saf'
 TEST_TABLE_NAME = 'NLP_test_features_saf'
 ID_SIZE = 1
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 50
+NUM_FEATURES = 60
 
 class NeuralNetwork:
     
@@ -30,7 +32,7 @@ class NeuralNetwork:
     # Output: Feat1, Feat2, ... Featn, Feat2-1, Feat3-2.. Featn-(n-1)
     def get_features(self, dataframe):
         # Extract the features as numpy ndarray
-        features = dataframe.ix[:, ID_SIZE: NUM_FEATURES].values
+        features = dataframe.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES].values
 
         # Create ndarray for derived features (the differences)
         derived_features = np.diff(features)
@@ -66,6 +68,12 @@ class NeuralNetwork:
 
     # Build the neural network
     def build_neural_network(self, xTrain, xTest, yTrain, yTest):
+        print "---- In Build Neural Network ----"
+        print "xTrain: ", xTrain.shape
+        print "yTrain: ", yTrain.shape
+        print "xTest: ", xTest.shape
+        print "yTest: ", yTest.shape
+
         model = Sequential()
 
         # Add layers
@@ -109,14 +117,16 @@ if __name__ == "__main__":
     # build neural network (build_neural_network())
     db_wrapper = DB_wrapper()
     dataframe_train = db_wrapper.retrieve_data(TRAIN_TABLE_NAME) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
-    dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
+    #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
     # generating random labels for now <-- This is not required though
     # labels will be part of table, so use the main dataframe
-    label_frame = pd.DataFrame(np.random.uniform(-1, 1, size = (len(dataframe_train), 1)))
-    dataframe_train = pd.concat([dataframe_train, label_frame], axis = 1)
+    #label_frame = pd.DataFrame(np.random.uniform(-1, 1, size = (len(dataframe_train), 1)))
+    #dataframe_train = pd.concat([dataframe_train, label_frame], axis = 1)
 
-    train_size = 10000
+    print "Total rows in Dataset: ", len(dataframe_train)
+    print "Total Columns in Dataset: ", len(dataframe_train.columns)
+    train_size = 15000
 
     train_set = dataframe_train.ix[0: train_size, :]
     test_set = dataframe_train.ix[train_size:, :]
@@ -126,6 +136,9 @@ if __name__ == "__main__":
     yTrain = Network.get_labels(train_set)
     xTest = Network.get_features(test_set)
     yTest = Network.get_labels(test_set)
+
+    xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
+    xTest, yTest = Util.remove_nan(xTest, yTest)
 
     Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
