@@ -7,6 +7,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from DB_wrapper import  DB_wrapper
+import math
 
 import Util
 
@@ -140,7 +141,7 @@ if __name__ == "__main__":
     current_month = dataframe_train.label.values
     p_month = []
     c_month = []
-    for i in xrange(previous_month):
+    for i in xrange(len(previous_month)):
         if previous_month[i] is  None or current_month[i] is  None or  math.isnan(previous_month[i]) or math.isnan(current_month[i]):
             continue
         p_month.append(previous_month[i])
