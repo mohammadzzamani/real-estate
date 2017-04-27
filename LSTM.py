@@ -132,7 +132,7 @@ def do_pca(trainX, trainY, testX, testY):
 
 def build_LSTM(trainX, trainY, testX, testY):
     print 'baseline: ', mean_squared_error(testY, testX[:, -1])
-    batch_size = 50
+    batch_size = 25
     model = Sequential()
     model.add(LSTM(20, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = True))
     model.add(BatchNormalization())
@@ -145,7 +145,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     model.add(Dense(1))
     lr = 0.005
     decay = 0.95
-    nb_epoch = 100
+    nb_epoch = 50
     adam = optimizers.adam(lr=lr)
     # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=adam)
@@ -162,7 +162,7 @@ def build_LSTM(trainX, trainY, testX, testY):
             adam.lr.set_value(lr)
         else:
             # adam.__setattr__('lr', lr*5)
-            adam.lr.set_value(lr*5)
+            adam.lr.set_value(lr*2)
 
         print 'i: ' , i , ' lr: ' , adam.lr.get_value() #adam.__getattribute__('lr') # adam.lr.get_value()
         model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_split= 0.15 ) #validation_data=(testX, testY))
