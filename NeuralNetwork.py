@@ -126,13 +126,13 @@ if __name__ == "__main__":
         splitted = index.split('_')
         cnty = splitted[0]
         month = int(splitted[1]) -1
-        print cnty , ' , ', month
+        # print cnty , ' , ', month
         if month >= 0:
             prev_month_id =  cnty+'_'+str(month)
             prev_month = dataframe_train.label[prev_month_id]
             dataframe_train.set_value(index, 'prev_month', prev_month)
-            print dataframe_train.label[prev_month_id], ' , ' , dataframe_train.prev_month[index] , ' , ', dataframe_train.label[index]
-
+            # print dataframe_train.label[prev_month_id], ' , ' , dataframe_train.prev_month[index] , ' , ', dataframe_train.label[index]
+    dataframe_train = dataframe_train.drop('prev_month')
     #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
     # generating random labels for now <-- This is not required though
