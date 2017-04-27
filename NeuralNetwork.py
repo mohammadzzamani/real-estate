@@ -127,7 +127,7 @@ if __name__ == "__main__":
         cnty = splitted[0]
         month = int(splitted[1]) -1
         print cnty , ' , ', month
-        if month <> 0:
+        if month < 0:
             prev_month_id =  cnty+'_'+str(month)
             prev_month = dataframe_train.label[prev_month_id]
             dataframe_train.set_value(index, 'prev_month', prev_month)
