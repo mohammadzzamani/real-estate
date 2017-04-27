@@ -13,10 +13,12 @@ from keras import layers
 from keras.layers.normalization import BatchNormalization
 import keras.backend as K
 import random
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-
-from sqlalchemy import create_engine
-from sqlalchemy.engine.url import URL
+# from sqlalchemy import create_engine
+# from sqlalchemy.engine.url import URL
 
 import DB_info
 
@@ -113,6 +115,21 @@ def normalize(dataset, train_size):
     return dataset
 
 
+def do_pca(trainX, trainY, testX, testY):
+    pca = PCA(n_components=2)
+
+    trainX = trainX.reshape(trainX.shape[0] , trainX.shape[1])
+    trainY = trainY.reshape(trainY.shape[0])
+    pca.fit(trainX)
+    trainX_pca = pca.fit_transform(trainX)
+    # testX_pca = pca.fit_transform(testX)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(trainX_pca[:,0], trainX_pca[:,1], -trainY, zdir='z', c= 'red')
+    plt.savefig("demo.png")
+
+
 def build_LSTM(trainX, trainY, testX, testY):
     print 'baseline: ', mean_squared_error(testY, testX[:, -1])
     batch_size = 50
@@ -141,10 +158,13 @@ def build_LSTM(trainX, trainY, testX, testY):
     for i in range(nb_epoch):
         rd = random.random()
         if rd <0.95:
-            adam.lr.set_value(lr)
+            adam.__setattr__('lr', lr)
+            # adam.lr.set_value(lr)
         else:
-            adam.lr.set_value(lr*5)
-        print 'i: ' , i , ' lr: ' , adam.lr.get_value()
+            adam.__setattr__('lr', lr*5)
+            # adam.lr.set_value(lr*5)
+
+        print 'i: ' , i , ' lr: ' , adam.__getattribute__('lr') # adam.lr.get_value()
         model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_split= 0.15 ) #validation_data=(testX, testY))
         # model.reset_states()
         if i % 5 == 0:
@@ -234,7 +254,7 @@ def remove_nan(X, Y):
 
 def build_lstm_on_labels():
     db_wrapper = DB_wrapper()
-    dataframe = db_wrapper.retrieve_data(DB_info.IP_TABLE) #get_dataframe()
+    dataframe = db_wrapper.retrieve_data(DB_info.MSP_TABLE) #get_dataframe()
     # dataset = get_county_month(dataframe.values)
     dataset = normalize(get_county_month(dataframe.values), TRAIN_MONTHS)
 
@@ -242,6 +262,8 @@ def build_lstm_on_labels():
 
     # split into train and test sets
     trainX, trainY, testX, testY = get_train_and_test(dataset, TRAIN_MONTHS)
+
+    # do_pca(trainX, trainY, testX, testY)
     build_LSTM(trainX, trainY, testX, testY)
 
 
