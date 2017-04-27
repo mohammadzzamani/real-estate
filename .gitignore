@@ -3,3 +3,4 @@
 db_info.py
 *.pyc
 venv/
+DB_info.py
