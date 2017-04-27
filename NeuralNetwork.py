@@ -135,6 +135,10 @@ if __name__ == "__main__":
     # dataframe_train = dataframe_train.drop('prev_month')
     print list(dataframe_train.columns.values)
 
+    print 'baseline: ', mean_squared_error(dataframe_train.prev_month.values, dataframe_train.label.values)
+
+    print 'length: ' , len(dataframe_train.prev_month.values), ' , ', len(dataframe_train.label.values)
+
     #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
     # generating random labels for now <-- This is not required though
