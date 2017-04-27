@@ -19,8 +19,20 @@ python dlatkInterface.py -d mztwitter -t NLP_train_data -c cnty_month -f 'feat$1
 # Adding saf labels to train features
 update NLP_train_features JOIN housing_outcomes ON NLP_train_features.cnty_month = housing_outcomes.cnty_month set NLP_train_features.saf = housing_outcomes.saf;
 
+# Wrong query used for getting month and cnty col
 create table NLP_train_features_saf_temp as select NLP_train_features_saf.*, NLP_train_data.cnty, NLP_train_data.month_id from NLP_train_features_saf left join NLP_train_data on NLP_train_data.cnty_month = NLP_train_features_saf.cnty_month;
 
-update NLP_test_features_saf set month=cast(SUBSTRING_INDEX(cnty_month, '_', -1) as unsigned);
-update NLP_test_features_saf set month=SUBSTRING_INDEX(cnty_month, '_', 1);
 
+alter table NLP_test_features_saf add column cnty varchar(20);
+alter table NLP_test_features_saf add column month int;
+
+update NLP_test_features_saf set month=cast(SUBSTRING_INDEX(cnty_month, '_', -1) as unsigned);
+update NLP_test_features_saf set cnty=SUBSTRING_INDEX(cnty_month, '_', 1);
+
+# To merge tables
+ create table NLP_features_ip like NLP_train_features_ip;
+insert ignore into NLP_features_saf select * from NLP_test_features_saf;
+
+# Queries to add labels to feature tables.
+alter table NLP_features_ip add column ip float default NULL;
+update NLP_features_ip t join housing_outcomes s on t.cnty_month = s.cnty_month update t.ip = s.ip;
