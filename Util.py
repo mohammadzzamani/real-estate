@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import math
 
 def remove_nan(X, Y):
     print 'remove_nan'
