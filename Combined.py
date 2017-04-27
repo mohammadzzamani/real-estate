@@ -68,8 +68,6 @@ def get_county_month(dataset):
 
 
 
-
-
 def build_LSTM(trainX, trainY, testX, testY):
     print 'baseline: ', mean_squared_error(testY, testX[:, -1])
     batch_size = 25
@@ -140,12 +138,8 @@ def get_train_and_test(dataset, train_size):
     print 'start: ' , (train_size - LOOK_BACK-1), ' , end: ', ( num_of_months - LOOK_BACK-1)
     testX, testY = create_dataset(dataset,  start= train_size - LOOK_BACK-1 , end = num_of_months - LOOK_BACK-1, num_of_counties = num_of_counties)
 
-    # trainX, trainY = create_dataset(train, look_back)
-    # testX, testY = create_dataset(test, look_back)
 
-    print 'data:'
-    print trainX[1680,:]
-    print trainX[1681,:]
+
     # trainX = trainX[:2000, :]
     # testX = testX[0:100, :]
     # trainY = trainY[:2000]
@@ -163,8 +157,6 @@ def get_train_and_test(dataset, train_size):
 
 
     return trainX, trainY, testX, testY
-
-
 
 
 def build_lstm_on_labels():
