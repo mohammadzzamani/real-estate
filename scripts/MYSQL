@@ -19,7 +19,8 @@ python dlatkInterface.py -d mztwitter -t NLP_train_data -c cnty_month -f 'feat$1
 # Adding saf labels to train features
 update NLP_train_features JOIN housing_outcomes ON NLP_train_features.cnty_month = housing_outcomes.cnty_month set NLP_train_features.saf = housing_outcomes.saf;
 
+create table NLP_train_features_saf_temp as select NLP_train_features_saf.*, NLP_train_data.cnty, NLP_train_data.month_id from NLP_train_features_saf left join NLP_train_data on NLP_train_data.cnty_month = NLP_train_features_saf.cnty_month;
 
-df.merge(s.to_frame(), left_index=True, right_index=True)
-
+update NLP_test_features_saf set month=cast(SUBSTRING_INDEX(cnty_month, '_', -1) as unsigned);
+update NLP_test_features_saf set month=SUBSTRING_INDEX(cnty_month, '_', 1);
 
