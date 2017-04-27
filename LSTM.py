@@ -158,11 +158,11 @@ def build_LSTM(trainX, trainY, testX, testY):
     for i in range(nb_epoch):
         rd = random.random()
         if rd <0.95:
-            adam.__setattr__('lr', lr)
-            # adam.lr.set_value(lr)
+            # adam.__setattr__('lr', lr)
+            adam.lr.set_value(lr)
         else:
-            adam.__setattr__('lr', lr*5)
-            # adam.lr.set_value(lr*5)
+            # adam.__setattr__('lr', lr*5)
+            adam.lr.set_value(lr*5)
 
         print 'i: ' , i , ' lr: ' , adam.__getattribute__('lr') # adam.lr.get_value()
         model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_split= 0.15 ) #validation_data=(testX, testY))
