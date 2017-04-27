@@ -96,7 +96,7 @@ def normalize(dataset, train_size):
     standard_deviation = np.std(dataset[1: train_size], axis = 0)
     print 'standard_deviation: ' , standard_deviation.shape
     print 'dataset: ' , dataset.shape
-    dataset = (dataset - mean)* 100.0/standard_deviation
+    dataset = (dataset - mean)/standard_deviation
     return dataset
 
 # def normalize(dataset, train_size):
@@ -222,19 +222,10 @@ def get_train_and_test(dataset, train_size):
     testX, testY = remove_nan(testX, testY)
 
 
-    # print trainX[0:100,0:25]
-
-
-    # for i in xrange(testX.shape[0]):
-    #     for j in xrange(testX.shape[1]):
-    #         if testX[i,j] is None:
-    #             print ' i , j : ' , i, j
-
     return trainX, trainY, testX, testY
 
 def remove_nan(X, Y):
-
-
+    print 'remove_nan'
     shape0 = X.shape[0]
     shape1 = X.shape[1]
     for i in reversed(xrange(shape0)):
@@ -242,13 +233,10 @@ def remove_nan(X, Y):
         for j in xrange(shape1):
             if X[i,j] is None or math.isnan(X[i,j]):
                 remove = 1
-                # print ' i , j : ' , i, j
-                # print X[i,:]
         if remove == 1:
             X = np.delete(X, (i), axis=0)
             Y = np.delete(Y, (i), axis=0)
     print X.shape, ' , ', Y.shape
-
     return X, Y
 
 
