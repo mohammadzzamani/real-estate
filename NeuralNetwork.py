@@ -135,9 +135,21 @@ if __name__ == "__main__":
     # dataframe_train = dataframe_train.drop('prev_month')
     print list(dataframe_train.columns.values)
 
-    print 'baseline: ', mean_squared_error(dataframe_train.prev_month.values, dataframe_train.label.values)
+
+    previous_month = dataframe_train.prev_month.values
+    current_month = dataframe_train.label.values
+    p_month = []
+    c_month = []
+    for i in xrange(previous_month):
+        if previous_month[i] is  None or current_month[i] is  None or  math.isnan(previous_month[i]) or math.isnan(current_month[i]):
+            continue
+        p_month.append(previous_month[i])
+        c_month.append(current_month[i])
+
+    print 'baseline: ', mean_squared_error(p_month, c_month)
 
     print 'length: ' , len(dataframe_train.prev_month.values), ' , ', len(dataframe_train.label.values)
+    print 'length: ' , len(p_month), ' , ', len(c_month)
 
     #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
