@@ -117,6 +117,21 @@ if __name__ == "__main__":
     # build neural network (build_neural_network())
     db_wrapper = DB_wrapper()
     dataframe_train = db_wrapper.retrieve_data(TRAIN_TABLE_NAME) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
+
+    print dataframe_train.shape
+    dataframe_train['prev_month'] = None
+    print dataframe_train.shape
+    dataframe_train = dataframe_train.set_index('cnty_month')
+    for index, row in dataframe_train.iterrows():
+        splitted = index.split('_')
+        cnty = splitted[0]
+        month = splitted[1]
+        print cnty , ' , ', month
+        if month <> 0:
+            prev_month_id =  cnty+'_'+month
+            prev_month = dataframe_train.label[prev_month_id]
+            dataframe_train.set_value('prev_month', prev_month)
+
     #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
     # generating random labels for now <-- This is not required though
