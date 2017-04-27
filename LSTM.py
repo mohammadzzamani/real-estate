@@ -27,9 +27,14 @@ import DB_info
 INIT_SKIP = 48
 MONTH_COLUMNS = 45
 TRAIN_MONTHS = 43
-TEST_MONTHS = 9
+# TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
+#IP:
+# COUNTY_COLUMN_NUMBER = 113
+#MSP:
+# COUNTY_COLUMN_NUMBER = 104
+#SAF:
 COUNTY_COLUMN_NUMBER = 107
 LOOK_BACK = 30
 
@@ -110,7 +115,7 @@ def normalize(dataset, train_size):
 
 def build_LSTM(trainX, trainY, testX, testY):
     print 'baseline: ', mean_squared_error(testY, testX[:, -1])
-    batch_size = 20
+    batch_size = 50
     model = Sequential()
     model.add(LSTM(20, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = True))
     model.add(BatchNormalization())
@@ -123,7 +128,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     model.add(Dense(1))
     lr = 0.005
     decay = 0.95
-    nb_epoch = 50
+    nb_epoch = 100
     adam = optimizers.adam(lr=lr)
     # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=adam)
@@ -135,7 +140,7 @@ def build_LSTM(trainX, trainY, testX, testY):
 
     for i in range(nb_epoch):
         rd = random.random()
-        if rd <0.9:
+        if rd <0.95:
             adam.lr.set_value(lr)
         else:
             adam.lr.set_value(lr*5)
