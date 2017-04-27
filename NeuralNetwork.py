@@ -13,7 +13,7 @@ import Util
 DATABASE = 'mztwitter'
 TRAIN_TABLE_NAME = 'NLP_features_saf'
 TEST_TABLE_NAME = 'NLP_test_features_saf'
-ID_SIZE = 1
+ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
@@ -45,7 +45,7 @@ class NeuralNetwork:
 
     # Returns the labels as a numpy ndarray
     def get_labels(self, dataframe):
-        return dataframe[dataframe.columns[-1]].values
+        return dataframe[dataframe.columns[-2]].values
 
 
     # Standardize a given numpy ndarray (makes mean = 0)
@@ -132,7 +132,9 @@ if __name__ == "__main__":
             prev_month = dataframe_train.label[prev_month_id]
             dataframe_train.set_value(index, 'prev_month', prev_month)
             # print dataframe_train.label[prev_month_id], ' , ' , dataframe_train.prev_month[index] , ' , ', dataframe_train.label[index]
-    dataframe_train = dataframe_train.drop('prev_month')
+    # dataframe_train = dataframe_train.drop('prev_month')
+    print list(dataframe_train.columns.values)
+
     #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
     # generating random labels for now <-- This is not required though
