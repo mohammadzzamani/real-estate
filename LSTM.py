@@ -164,7 +164,7 @@ def build_LSTM(trainX, trainY, testX, testY):
             # adam.__setattr__('lr', lr*5)
             adam.lr.set_value(lr*5)
 
-        print 'i: ' , i , ' lr: ' , adam.__getattribute__('lr') # adam.lr.get_value()
+        print 'i: ' , i , ' lr: ' , adam.lr.get_value() #adam.__getattribute__('lr') # adam.lr.get_value()
         model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_split= 0.15 ) #validation_data=(testX, testY))
         # model.reset_states()
         if i % 5 == 0:
