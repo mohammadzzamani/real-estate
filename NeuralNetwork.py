@@ -130,7 +130,7 @@ if __name__ == "__main__":
         if month <> 0:
             prev_month_id =  cnty+'_'+month
             prev_month = dataframe_train.label[prev_month_id]
-            dataframe_train.set_value('prev_month', prev_month)
+            dataframe_train.set_value(index, 'prev_month', prev_month)
 
     #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
