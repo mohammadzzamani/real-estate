@@ -137,20 +137,7 @@ if __name__ == "__main__":
     print list(dataframe_train.columns.values)
 
 
-    previous_month = dataframe_train.prev_month.values
-    current_month = dataframe_train.label.values
-    p_month = []
-    c_month = []
-    for i in xrange(len(previous_month)):
-        if previous_month[i] is  None or current_month[i] is  None or  math.isnan(previous_month[i]) or math.isnan(current_month[i]):
-            continue
-        p_month.append(previous_month[i])
-        c_month.append(current_month[i])
 
-    print 'baseline: ', mean_squared_error(p_month, c_month)
-
-    print 'length: ' , len(dataframe_train.prev_month.values), ' , ', len(dataframe_train.label.values)
-    print 'length: ' , len(p_month), ' , ', len(c_month)
 
     #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
@@ -165,6 +152,22 @@ if __name__ == "__main__":
 
     train_set = dataframe_train.ix[0: train_size, :]
     test_set = dataframe_train.ix[train_size:, :]
+
+
+    previous_month = test_set.prev_month.values
+    current_month = test_set.label.values
+    p_month = []
+    c_month = []
+    for i in xrange(len(previous_month)):
+        if previous_month[i] is  None or current_month[i] is  None or  math.isnan(previous_month[i]) or math.isnan(current_month[i]):
+            continue
+        p_month.append(previous_month[i])
+        c_month.append(current_month[i])
+
+    print 'baseline: ', mean_squared_error(p_month, c_month)
+
+    print 'length: ' , len(test_set.prev_month.values), ' , ', len(test_set.label.values)
+    print 'length: ' , len(p_month), ' , ', len(c_month)
 
     Network = NeuralNetwork()
     xTrain = Network.get_features(train_set)
