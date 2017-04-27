@@ -9,16 +9,16 @@ from sqlalchemy.engine.url import URL
 from DB_wrapper import  DB_wrapper
 
 DATABASE = 'mztwitter'
-TRAIN_TABLE_NAME = 'NLP_train_features'
-TEST_TABLE_NAME = 'NLP_test_features'
+TRAIN_TABLE_NAME = 'NLP_train_features_saf'
+TEST_TABLE_NAME = 'NLP_test_features_saf'
+ID_SIZE = 1
+
+# Change this depending on whatever is the number of features
+# in the dataframe.
+NUM_FEATURES = 50
 
 class NeuralNetwork:
-    ID_SIZE = 1
-
-    # Change this depending on whatever is the number of features
-    # in the dataframe.
-    NUM_FEATURES = 50
-
+    
     # Returns the ID columns as numpy ndarray
     def get_ids(self, dataframe):
         return dataframe.ix[:, 0: ID_SIZE].values
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     # build neural network (build_neural_network())
     db_wrapper = DB_wrapper()
     dataframe_train = db_wrapper.retrieve_data(TRAIN_TABLE_NAME) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
-    #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
+    dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
     # generating random labels for now <-- This is not required though
     # labels will be part of table, so use the main dataframe
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     train_size = 10000
 
     train_set = dataframe_train.ix[0: train_size, :]
-    test_set = dataframe_train.txt[train_size:, :]
+    test_set = dataframe_train.ix[train_size:, :]
 
     Network = NeuralNetwork()
     xTrain = Network.get_features(train_set)
