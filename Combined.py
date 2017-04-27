@@ -67,6 +67,18 @@ def get_county_month(dataset):
     return dataset
 
 
+def build_one_LSTM(trainX, trainY, testX, testY):
+    # print 'baseline: ', mean_squared_error(testY, testX[:, -1])
+    batch_size = 25
+    model = Sequential()
+    model.add(LSTM(20, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = True))
+    # model.add(BatchNormalization())
+    model.add(layers.core.Dropout(0.2))
+    model.add(LSTM(5,return_sequences=False))
+    model.add(layers.core.Dropout(0.2))
+
+    return model
+
 
 def build_LSTM(trainX, trainY, testX, testY):
     print 'baseline: ', mean_squared_error(testY, testX[:, -1])
@@ -163,10 +175,9 @@ def build_lstm_on_labels():
     # dataset = get_county_month(dataframe.values)
 
     ####### do the reshape
-    # data = dataframe.values
+    data = dataframe.values
 
-    # for i in xrange(data.shape[0]):
-
+    for i in xrange(data.shape[0]):
 
     dataset = Util.normalize_min_max(get_county_month(dataframe.values), TRAIN_MONTHS)
 
