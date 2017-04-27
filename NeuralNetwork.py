@@ -131,6 +131,7 @@ if __name__ == "__main__":
             prev_month_id =  cnty+'_'+month
             prev_month = dataframe_train.label[prev_month_id]
             dataframe_train.set_value(index, 'prev_month', prev_month)
+            print dataframe_train.label[prev_month_id], ' , ' , prev_month_id.prev_month[index] , ' , ', prev_month_id.label[index]
 
     #dataframe_test = db_wrapper.retrieve_data(TEST_TABLE_NAME) #get_dataframe(DATABASE, TEST_TABLE_NAME)
 
