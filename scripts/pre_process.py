@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 import numpy as np
 import pandas as pd
-import load_DB as ld
 import pickle
 
 db = "mztwitter"
@@ -25,14 +24,14 @@ connection.execute("drop table if exists NLP_test_data")
 # Create a table for train
 #connection.execute("create table if not exists NLP_train_data (message_id bigint(20), cnty int(5), message text, created_time timestamp) CHARSET=utf8, COLLATE=utf8_unicode_ci")
 
-'''
+
 print "Starting random selection of train data"
 for month in train:
         table = 'msgs_' + month
         print
         print "Table currently executing : ", table
         connection.execute('insert into NLP_train_data select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.1) <= 200 then rn <= LEAST(200, rn) else rn <= LEAST(1000, rn * 0.1) end)' % table)
-'''
+
 print
 print "Starting random selection of test data"
 # Create a table for test
@@ -45,5 +44,3 @@ for month in test:
         connection.execute('insert into NLP_test_data select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.1) <= 200 then rn <= LEAST(200, rn) else rn <= LEAST(1000, rn * 0.1) end)' % table)
 
 print "Completed! Bye"
-
-
