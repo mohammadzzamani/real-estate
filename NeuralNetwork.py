@@ -35,25 +35,25 @@ class NeuralNetwork:
     def get_features(self, dataframe):
         # Extract the features as numpy ndarray
         features = dataframe.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES]
-        # prev_month = dataframe.prev_month.values
-        # prev_month = np.reshape(prev_month, (prev_month.shape[0], 1))
+        prev_month = dataframe.prev_month.values
+        prev_month = np.reshape(prev_month, (prev_month.shape[0], 1))
 
         print "Rows features: ", features.shape
-        # print "Prev Month: ", prev_month.shape
+        print "Prev Month: ", prev_month.shape
 
         # Create ndarray for derived features (the differences)
         derived_features = np.diff(features)
 
         # Concatenate the actual features, and their differences
         X = np.concatenate((features, derived_features), axis = 1)
-        # X = np.concatenate((X, prev_month), axis = 1)
+        X = np.concatenate((X, prev_month), axis = 1)
 
         return X
 
 
     # Returns the labels as a numpy ndarray
     def get_labels(self, dataframe):
-        return dataframe[dataframe.columns[-2]].values - dataframe[dataframe.columns[-1]].values
+        return dataframe[dataframe.columns[-2]].values # - dataframe[dataframe.columns[-1]].values
 
 
     # Standardize a given numpy ndarray (makes mean = 0)
@@ -256,5 +256,14 @@ if __name__ == "__main__":
 
     xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
     xTest, yTest = Util.remove_nan(xTest, yTest)
+
+
+    yTest = yTest - xTest[:,-1]
+    yTrain = yTrain - xTrain[:,-1]
+
+    xTrain = xTrain [: , :-1]
+    xTest = xTest [: , : -1]
+
+
     Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
