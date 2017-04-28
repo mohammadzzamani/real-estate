@@ -52,6 +52,22 @@ def normalize_min_max(dataset, train_size):
     # dataset = (dataset - mean)/standard_deviation
     return dataset
 
+def normalize_min_max_splitted(train, test):
+    minimum = np.min(train, axis = 0)
+    maximum = np.max(train, axis = 0)
+    print 'minimum'
+    # print minimum[1:20]
+    print 'maximum'
+    # print maximum[1:20]
+    print 'min: ' , minimum.shape
+    # standard_deviation = np.std(dataset[1: train_size], axis = 0)
+    # print 'standard_deviation: ' , standard_deviation.shape
+    # print 'dataset: ' , dataset.shape
+    train = ((train - minimum)* 100.0)/ (maximum-minimum)
+    test = ((test - minimum)* 100.0)/ (maximum-minimum)
+    # dataset = (dataset - mean)/standard_deviation
+    return [train, test]
+
 # This method normalizes the data using the mean and
 # standard deviation, obtained using the train data
 # only.
@@ -69,3 +85,13 @@ def normalize_mean_variance(dataset, train_size):
     print 'dataset: ' , dataset.shape
     dataset = (dataset - mean) * 10.0/standard_deviation
     return dataset
+
+def normalize_mean_variance(train, test):
+    mean = np.mean(train, axis = 0)
+    print 'mean: ' , mean.shape
+    standard_deviation = np.std(train, axis = 0)
+    print 'standard_deviation: ' , standard_deviation.shape
+    print 'dataset: ' , train.shape
+    train = (train - mean) * 10.0/standard_deviation
+    test = (test - mean) * 10.0/standard_deviation
+    return [train, test]
