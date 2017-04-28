@@ -102,12 +102,12 @@ class NeuralNetwork:
         # final_model.add(Merge([model, label_model], mode = 'concat'))
         # final_model.add(Dense(1, init = 'normal', activation = 'sigmoid'))
 
-        lr = 0.5
+        lr = 2
 
         adam = optimizers.adam(lr = lr)
         model.compile(loss = 'mean_squared_error', optimizer = adam)
 
-        nb_epochs = 100
+        nb_epochs = 10000
         decay = 0.95
         for i in xrange(nb_epochs):
             
@@ -122,7 +122,7 @@ class NeuralNetwork:
 
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.1)
             # final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
-            if i % 5 == 0:
+            if i % 10 == 0:
                 testPredict = model.predict(xTest, batch_size = 100, verbose = 1)
                 # testPredict = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
                 print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
@@ -262,6 +262,13 @@ if __name__ == "__main__":
 
     xTrain = xTrain [: , :-1]
     xTest = xTest [: , : -1]
+
+
+
+    xTrain = xTrain[:2000, :]
+    xTest = xTest[0:1000, :]
+    yTrain = yTrain[:2000]
+    yTest = yTest[0:1000]
 
 
     Network.build_neural_network(xTrain, xTest, yTrain, yTest)
