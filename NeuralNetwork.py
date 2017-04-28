@@ -93,6 +93,7 @@ class NeuralNetwork:
         model.add(Dense(output_dim = 1, init = 'normal'))
 
         label_model = Sequential()
+        label_model.add(Dense(output_dim = 1, input_dim = 1, init= 'normal', activation = 'sigmoid'))
 
         final_model = Sequential()
         final_model.add(Merge([model, label_model], mode = 'concat'))
