@@ -129,7 +129,9 @@ class NeuralNetwork:
                 # testPredict = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
                 print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
 
-            lr = lr * decay
+
+            if i% 25 == 0:
+                lr = lr * decay
 
         
         score = model.evaluate(xTest, yTest, batch_size = 100)
