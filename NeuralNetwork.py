@@ -42,11 +42,12 @@ class NeuralNetwork:
         print "Prev Month: ", prev_month.shape
 
         # Create ndarray for derived features (the differences)
-        derived_features = np.diff(features)
+        # derived_features = np.diff(features)
 
         # Concatenate the actual features, and their differences
-        X = np.concatenate((features, derived_features), axis = 1)
-        X = np.concatenate((X, prev_month), axis = 1)
+        # X = np.concatenate((features, derived_features), axis = 1)
+        # X = np.concatenate((X, prev_month), axis = 1)
+        X = np.concatenate((features, prev_month), axis = 1)
 
         return X
 
@@ -108,7 +109,7 @@ class NeuralNetwork:
         model.compile(loss = 'mean_squared_error', optimizer = adam)
 
         nb_epochs = 10000
-        decay = 0.95
+        decay = 0.98
         for i in xrange(nb_epochs):
 
 
@@ -118,7 +119,7 @@ class NeuralNetwork:
             if rd < 0.95:
                 adam.lr.set_value(lr)
             else:
-                adam.lr.set_value(lr * 5)
+                adam.lr.set_value(lr * 2)
             print 'i: ' , ' lr:  ' , adam.lr.get_value()
 
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.1)
@@ -268,9 +269,9 @@ if __name__ == "__main__":
 
 
     xTrain = xTrain[:2000, :]
-    xTest = xTest[0:1000, :]
+    # xTest = xTest[0:1000, :]
     yTrain = yTrain[:2000]
-    yTest = yTest[0:1000]
+    # yTest = yTest[0:1000]
 
 
     Network.build_neural_network(xTrain, xTest, yTrain, yTest)
