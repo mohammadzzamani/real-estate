@@ -7,6 +7,7 @@ from keras import layers, optimizers
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from DB_wrapper import  DB_wrapper
+from keras.layers.normalization import BatchNormalization
 import math
 import random
 import Util
@@ -34,25 +35,25 @@ class NeuralNetwork:
     def get_features(self, dataframe):
         # Extract the features as numpy ndarray
         features = dataframe.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES]
-        prev_month = dataframe.prev_month.values
-        prev_month = np.reshape(prev_month, (prev_month.shape[0], 1))
+        # prev_month = dataframe.prev_month.values
+        # prev_month = np.reshape(prev_month, (prev_month.shape[0], 1))
 
         print "Rows features: ", features.shape
-        print "Prev Month: ", prev_month.shape
+        # print "Prev Month: ", prev_month.shape
 
         # Create ndarray for derived features (the differences)
         derived_features = np.diff(features)
 
         # Concatenate the actual features, and their differences
         X = np.concatenate((features, derived_features), axis = 1)
-        X = np.concatenate((X, prev_month), axis = 1)
+        # X = np.concatenate((X, prev_month), axis = 1)
 
         return X
 
 
     # Returns the labels as a numpy ndarray
     def get_labels(self, dataframe):
-        return dataframe[dataframe.columns[-2]].values
+        return dataframe[dataframe.columns[-2]].values - dataframe[dataframe.columns[-1]].values
 
 
     # Standardize a given numpy ndarray (makes mean = 0)
@@ -86,24 +87,26 @@ class NeuralNetwork:
         model = Sequential()
 
         # Add layers
-        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0])-1, init = 'normal', activation = 'sigmoid'))
+        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]), init = 'normal', activation = 'sigmoid'))
         model.add(layers.core.Dropout(0.2))
-        model.add(Dense(output_dim = 25, init = 'normal', activation = 'tanh'))
+        model.add(BatchNormalization())
+        model.add(Dense(output_dim = 20, init = 'normal', activation = 'tanh'))
         model.add(layers.core.Dropout(0.2))
+        model.add(BatchNormalization())
         model.add(Dense(output_dim = 1, init = 'normal'))
 
-        label_model = Sequential()
-        label_model.add(Dense(output_dim = 1, input_dim = 1, init= 'normal', activation = 'sigmoid'))
-
-        final_model = Sequential()
-        final_model.add(Merge([model, label_model], mode = 'concat'))
-        final_model.add(Dense(1, init = 'normal', activation = 'sigmoid'))
+        # label_model = Sequential()
+        # label_model.add(Dense(output_dim = 1, input_dim = 1, init= 'normal', activation = 'sigmoid'))
+        #
+        # final_model = Sequential()
+        # final_model.add(Merge([model, label_model], mode = 'concat'))
+        # final_model.add(Dense(1, init = 'normal', activation = 'sigmoid'))
 
 
         lr = 0.005
 
         adam = optimizers.adam(lr = lr)
-        final_model.compile(loss = 'mean_squared_error', optimizer = adam)
+        model.compile(loss = 'mean_squared_error', optimizer = adam)
 
         nb_epochs = 100
         decay = 0.95
@@ -118,15 +121,17 @@ class NeuralNetwork:
                 adam.lr.set_value(lr * 2)
             print 'i: ' , ' lr:  ' , adam.lr.get_value()
 
-                        
-            final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
+            model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
+            # final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
             if i % 5 == 0:
-                testPredict = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
+                testPredict = model.predict(xTest, batch_size = 100, verbose = 1)
+                # testPredict = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
                 print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
 
         
-        score = final_model.evaluate(xTest, yTest, batch_size = 100)
-        prediction = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
+        score = model.evaluate(xTest, yTest, batch_size = 100)
+        prediction = model.predict(xTest, batch_size = 100, verbose = 1)
+        # prediction = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
         print 'Result: ', mean_squared_error(yTest, prediction)
 
         result = [(yTest[i], prediction[i][0]) for i in xrange(0, 30)]
@@ -239,7 +244,7 @@ if __name__ == "__main__":
     #     c_month.append(current_month[i])
 
     # print 'baseline: ', mean_squared_error(p_month, c_month)
-    Network.compute_baseline(test_set)
+    # Network.compute_baseline(test_set)
 
     # print 'length: ' , len(test_set.prev_month.values), ' , ', len(test_set.label.values)
     # print 'length: ' , len(p_month), ' , ', len(c_month)
