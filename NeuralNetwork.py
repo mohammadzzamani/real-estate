@@ -3,16 +3,16 @@ import pandas as pd
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Embedding, LSTM, SimpleRNN, GRU, Merge
 from sklearn.metrics import mean_squared_error, mean_absolute_error
-
+from keras import layers, optimizers
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from DB_wrapper import  DB_wrapper
 import math
-
+import random
 import Util
 
 DATABASE = 'mztwitter'
-TRAIN_TABLE_NAME = 'NLP_features_saf'
+TRAIN_TABLE_NAME = 'NLP_features_msp'
 TEST_TABLE_NAME = 'NLP_test_features_saf'
 ID_SIZE = 0
 
@@ -33,8 +33,12 @@ class NeuralNetwork:
     # Output: Feat1, Feat2, ... Featn, Feat2-1, Feat3-2.. Featn-(n-1)
     def get_features(self, dataframe):
         # Extract the features as numpy ndarray
-        features = dataframe.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES].
+        features = dataframe.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES]
         prev_month = dataframe.prev_month.values
+        prev_month = np.reshape(prev_month, (prev_month.shape[0], 1))
+
+        print "Rows features: ", features.shape
+        print "Prev Month: ", prev_month.shape
 
         # Create ndarray for derived features (the differences)
         derived_features = np.diff(features)
@@ -58,6 +62,7 @@ class NeuralNetwork:
         mean = values.mean(axis = 0)
         variance = values.var(axis = 0)
         values = (values - mean) / variance
+        return values
 
 
     # Normalizes the data (values reduced to 0 and 1)
@@ -67,6 +72,7 @@ class NeuralNetwork:
         minimum = values.min(axis = 0)
         maximum = values.max(axis = 0)
         values = -1 + 2 * (values - minimum) / (maximum - minimum)
+        return values
 
 
     # Build the neural network
@@ -80,36 +86,58 @@ class NeuralNetwork:
         model = Sequential()
 
         # Add layers
-        model.add(Dense(output_dim = 50, input_dim = len(xTrain[0]), init = 'normal', activation = 'sigmoid'))
-        model.add(Dense(output_dim = 10, init = 'normal', activation = 'tanh'))
+        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]), init = 'normal', activation = 'sigmoid'))
+        model.add(layers.core.Dropout(0.2))
+        model.add(Dense(output_dim = 25, init = 'normal', activation = 'tanh'))
+        model.add(layers.core.Dropout(0.2))
         model.add(Dense(output_dim = 1, init = 'normal'))
+        lr = 0.005
 
-        # Compile model
-        model.compile(loss = 'mean_squared_error', optimizer = 'adam')
+        adam = optimizers.adam(lr = lr)
+        model.compile(loss = 'mean_squared_error', optimizer = adam)
 
-        model.fit(xTrain, yTrain, nb_epoch = 10, batch_size = 100, validation_split = 0.1)
+        nb_epochs = 100
+        decay = 0.95
+        for i in xrange(nb_epochs):
+            
+            lr = lr * decay 
+            # Compile model
+            rd = random.random()
+            if rd < 0.95:
+                adam.lr.set_value(lr)
+            else:
+                adam.lr.set_value(lr * 2)
+            print 'i: ' , ' lr:  ' , adam.lr.get_value()
 
+                        
+            model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
+            if i % 5 == 0:
+                testPredict = model.predict(xTest, batch_size = 100, verbose = 1)
+                print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
+
+        
         score = model.evaluate(xTest, yTest, batch_size = 100)
         prediction = model.predict(xTest, batch_size = 100, verbose = 1)
+        print 'Result: ', mean_squared_error(yTest, prediction)
 
         result = [(yTest[i], prediction[i][0]) for i in xrange(0, 30)]
 
 
     def add_prev_month_value(self, dataframe):
-        dataframe_train['prev_month'] = None
-        dataframe_train = dataframe_train.set_index('cnty_month')
+        dataframe['prev_month'] = None
+        #dataframe = dataframe_train.set_index('cnty_month')
 
-        for index, row in dataframe_train.iterrows():
+        for index, row in dataframe.iterrows():
             splitted = index.split('_')
             cnty = splitted[0]
             month = int(splitted[1]) -1
             # print cnty , ' , ', month
             if month >= 0:
                 prev_month_id =  cnty+'_'+str(month)
-                prev_month = dataframe_train.label[prev_month_id]
-                dataframe_train.set_value(index, 'prev_month', prev_month)
+                prev_month = dataframe.label[prev_month_id]
+                dataframe.set_value(index, 'prev_month', prev_month)
 
-        print list(dataframe_train.columns.values)
+        print list(dataframe.columns.values)
         return dataframe
 
 
@@ -154,6 +182,8 @@ if __name__ == "__main__":
     # build neural network (build_neural_network())
     db_wrapper = DB_wrapper()
     dataframe_train = db_wrapper.retrieve_data(TRAIN_TABLE_NAME) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
+    dataframe_train = dataframe_train.set_index('cnty_month')
+    dataframe_train = Util.normalize_each_county(dataframe_train)
 
     # dataframe_train = dataframe_train.set_index('cnty_month')
     # for index, row in dataframe_train.iterrows():
@@ -179,7 +209,7 @@ if __name__ == "__main__":
     #label_frame = pd.DataFrame(np.random.uniform(-1, 1, size = (len(dataframe_train), 1)))
     #dataframe_train = pd.concat([dataframe_train, label_frame], axis = 1)
     Network = NeuralNetwork()
-    dataframe = Network.add_prev_month_value(dataframe)
+    dataframe_train = Network.add_prev_month_value(dataframe_train)
 
     print "Total rows in Dataset: ", len(dataframe_train)
     print "Total Columns in Dataset: ", len(dataframe_train.columns)
@@ -212,6 +242,5 @@ if __name__ == "__main__":
 
     xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
     xTest, yTest = Util.remove_nan(xTest, yTest)
-
     Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"

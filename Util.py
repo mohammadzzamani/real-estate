@@ -37,14 +37,13 @@ def do_pca(trainX, trainY, testX, testY):
     plt.savefig("demo.png")
 
 
-def normalize_min_max(dataset, train_size):
-    minimum = np.min(dataset[1: train_size], axis = 0)
-    maximum = np.max(dataset[1: train_size], axis = 0)
-    print 'minimum'
+def normalize_min_max(dataset, train_size, axis = 0):
+    minimum = np.min(dataset[1: train_size], axis = axis)
+    maximum = np.max(dataset[1: train_size], axis = axis)
     # print minimum[1:20]
-    print 'maximum'
     # print maximum[1:20]
-    print 'min: ' , minimum.shape
+    #print 'min: ' , minimum.shape, ', ', len(minimum), ', ', len(maximum)
+    #print 'Minimum: ', minimum, ', Maximum: ', maximum
     # standard_deviation = np.std(dataset[1: train_size], axis = 0)
     # print 'standard_deviation: ' , standard_deviation.shape
     # print 'dataset: ' , dataset.shape
@@ -99,20 +98,22 @@ def normalize_mean_variance(train, test):
 
 def normalize_each_county(df):
     counties  = df.cnty.unique().tolist()
-    num_of_months = 46
+    num_of_months = 45
     num_of_features = 78
-    months = [ i for i in xrange(len(num_of_months))]
+    months = [ i for i in xrange(num_of_months)]
     features = ['feat_'+str(i) for i in xrange(num_of_features)]
     features.append('label')
 
     for feat in features:
+        #print 'Feat: ', feat
         for county in counties:
             values = []
             for month in months:
                 idx = str(county) +'_'+str(month)
                 values.append(df.get_value(idx, feat))
 
-            new_values = normalize_min_max(values, num_of_months * 0.8)
+            #print 'Len: ', len(values)
+            new_values = normalize_min_max(values, int(num_of_months * 0.8))
 
             for j in xrange(num_of_months):
                 idx = str(county) +'_'+str(j)
