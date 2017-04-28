@@ -121,12 +121,12 @@ class NeuralNetwork:
                         
             final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
             if i % 5 == 0:
-                testPredict = final_model.predict(xTest, batch_size = 100, verbose = 1)
+                testPredict = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
                 print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
 
         
         score = final_model.evaluate(xTest, yTest, batch_size = 100)
-        prediction = final_model.predict(xTest, batch_size = 100, verbose = 1)
+        prediction = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
         print 'Result: ', mean_squared_error(yTest, prediction)
 
         result = [(yTest[i], prediction[i][0]) for i in xrange(0, 30)]
