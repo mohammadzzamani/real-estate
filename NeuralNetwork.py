@@ -90,10 +90,10 @@ class NeuralNetwork:
         # Add layers
         model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]), init='normal', activation = 'relu'))
         model.add(layers.core.Dropout(0.2))
-        model.add(BatchNormalization())
+        # model.add(BatchNormalization())
         model.add(Dense(output_dim = 20, init='normal' , activation = 'relu'))
         model.add(layers.core.Dropout(0.2))
-        model.add(BatchNormalization())
+        # model.add(BatchNormalization())
         model.add(Dense(output_dim = 1, init='normal'))
 
         # label_model = Sequential()
@@ -103,7 +103,7 @@ class NeuralNetwork:
         # final_model.add(Merge([model, label_model], mode = 'concat'))
         # final_model.add(Dense(1, init = 'normal', activation = 'sigmoid'))
 
-        lr = 0.5
+        lr = 0.1
 
         adam = optimizers.adam(lr = lr)
         model.compile(loss = 'mean_squared_error', optimizer = adam)
@@ -120,7 +120,7 @@ class NeuralNetwork:
             adam.lr.set_value(lr)
             # else:
             #     adam.lr.set_value(lr * 2)
-            print 'i: ' , ' lr:  ' , adam.lr.get_value()
+            print 'i: ' , i , ' lr:  ' , adam.lr.get_value()
 
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.1)
             # final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
@@ -128,7 +128,8 @@ class NeuralNetwork:
                 testPredict = model.predict(xTest, batch_size = 100, verbose = 1)
                 # testPredict = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
                 print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
-                lr = lr * decay
+
+            lr = lr * decay
 
         
         score = model.evaluate(xTest, yTest, batch_size = 100)
