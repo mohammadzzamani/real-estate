@@ -103,7 +103,7 @@ class NeuralNetwork:
         # final_model.add(Merge([model, label_model], mode = 'concat'))
         # final_model.add(Dense(1, init = 'normal', activation = 'sigmoid'))
 
-        lr = 5
+        lr = 0.5
 
         adam = optimizers.adam(lr = lr)
         model.compile(loss = 'mean_squared_error', optimizer = adam)
