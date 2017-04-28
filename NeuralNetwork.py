@@ -102,7 +102,7 @@ class NeuralNetwork:
         # final_model.add(Merge([model, label_model], mode = 'concat'))
         # final_model.add(Dense(1, init = 'normal', activation = 'sigmoid'))
 
-        lr = 2
+        lr = 5
 
         adam = optimizers.adam(lr = lr)
         model.compile(loss = 'mean_squared_error', optimizer = adam)
@@ -110,8 +110,9 @@ class NeuralNetwork:
         nb_epochs = 10000
         decay = 0.95
         for i in xrange(nb_epochs):
-            
-            lr = lr * decay 
+
+
+
             # Compile model
             rd = random.random()
             if rd < 0.95:
@@ -126,6 +127,7 @@ class NeuralNetwork:
                 testPredict = model.predict(xTest, batch_size = 100, verbose = 1)
                 # testPredict = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
                 print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
+                lr = lr * decay
 
         
         score = model.evaluate(xTest, yTest, batch_size = 100)
@@ -243,7 +245,7 @@ if __name__ == "__main__":
     #     c_month.append(current_month[i])
 
     # print 'baseline: ', mean_squared_error(p_month, c_month)
-    # Network.compute_baseline(test_set)
+    Network.compute_baseline(test_set)
 
     # print 'length: ' , len(test_set.prev_month.values), ' , ', len(test_set.label.values)
     # print 'length: ' , len(p_month), ' , ', len(c_month)
