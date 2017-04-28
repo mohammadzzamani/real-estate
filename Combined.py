@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import math
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Merge
 from keras.layers import LSTM
 from sklearn.metrics import mean_squared_error
 from DB_wrapper import DB_wrapper
 from keras import optimizers
 from keras import layers
-import random
+
 
 import Util
 import DB_info
@@ -161,13 +161,10 @@ def get_train_and_test(dataset, train_size):
     trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
     testX = np.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 
-
     trainX, trainY = Util.remove_nan(trainX, trainY)
     testX, testY = Util.remove_nan(testX, testY)
 
-
     return trainX, trainY, testX, testY
-
 
 def build_lstm_on_labels():
     db_wrapper = DB_wrapper()
@@ -177,17 +174,36 @@ def build_lstm_on_labels():
     ####### do the reshape
     data = dataframe.values
 
+    lstm = []
     for i in xrange(data.shape[0]):
 
-    dataset = Util.normalize_min_max(get_county_month(dataframe.values), TRAIN_MONTHS)
+        dataset = Util.normalize_min_max(get_county_month(dataframe.values), TRAIN_MONTHS)
 
-    print "Dataset shape: ", dataset.shape
+        print "Dataset shape: ", dataset.shape
 
-    # split into train and test sets
-    trainX, trainY, testX, testY = get_train_and_test(dataset, TRAIN_MONTHS)
+        # split into train and test sets
+        trainX, trainY, testX, testY = get_train_and_test(dataset, TRAIN_MONTHS)
 
-    # do_pca(trainX, trainY, testX, testY)
-    build_LSTM(trainX, trainY, testX, testY)
+        lstm.append(build_one_LSTM(trainX, trainY, testX, testY))
+
+
+def Neural_Net(models):
+
+    model = Sequential()
+    model.add(Merge(models, mode = 'concat'))
+    model.add(Dense(output_dim = 50, input_dim = len(models), init = 'normal', activation = 'sigmoid'))
+    model.add(Dense(output_dim = 10, init = 'normal', activation = 'tanh'))
+    model.add(Dense(output_dim = 1, init = 'normal'))
+
+    # Compile model
+    model.compile(loss = 'mean_squared_error', optimizer = 'adam')
+
+    model.fit(xTrain, yTrain, nb_epoch = 10, batch_size = 100, validation_split = 0.1)
+
+    score = model.evaluate(xTest, yTest, batch_size = 100)
+    prediction = model.predict(xTest, batch_size = 100, verbose = 1)
+
+    result = [(yTest[i], prediction[i][0]) for i in xrange(0, 30)]
 
 
 if __name__ == "__main__":
