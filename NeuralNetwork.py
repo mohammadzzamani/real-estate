@@ -19,7 +19,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 60
+NUM_FEATURES = 78
 
 class NeuralNetwork:
     
@@ -88,13 +88,13 @@ class NeuralNetwork:
         model = Sequential()
 
         # Add layers
-        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]), init = 'normal', activation = 'sigmoid'))
+        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]), kernel_initializer='normal', activation = 'relu'))
         model.add(layers.core.Dropout(0.2))
         model.add(BatchNormalization())
-        model.add(Dense(output_dim = 20, init = 'normal', activation = 'tanh'))
+        model.add(Dense(output_dim = 20, kernel_initializer='normal' , activation = 'relu'))
         model.add(layers.core.Dropout(0.2))
         model.add(BatchNormalization())
-        model.add(Dense(output_dim = 1, init = 'normal'))
+        model.add(Dense(output_dim = 1, kernel_initializer='normal'))
 
         # label_model = Sequential()
         # label_model.add(Dense(output_dim = 1, input_dim = 1, init= 'normal', activation = 'sigmoid'))
@@ -115,11 +115,11 @@ class NeuralNetwork:
 
 
             # Compile model
-            rd = random.random()
-            if rd < 0.95:
-                adam.lr.set_value(lr)
-            else:
-                adam.lr.set_value(lr * 2)
+            # rd = random.random()
+            # if rd < 0.95:
+            adam.lr.set_value(lr)
+            # else:
+            #     adam.lr.set_value(lr * 2)
             print 'i: ' , ' lr:  ' , adam.lr.get_value()
 
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.1)
