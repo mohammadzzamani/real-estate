@@ -88,13 +88,13 @@ class NeuralNetwork:
         model = Sequential()
 
         # Add layers
-        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]), kernel_initializer='normal', activation = 'relu'))
+        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]), init='normal', activation = 'relu'))
         model.add(layers.core.Dropout(0.2))
         model.add(BatchNormalization())
-        model.add(Dense(output_dim = 20, kernel_initializer='normal' , activation = 'relu'))
+        model.add(Dense(output_dim = 20, init='normal' , activation = 'relu'))
         model.add(layers.core.Dropout(0.2))
         model.add(BatchNormalization())
-        model.add(Dense(output_dim = 1, kernel_initializer='normal'))
+        model.add(Dense(output_dim = 1, init='normal'))
 
         # label_model = Sequential()
         # label_model.add(Dense(output_dim = 1, input_dim = 1, init= 'normal', activation = 'sigmoid'))
