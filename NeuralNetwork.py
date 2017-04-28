@@ -102,8 +102,7 @@ class NeuralNetwork:
         # final_model.add(Merge([model, label_model], mode = 'concat'))
         # final_model.add(Dense(1, init = 'normal', activation = 'sigmoid'))
 
-
-        lr = 0.05
+        lr = 0.5
 
         adam = optimizers.adam(lr = lr)
         model.compile(loss = 'mean_squared_error', optimizer = adam)
@@ -118,7 +117,7 @@ class NeuralNetwork:
             if rd < 0.95:
                 adam.lr.set_value(lr)
             else:
-                adam.lr.set_value(lr * 2)
+                adam.lr.set_value(lr * 5)
             print 'i: ' , ' lr:  ' , adam.lr.get_value()
 
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.1)
