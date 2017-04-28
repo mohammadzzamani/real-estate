@@ -91,10 +91,18 @@ class NeuralNetwork:
         model.add(Dense(output_dim = 25, init = 'normal', activation = 'tanh'))
         model.add(layers.core.Dropout(0.2))
         model.add(Dense(output_dim = 1, init = 'normal'))
+
+        label_model = Sequential()
+
+        final_model = Sequential()
+        final_model.add(Merge([model, label_model], mode = 'concat'))
+        final_model.add(Dense(1, init = 'normal', activation = 'sigmoid'))
+
+
         lr = 0.005
 
         adam = optimizers.adam(lr = lr)
-        model.compile(loss = 'mean_squared_error', optimizer = adam)
+        final_model.compile(loss = 'mean_squared_error', optimizer = adam)
 
         nb_epochs = 100
         decay = 0.95
@@ -110,14 +118,14 @@ class NeuralNetwork:
             print 'i: ' , ' lr:  ' , adam.lr.get_value()
 
                         
-            model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
+            final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
             if i % 5 == 0:
-                testPredict = model.predict(xTest, batch_size = 100, verbose = 1)
+                testPredict = final_model.predict(xTest, batch_size = 100, verbose = 1)
                 print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
 
         
-        score = model.evaluate(xTest, yTest, batch_size = 100)
-        prediction = model.predict(xTest, batch_size = 100, verbose = 1)
+        score = final_model.evaluate(xTest, yTest, batch_size = 100)
+        prediction = final_model.predict(xTest, batch_size = 100, verbose = 1)
         print 'Result: ', mean_squared_error(yTest, prediction)
 
         result = [(yTest[i], prediction[i][0]) for i in xrange(0, 30)]
