@@ -33,13 +33,15 @@ class NeuralNetwork:
     # Output: Feat1, Feat2, ... Featn, Feat2-1, Feat3-2.. Featn-(n-1)
     def get_features(self, dataframe):
         # Extract the features as numpy ndarray
-        features = dataframe.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES].values
+        features = dataframe.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES].
+        prev_month = dataframe.prev_month.values
 
         # Create ndarray for derived features (the differences)
         derived_features = np.diff(features)
 
         # Concatenate the actual features, and their differences
         X = np.concatenate((features, derived_features), axis = 1)
+        X = np.concatenate((X, prev_month), axis = 1)
 
         return X
 
@@ -92,6 +94,40 @@ class NeuralNetwork:
 
         result = [(yTest[i], prediction[i][0]) for i in xrange(0, 30)]
 
+
+    def add_prev_month_value(self, dataframe):
+        dataframe_train['prev_month'] = None
+        dataframe_train = dataframe_train.set_index('cnty_month')
+
+        for index, row in dataframe_train.iterrows():
+            splitted = index.split('_')
+            cnty = splitted[0]
+            month = int(splitted[1]) -1
+            # print cnty , ' , ', month
+            if month >= 0:
+                prev_month_id =  cnty+'_'+str(month)
+                prev_month = dataframe_train.label[prev_month_id]
+                dataframe_train.set_value(index, 'prev_month', prev_month)
+
+        print list(dataframe_train.columns.values)
+        return dataframe
+
+
+    def compute_baseline(self, test_set):
+        previous_month = test_set.prev_month.values
+        current_month = test_set.label.values
+        p_month = []
+        c_month = []
+
+        for i in xrange(len(previous_month)):
+            if previous_month[i] is  None or current_month[i] is  None or  math.isnan(previous_month[i]) or math.isnan(current_month[i]):
+                continue
+            p_month.append(previous_month[i])
+            c_month.append(current_month[i])
+
+        print 'baseline: ', mean_squared_error(p_month, c_month)
+
+
     def __init__(self):
         print "-- Created NeuralNetwork Object --"
 
@@ -119,22 +155,19 @@ if __name__ == "__main__":
     db_wrapper = DB_wrapper()
     dataframe_train = db_wrapper.retrieve_data(TRAIN_TABLE_NAME) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
 
-    print dataframe_train.shape
-    dataframe_train['prev_month'] = None
-    print dataframe_train.shape
-    dataframe_train = dataframe_train.set_index('cnty_month')
-    for index, row in dataframe_train.iterrows():
-        splitted = index.split('_')
-        cnty = splitted[0]
-        month = int(splitted[1]) -1
-        # print cnty , ' , ', month
-        if month >= 0:
-            prev_month_id =  cnty+'_'+str(month)
-            prev_month = dataframe_train.label[prev_month_id]
-            dataframe_train.set_value(index, 'prev_month', prev_month)
-            # print dataframe_train.label[prev_month_id], ' , ' , dataframe_train.prev_month[index] , ' , ', dataframe_train.label[index]
-    # dataframe_train = dataframe_train.drop('prev_month')
-    print list(dataframe_train.columns.values)
+    # dataframe_train = dataframe_train.set_index('cnty_month')
+    # for index, row in dataframe_train.iterrows():
+    #     splitted = index.split('_')
+    #     cnty = splitted[0]
+    #     month = int(splitted[1]) -1
+    #     # print cnty , ' , ', month
+    #     if month >= 0:
+    #         prev_month_id =  cnty+'_'+str(month)
+    #         prev_month = dataframe_train.label[prev_month_id]
+    #         dataframe_train.set_value(index, 'prev_month', prev_month)
+    #         # print dataframe_train.label[prev_month_id], ' , ' , dataframe_train.prev_month[index] , ' , ', dataframe_train.label[index]
+    # # dataframe_train = dataframe_train.drop('prev_month')
+    # print list(dataframe_train.columns.values)
 
 
 
@@ -145,31 +178,33 @@ if __name__ == "__main__":
     # labels will be part of table, so use the main dataframe
     #label_frame = pd.DataFrame(np.random.uniform(-1, 1, size = (len(dataframe_train), 1)))
     #dataframe_train = pd.concat([dataframe_train, label_frame], axis = 1)
+    Network = NeuralNetwork()
+    dataframe = Network.add_prev_month_value(dataframe)
 
     print "Total rows in Dataset: ", len(dataframe_train)
     print "Total Columns in Dataset: ", len(dataframe_train.columns)
-    train_size = 15000
+    train_size = int(0.8 * len(dataframe_train))
 
     train_set = dataframe_train.ix[0: train_size, :]
     test_set = dataframe_train.ix[train_size:, :]
 
 
-    previous_month = test_set.prev_month.values
-    current_month = test_set.label.values
-    p_month = []
-    c_month = []
-    for i in xrange(len(previous_month)):
-        if previous_month[i] is  None or current_month[i] is  None or  math.isnan(previous_month[i]) or math.isnan(current_month[i]):
-            continue
-        p_month.append(previous_month[i])
-        c_month.append(current_month[i])
+    # previous_month = test_set.prev_month.values
+    # current_month = test_set.label.values
+    # p_month = []
+    # c_month = []
+    # for i in xrange(len(previous_month)):
+    #     if previous_month[i] is  None or current_month[i] is  None or  math.isnan(previous_month[i]) or math.isnan(current_month[i]):
+    #         continue
+    #     p_month.append(previous_month[i])
+    #     c_month.append(current_month[i])
 
-    print 'baseline: ', mean_squared_error(p_month, c_month)
+    # print 'baseline: ', mean_squared_error(p_month, c_month)
+    Network.compute_baseline(test_set)
 
-    print 'length: ' , len(test_set.prev_month.values), ' , ', len(test_set.label.values)
-    print 'length: ' , len(p_month), ' , ', len(c_month)
+    # print 'length: ' , len(test_set.prev_month.values), ' , ', len(test_set.label.values)
+    # print 'length: ' , len(p_month), ' , ', len(c_month)
 
-    Network = NeuralNetwork()
     xTrain = Network.get_features(train_set)
     yTrain = Network.get_labels(train_set)
     xTest = Network.get_features(test_set)
