@@ -86,7 +86,7 @@ class NeuralNetwork:
         model = Sequential()
 
         # Add layers
-        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]), init = 'normal', activation = 'sigmoid'))
+        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]-1), init = 'normal', activation = 'sigmoid'))
         model.add(layers.core.Dropout(0.2))
         model.add(Dense(output_dim = 25, init = 'normal', activation = 'tanh'))
         model.add(layers.core.Dropout(0.2))
