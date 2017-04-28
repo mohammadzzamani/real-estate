@@ -103,7 +103,7 @@ class NeuralNetwork:
         # final_model.add(Dense(1, init = 'normal', activation = 'sigmoid'))
 
 
-        lr = 0.005
+        lr = 0.05
 
         adam = optimizers.adam(lr = lr)
         model.compile(loss = 'mean_squared_error', optimizer = adam)
@@ -121,7 +121,7 @@ class NeuralNetwork:
                 adam.lr.set_value(lr * 2)
             print 'i: ' , ' lr:  ' , adam.lr.get_value()
 
-            model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
+            model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.1)
             # final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
             if i % 5 == 0:
                 testPredict = model.predict(xTest, batch_size = 100, verbose = 1)
