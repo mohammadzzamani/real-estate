@@ -20,6 +20,9 @@ ID_SIZE = 0
 # Change this depending on whatever is the number of features
 # in the dataframe.
 NUM_FEATURES = 78
+TOTAL_MONTHS = 45
+
+MONTH = 'month'
 
 class NeuralNetwork:
     
@@ -28,21 +31,63 @@ class NeuralNetwork:
         return dataframe.ix[:, 0: ID_SIZE].values
 
 
+    def add_derived_features(self, dataframe):
+        features = dataframe.ix[:, : NUM_FEATURES]
+        other_info = dataframe.ix[:, NUM_FEATURES:]
+
+        print "************* Other_info: ", other_info.shape
+
+        features = features.values
+        derived_features = np.empty((0, features.shape[1]), dtype = float)
+        print "derived shape: ", derived_features.shape
+        print derived_features
+        
+        # Generate the derived features
+        for i in range(0, len(features)):
+            if int(other_info.ix[i, MONTH]) == 0:
+                # Skip the month zero
+                derived_features = np.append(derived_features, np.zeros((1, NUM_FEATURES)), axis = 0)
+            else:
+                difference = np.diff((features[i - 1], features[i]), axis = 0)
+                derived_features = np.append(derived_features, difference, axis = 0)
+        
+        #features = np.append(features, derived_features, axis = 1)
+        #features = np.append(features, other_info.values, axis = 1)
+        #dataframe = pd.DataFrame(features)
+        
+        features = pd.DataFrame(np.append(features, derived_features, axis = 1))
+        features.reset_index(drop = True, inplace = True)
+        other_info.reset_index(drop = True, inplace = True)
+        dataframe = pd.concat([features, other_info], axis = 1)
+        dataframe = dataframe[dataframe.month != 0]
+        print "Dataframe shape: ", dataframe.shape
+        return dataframe
+
+
     # Combines all feature differences with features
     # and returns the combined features as numpy ndarray
     # Eg: Input: Feat1, Feat2, .. Featn
     # Output: Feat1, Feat2, ... Featn, Feat2-1, Feat3-2.. Featn-(n-1)
     def get_features(self, dataframe):
         # Extract the features as numpy ndarray
-        features = dataframe.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES]
+        features = dataframe.ix[:, ID_SIZE: ID_SIZE + 2 * NUM_FEATURES]
         prev_month = dataframe.prev_month.values
         prev_month = np.reshape(prev_month, (prev_month.shape[0], 1))
 
         print "Rows features: ", features.shape
         print "Prev Month: ", prev_month.shape
 
-        # Create ndarray for derived features (the differences)
-        # derived_features = np.diff(features)
+        # Create np array for derived features (the differences)
+        # where each row represents the difference between the
+        # features of a county's month(i+1) and the same county's
+        # month(i). This is not computed for month 0.
+        #diff_features = np.empty((0, features.shape[1]))
+        #for i in range(0, len(features) - 1):
+        #    if (i % TOTAL_MONTHS == 0):
+        #        diff_features = np.append(diff_features, np.zeros((1, NUM_FEATURES)))
+        #    else:
+        #        diff_features = np.append(diff_features, np.diff((features[i], features[i +1]), axis = 0), axis = 0)
+
 
         # Concatenate the actual features, and their differences
         # X = np.concatenate((features, derived_features), axis = 1)
@@ -229,6 +274,8 @@ if __name__ == "__main__":
     #dataframe_train = pd.concat([dataframe_train, label_frame], axis = 1)
     Network = NeuralNetwork()
     dataframe_train = Network.add_prev_month_value(dataframe_train)
+    dataframe_train = Network.add_derived_features(dataframe_train)
+
 
     print "Total rows in Dataset: ", len(dataframe_train)
     print "Total Columns in Dataset: ", len(dataframe_train.columns)
