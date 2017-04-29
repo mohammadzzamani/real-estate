@@ -64,8 +64,14 @@ alter table NLP_train add index (cnty_month);
 To check threshold : 
 select count(*) from (select count(*) as l from NLP_train group by cnty_month order by l desc) as t where l > 5000;
 
-./dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 5000
-./dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 5000
+./dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 400
+
+./dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 400
+
+# Incase we need to just combibe :
+./dlatkInterface.py -d mztwitter -t new_train -c cnty_month -f 'feat$1gram$new_train$cnty_month$16to16' 'feat$2gram$new_train$cnty_month$16to16' 'feat$1gram$new_train$cnty_month$16to16' --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 400
+
+
 
 ./dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month --add_lex_table -l met_a30_2000_cp --weighted_lexicon
 ./dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month --add_lex_table -l met_a30_2000_cp --weighted_lexicon
