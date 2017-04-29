@@ -19,7 +19,12 @@ test = ['2014_08','2014_09', '2014_10', '2014_11', '2014_12','2015_01', '2015_02
 
 # Drop the tables if they exist
 #connection.execute("drop table if exists NLP_train_data")
-connection.execute("drop table if exists NLP_test_data")
+# connection.execute("drop table if exists NLP_test_data")
+
+connection.execute("drop table if exists NLP_test")
+connection.execute("drop table if exists NLP_train")
+
+connection.execute("create table if not exists NLP_train (message_id bigint(20), cnty int(5), message text, created_time timestamp) CHARSET=utf8, COLLATE=utf8_unicode_ci")
 
 # Create a table for train
 #connection.execute("create table if not exists NLP_train_data (message_id bigint(20), cnty int(5), message text, created_time timestamp) CHARSET=utf8, COLLATE=utf8_unicode_ci")
@@ -30,17 +35,17 @@ for month in train:
         table = 'msgs_' + month
         print
         print "Table currently executing : ", table
-        connection.execute('insert into NLP_train_data select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.1) <= 200 then rn <= LEAST(200, rn) else rn <= LEAST(1000, rn * 0.1) end)' % table)
+        connection.execute('insert into NLP_train select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.15) <= 500 then rn <= LEAST(500, rn) else rn <= LEAST(1500, rn * 0.15) end)' % table)
 
 print
 print "Starting random selection of test data"
 # Create a table for test
-connection.execute("create table if not exists NLP_test_data (message_id bigint(20), cnty int(5), message text, created_time timestamp) CHARSET=utf8, COLLATE=utf8_unicode_ci")
+connection.execute("create table if not exists NLP_test (message_id bigint(20), cnty int(5), message text, created_time timestamp) CHARSET=utf8, COLLATE=utf8_unicode_ci")
 
 for month in test:
         table = 'msgs_' + month
         print
         print "Table currently executing : ", table
-        connection.execute('insert into NLP_test_data select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.1) <= 200 then rn <= LEAST(200, rn) else rn <= LEAST(1000, rn * 0.1) end)' % table)
+        connection.execute('insert into NLP_test select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.15) <= 500 then rn <= LEAST(500, rn) else rn <= LEAST(1500, rn * 0.15) end)' % table)
 
 print "Completed! Bye"

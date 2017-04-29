@@ -42,30 +42,33 @@ update NLP_features_ip t join housing_outcomes s on t.cnty_month = s.cnty_month 
 
 # MZ:
 
-alter table NLP_test_data_bigger add column month_id int;
-alter table NLP_train_data_bigger add column month_id int;
+scripts/pre_process.py
 
-update NLP_test_data_bigger  set month_id = TIMESTAMPDIFF(MONTH, '2011-11-07', date(created_time));
-update NLP_train_data_bigger  set month_id = TIMESTAMPDIFF(MONTH, '2011-11-07', date(created_time));
+alter table NLP_test add column month_id int;
+alter table NLP_train add column month_id int;
 
-
-alter table NLP_test_data_bigger add column cnty_month varchar(15);
-alter table NLP_train_data_bigger add column cnty_month varchar(15);
-
-update NLP_test_data_bigger set cnty_month = CONCAT(cnty,'_',month_id);
-update NLP_train_data_bigger set cnty_month = CONCAT(cnty,'_',month_id);
+update NLP_test  set month_id = TIMESTAMPDIFF(MONTH, '2011-11-07', date(created_time));
+update NLP_train  set month_id = TIMESTAMPDIFF(MONTH, '2011-11-07', date(created_time));
 
 
-alter table NLP_test_data_bigger add index (cnty_month);
-alter table NLP_train_data_bigger add index (cnty_month);
+alter table NLP_test add column cnty_month varchar(15);
+alter table NLP_train add column cnty_month varchar(15);
+
+update NLP_test set cnty_month = CONCAT(cnty,'_',month_id);
+update NLP_train set cnty_month = CONCAT(cnty,'_',month_id);
 
 
-python dlatkInterface.py -d mztwitter -t NLP_test_data -c cnty_month --add_lex_table -l met_a30_2000_cp --weighted_lexicon
-python dlatkInterface.py -d mztwitter -t NLP_train_data -c cnty_month --add_lex_table -l met_a30_2000_cp --weighted_lexicon
-
-python dlatkInterface.py -d mztwitter -t NLP_test_data -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 5000
-python dlatkInterface.py -d mztwitter -t NLP_train_data -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 5000
+alter table NLP_test add index (cnty_month);
+alter table NLP_train add index (cnty_month);
 
 
-python dlatkInterface.py -d mztwitter -t NLP_train_data -c cnty_month -f 'feat$1to3gram$NLP_train_data$cnty_month$16to16$0_01'  'feat$cat_met_a30_2000_cp_w$NLP_train_data$cnty_month$16to16' --group_freq_thresh 500 --outcome_table housing_outcomes --outcomes msp --train_regression --model ridgecv --save_model --picklefile pickles/PCA_MSP.pickle
-python dlatkInterface.py -d mztwitter -t NLP_test_data -c cnty_month -f 'feat$1to3gram$NLP_test_data$cnty_month$16to16$0_01'  'feat$cat_met_a30_2000_cp_w$NLP_test_data$cnty_month$16to16' --group_freq_thresh 500 --outcome_table housing_outcomes --outcomes msp --predict_regression  --load_model --picklefile pickles/PCA_MSP.pickle
+
+./dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 5000
+./dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 5000
+
+./dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month --add_lex_table -l met_a30_2000_cp --weighted_lexicon
+./dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month --add_lex_table -l met_a30_2000_cp --weighted_lexicon
+
+
+python dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month -f 'feat$1to3gram$NLP_test_data$cnty_month$16to16$0_01'  'feat$cat_met_a30_2000_cp_w$NLP_test_data$cnty_month$16to16' --group_freq_thresh 500 --outcome_table housing_outcomes --outcomes msp --predict_regression  --load_model --picklefile pickles/PCA_MSP.pickle
+python dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month -f 'feat$1to3gram$NLP_train_data$cnty_month$16to16$0_01'  'feat$cat_met_a30_2000_cp_w$NLP_train_data$cnty_month$16to16' --group_freq_thresh 500 --outcome_table housing_outcomes --outcomes msp --train_regression --model ridgecv --save_model --picklefile pickles/PCA_MSP.pickle
