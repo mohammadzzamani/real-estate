@@ -61,7 +61,8 @@ update NLP_train set cnty_month = CONCAT(cnty,'_',month_id);
 alter table NLP_test add index (cnty_month);
 alter table NLP_train add index (cnty_month);
 
-
+To check threshold : 
+select count(*) from (select count(*) as l from NLP_train group by cnty_month order by l desc) as t where l > 5000;
 
 ./dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 5000
 ./dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 5000
