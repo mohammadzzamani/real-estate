@@ -11,10 +11,11 @@ from keras.layers.normalization import BatchNormalization
 import math
 import random
 import Util
+import DB_info
 
-DATABASE = 'mztwitter'
-TRAIN_TABLE_NAME = 'NLP_features_msp'
-TEST_TABLE_NAME = 'NLP_test_features_saf'
+# DATABASE = 'mztwitter'
+# TRAIN_TABLE_NAME = 'NLP_features_msp'
+# TEST_TABLE_NAME = 'NLP_test_features_saf'
 ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
@@ -245,7 +246,7 @@ if __name__ == "__main__":
     # get yTrain and yTest from these dataframes (get_labels())
     # build neural network (build_neural_network())
     db_wrapper = DB_wrapper()
-    dataframe_train = db_wrapper.retrieve_data(TRAIN_TABLE_NAME) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
+    dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
     dataframe_train = dataframe_train.set_index('cnty_month')
     dataframe_train = Util.normalize_each_county(dataframe_train)
 
