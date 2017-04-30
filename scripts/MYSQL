@@ -40,7 +40,7 @@ update NLP_features_ip t join housing_outcomes s on t.cnty_month = s.cnty_month 
 
 
 
-# MZ:
+# IN ORDER:
 
 scripts/pre_process.py
 
@@ -60,6 +60,9 @@ update NLP_train set cnty_month = CONCAT(cnty,'_',month_id);
 
 alter table NLP_test add index (cnty_month);
 alter table NLP_train add index (cnty_month);
+
+alter table NLP_test add index (cnty);
+alter table NLP_train add index (cnty);
 
 To check threshold : 
 select count(*) from (select count(*) as l from NLP_train group by cnty_month order by l desc) as t where l > 5000;

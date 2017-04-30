@@ -30,6 +30,11 @@ connection.execute("create table if not exists NLP_train (message_id bigint(20),
 #connection.execute("create table if not exists NLP_train_data (message_id bigint(20), cnty int(5), message text, created_time timestamp) CHARSET=utf8, COLLATE=utf8_unicode_ci")
 
 
+# query = connection.execute("select cnty from housing_outcomes")
+# cnties = query.fetchall()
+# counties = set ( cnties )
+
+
 print "Starting random selection of train data"
 for month in train:
         table = 'msgs_' + month
