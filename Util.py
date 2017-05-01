@@ -96,10 +96,10 @@ def normalize_mean_variance(train, test):
     return [train, test]
 
 
-def normalize_each_county(df):
+def normalize_each_county(df,num_of_months , num_of_features ):
     counties  = df.cnty.unique().tolist()
-    num_of_months = 45
-    num_of_features = 78
+    # num_of_months = 45
+    # num_of_features = 78
     months = [ i for i in xrange(num_of_months)]
     features = ['feat_'+str(i) for i in xrange(num_of_features)]
     features.append('label')
@@ -108,11 +108,22 @@ def normalize_each_county(df):
         #print 'Feat: ', feat
         for county in counties:
             values = []
+            br = 0
             for month in months:
                 idx = str(county) +'_'+str(month)
-                values.append(df.get_value(idx, feat))
+                #print  ' cnty_month: ' , county , ' , ', month , ' ,',  idx, ' , ', feat
+                #if idx in df.index:
+                val = df.get_value(idx, feat)
+                #else:
+                        #val = None
+                        #print  ' cnty_month: ' , county , ' , ', month , ' ,',  idx, ' , ', feat
+                        #print 'val: ' , val
+                        #br = 1
+                        #break
+                values.append(val)
 
             #print 'Len: ', len(values)
+            # if br == 0:
             new_values = normalize_min_max(values, int(num_of_months * 0.8))
 
             for j in xrange(num_of_months):

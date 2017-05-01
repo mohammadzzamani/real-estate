@@ -20,7 +20,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 34
+NUM_FEATURES = 78
 TOTAL_MONTHS = 45
 
 MONTH = 'month'
@@ -248,7 +248,7 @@ if __name__ == "__main__":
     db_wrapper = DB_wrapper()
     dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
     dataframe_train = dataframe_train.set_index('cnty_month')
-    dataframe_train = Util.normalize_each_county(dataframe_train)
+    dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
     # dataframe_train = dataframe_train.set_index('cnty_month')
     # for index, row in dataframe_train.iterrows():
