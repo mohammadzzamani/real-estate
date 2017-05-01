@@ -40,7 +40,7 @@ for month in train:
         table = 'msgs_' + month
         print
         print "Table currently executing : ", table
-        connection.execute('insert into map_train select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.1) <= 500 then rn <= LEAST(500, rn) else rn <= LEAST(1000, rn * 0.1) end)' % table)
+        connection.execute('insert into map_train select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.1) <= 500 then rn <= LEAST(400, rn) else rn <= LEAST(1000, rn * 0.1) end)' % table)
 
 print
 print "Starting random selection of test data"
@@ -51,6 +51,6 @@ for month in test:
         table = 'msgs_' + month
         print
         print "Table currently executing : ", table
-        connection.execute('insert into map_test select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.1) <= 500 then rn <= LEAST(500, rn) else rn <= LEAST(1000, rn * 0.1) end)' % table)
+        connection.execute('insert into map_test select message_id, cnty, message, created_time from ( select  message_id, cnty, message, created_time, CASE WHEN @cnty != cnty THEN @rn := 1 ELSE @rn := @rn + 1 END rn,@cnty:=cnty FROM (select * FROM %s ORDER BY RAND()) a, (select @rn := 0, @cnty:= NULL) r ORDER BY cnty) s WHERE (case when (rn * 0.1) <= 500 then rn <= LEAST(400, rn) else rn <= LEAST(1000, rn * 0.1) end)' % table)
 
 print "Completed! Bye"
