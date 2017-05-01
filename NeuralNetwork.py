@@ -134,10 +134,12 @@ class NeuralNetwork:
         model = Sequential()
 
         # Add layers
-        model.add(Dense(output_dim = 100, input_dim = len(xTrain[0]), init='normal', activation = 'relu'))
+        model.add(Dense(output_dim = 150, input_dim = len(xTrain[0]), init='normal', activation = 'linear'))
+        model.add(layers.core.Dropout(0.2))
+        model.add(Dense(output_dim = 60, init='normal' , activation = 'relu'))
         model.add(layers.core.Dropout(0.2))
         # model.add(BatchNormalization())
-        model.add(Dense(output_dim = 20, init='normal' , activation = 'relu'))
+        model.add(Dense(output_dim = 20, init='normal' , activation = 'linear'))
         model.add(layers.core.Dropout(0.2))
         # model.add(BatchNormalization())
         model.add(Dense(output_dim = 1, init='normal'))
