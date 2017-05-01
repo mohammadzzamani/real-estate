@@ -55,8 +55,9 @@ class NeuralNetwork:
         #features = np.append(features, derived_features, axis = 1)
         #features = np.append(features, other_info.values, axis = 1)
         #dataframe = pd.DataFrame(features)
-        
-        features = pd.DataFrame(np.append(features, derived_features, axis = 1))
+
+        features = pd.DataFrame(derived_features)
+        # features = pd.DataFrame(np.append(features, derived_features, axis = 1))
         features.reset_index(drop = True, inplace = True)
         other_info.reset_index(drop = True, inplace = True)
         dataframe = pd.concat([features, other_info], axis = 1)
