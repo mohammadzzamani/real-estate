@@ -220,7 +220,11 @@ class NeuralNetwork:
             p_month.append(previous_month[i])
             c_month.append(current_month[i])
 
-        print 'baseline: ', mean_squared_error(p_month, c_month)
+        mean = np.mean(p_month - c_month)
+        m_month = [mean for i in c_month]
+
+        print 'baseline1: ', mean_squared_error(p_month, c_month)
+        print 'baseline2: ', mean_squared_error(m_month, c_month)
 
 
     def __init__(self):
