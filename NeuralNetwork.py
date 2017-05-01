@@ -20,7 +20,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 40
+NUM_FEATURES = 78
 TOTAL_MONTHS = 45
 
 MONTH = 'month'
@@ -250,11 +250,11 @@ if __name__ == "__main__":
     db_wrapper = DB_wrapper()
     dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
     dataframe_train = dataframe_train.set_index('cnty_month')
-    dataframe_train = dataframe_train.drop(dataframe_train.columns[[i for i in xrange(NUM_FEATURES/2, NUM_FEATURES)]], axis=1)
-    old_names = dataframe_train.columns
-    new_names = ['feat_'+str(i) for i in xrange(NUM_FEATURES)]
-    dataframe_train.rename(columns=dict(zip(old_names, new_names)), inplace=True)
-    print dataframe_train.columns
+    # dataframe_train = dataframe_train.drop(dataframe_train.columns[[i for i in xrange(NUM_FEATURES/2, NUM_FEATURES)]], axis=1)
+    # old_names = dataframe_train.columns
+    # new_names = ['feat_'+str(i) for i in xrange(NUM_FEATURES)]
+    # dataframe_train.rename(columns=dict(zip(old_names, new_names)), inplace=True)
+    # print dataframe_train.columns
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
     # dataframe_train = dataframe_train.set_index('cnty_month')
@@ -326,9 +326,9 @@ if __name__ == "__main__":
 
 
 
-    xTrain = xTrain[:2000, :]
+    # xTrain = xTrain[:2000, :]
     # xTest = xTest[0:1000, :]
-    yTrain = yTrain[:2000]
+    # yTrain = yTrain[:2000]
     # yTest = yTest[0:1000]
 
 
