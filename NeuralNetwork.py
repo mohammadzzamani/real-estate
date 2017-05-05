@@ -249,8 +249,8 @@ class NeuralNetwork_:
         p_month = []
         c_month = []
         for index, row in test_set.iterrows():
-            previous_month = row.prev_label
-            current_month = row.label
+            previous_month = float(row.prev_label)
+            current_month = float(row.label)
             if previous_month is  None or current_month is  None or  math.isnan(previous_month) or math.isnan(current_month):
                 continue
             p_month.append(previous_month)
@@ -313,10 +313,9 @@ if __name__ == "__main__":
     print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
     #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     [train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    print 'dataframe_train before adding prev_data: ' , train_set.shape , ' , ', test_set.shape
 
 
-    mean = np.mean(train_set.label) - np.mean(train_set.prev_label)
-    Network.compute_baseline(mean, test_set)
 
 
 
@@ -336,6 +335,10 @@ if __name__ == "__main__":
     print xTrain[100]
     print yTrain[100]
 
+
+    mean = np.mean(train_set.label) - np.mean(train_set.prev_label)
+    print 'mean: ', mean
+    Network.compute_baseline(mean, test_set)
 
 
     xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
