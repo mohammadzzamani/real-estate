@@ -48,6 +48,7 @@ class NeuralNetwork_:
         te_indices = []
         for index , row in df.iterrows():
             [cnty , month ]   = index.split('_')
+            month = int(month)
             if month <> 0:
                 prev_index = str(int(cnty))+'_'+str(int(month)-1)
                 prev_data = df.ix[prev_index].values
@@ -63,7 +64,7 @@ class NeuralNetwork_:
                     train_data = np.vstack((train_data , diff_data))
                     tr_indices.append(index)
 
-        train_df = pd.DataFrame(data = train_data	, index = tr_indices, columns = cols)
+        train_df = pd.DataFrame(data = train_data       , index = tr_indices, columns = cols)
         test_df = pd.DataFrame(data = test_data       , index = te_indices, columns = cols)
 
         train_df.reset_index(drop = True, inplace = True)
@@ -71,8 +72,10 @@ class NeuralNetwork_:
         return [train_df , test_df]
 
 
+
     def add_prev_features(self, df ,train_month ):
 
+        print 'train_month: ' , train_month
         df.drop('cnty', axis=1, inplace=True)
         df.drop('month', axis=1, inplace=True)
         columns = df.columns
@@ -90,13 +93,15 @@ class NeuralNetwork_:
         te_indices = []
         for index , row in df.iterrows():
             [cnty , month ]   = index.split('_')
-            # print cnty , ' , ', month
-            if int(month) <> 0:
-                # print cnty , ' , ', month
-                prev_index = str(int(cnty))+'_'+str(int(month)-1)
+            month = int(month)
+            prev_index = str(int(cnty))+'_'+str(int(month)-1)
+            #print cnty , ' , ', month
+            if int(month) <> 0 and prev_index in df.index.values:
+                print cnty , ' , ', month
                 prev_data = df.ix[prev_index].values
                 current_data = row.values
                 new_data = np.append(prev_data,current_data)
+                print 'month: ' , month, ' , ', train_month
                 if month > train_month:
                     test_data = np.vstack((test_data , new_data))
                     te_indices.append(index)
@@ -104,12 +109,16 @@ class NeuralNetwork_:
                     train_data = np.vstack((train_data , new_data))
                     tr_indices.append(index)
 
-        train_df = pd.DataFrame(data = train_data	, index = tr_indices, columns = cols)
+                print ' train_size: ' , train_data.shape
+                print ' test_size: ' , test_data.shape
+
+        train_df = pd.DataFrame(data = train_data       , index = tr_indices, columns = cols)
         test_df = pd.DataFrame(data = test_data       , index = te_indices, columns = cols)
 
         train_df.reset_index(drop = True, inplace = True)
         test_df.reset_index(drop = True, inplace = True)
         return [train_df , test_df]
+
 
 
 
@@ -310,9 +319,10 @@ if __name__ == "__main__":
 
 
     Network = NeuralNetwork_()
+    #dataframe_train = dataframe_train.ix[0:1000]
     print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
-    #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
-    [train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    [train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     print 'dataframe_train before adding prev_data: ' , train_set.shape , ' , ', test_set.shape
 
 
