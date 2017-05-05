@@ -90,9 +90,9 @@ class NeuralNetwork_:
         te_indices = []
         for index , row in df.iterrows():
             [cnty , month ]   = index.split('_')
-            print cnty , ' , ', month
+            # print cnty , ' , ', month
             if int(month) <> 0:
-                print cnty , ' , ', month
+                # print cnty , ' , ', month
                 prev_index = str(int(cnty))+'_'+str(int(month)-1)
                 prev_data = df.ix[prev_index].values
                 current_data = row.values
