@@ -91,7 +91,7 @@ class NeuralNetwork_:
         for index , row in df.iterrows():
             [cnty , month ]   = index.split('_')
             print cnty , ' , ', month
-            if month <> 0:
+            if int(month) <> 0:
                 print cnty , ' , ', month
                 prev_index = str(int(cnty))+'_'+str(int(month)-1)
                 prev_data = df.ix[prev_index].values
