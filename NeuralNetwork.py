@@ -35,6 +35,10 @@ class NeuralNetwork_:
 
 
     def add_diff_features(self, df ,train_month ):
+
+        df.drop('cnty', axis=1, inplace=True)
+        df.drop('month', axis=1, inplace=True)
+
         columns = df.columns
 
         cols = np.append(columns[:-1],  'prev_label')
