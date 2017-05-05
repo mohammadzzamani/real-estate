@@ -72,7 +72,11 @@ class NeuralNetwork_:
 
 
     def add_prev_features(self, df ,train_month ):
+
+        df.drop('cnty', axis=1, inplace=True)
+        df.drop('month', axis=1, inplace=True)
         columns = df.columns
+
         prev_columns = ['prev_'+str(c) for c in columns ]
 
         cols = np.append(prev_columns , columns )
