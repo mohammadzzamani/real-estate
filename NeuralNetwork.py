@@ -296,8 +296,8 @@ class NeuralNetwork_:
         yTest_c =  np.sign(yTest)
         yTrain_c = np.sign(yTrain)
 
-        print ' lr test accuracy: ' , sum(1 for x,y in zip(lr_pred_test,yTest) if x == y) / float(len(yTest))
-        print ' lr train accuracy: ' , sum(1 for x,y in zip(lr_pred_train,yTrain) if x == y) / float(len(yTrain))
+        print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test),np.sign(yTest)) if x == y) / float(len(yTest))
+        print ' lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train),np.sign(yTrain)) if x == y) / float(len(yTrain))
 
         print  'lr.coef_: '
         print lr.coef_
