@@ -47,15 +47,16 @@ class NeuralNetwork_:
         tr_indices = []
         te_indices = []
         for index , row in df.iterrows():
-            if row.month <> 0:
-                prev_index = str(int(row.cnty))+'_'+str(int(row.month)-1)
+            [cnty , month ]   = index.split('_')
+            if month <> 0:
+                prev_index = str(int(cnty))+'_'+str(int(month)-1)
                 prev_data = df.ix[prev_index].values
                 current_data = row.values
                 diff_data = current_data[:NUM_FEATURES] -  prev_data[:NUM_FEATURES]
                 other_data = current_data[NUM_FEATURES:]
                 diff_data = np.append(diff_data,other_data)
                 diff_data = np.append(diff_data, prev_data[len(prev_data)-1])
-                if row.month > train_month:
+                if month > train_month:
                     test_data = np.vstack((test_data , diff_data))
                     te_indices.append(index)
                 else:
@@ -84,7 +85,6 @@ class NeuralNetwork_:
         te_indices = []
         for index , row in df.iterrows():
             [cnty , month ]   = index.split('_')
-            
             if month <> 0:
                 prev_index = str(int(cnty))+'_'+str(int(month)-1)
                 prev_data = df.ix[prev_index].values
@@ -168,8 +168,8 @@ class NeuralNetwork_:
                 print 'score: ' , score
 
                 testPredict = model.predict(xTest, batch_size = 5000, verbose = 1)
-                    print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
-                    print 'Neural Network_i: ', mean_absolute_error(yTest, testPredict)
+                print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
+                print 'Neural Network_i: ', mean_absolute_error(yTest, testPredict)
                 print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict),np.sign(yTest)) if x == y) / float(len(yTest))
 
 
@@ -261,11 +261,6 @@ class NeuralNetwork_:
         print 'baseline2 (MSE): ', mean_squared_error(m_month, c_month)
         print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in c_month]),np.sign(dif)) if x == y) / float(len(c_month))
 
-    def __init__(self):
-        print "-- Created NeuralNetwork Object --"
-
-
-
     def linear_model(self, xTrain, yTrain, xTest, yTest):
         lr = linear_model.LinearRegression()
         lr.fit(xTrain, yTrain)
@@ -289,6 +284,12 @@ class NeuralNetwork_:
 
         print  'lr.coef_: '
         print lr.coef_
+
+
+    def __init__(self):
+        print "-- Created NeuralNetwork Object --"
+
+
 
 
 
