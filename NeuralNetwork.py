@@ -37,7 +37,7 @@ class NeuralNetwork_:
     def add_diff_features(self, df ,train_month ):
         columns = df.columns
 
-        cols = np.append(columns[:-1],  'prev_month')
+        cols = np.append(columns[:-1],  'prev_label')
         cols = np.append(cols , columns[-1])
         print 'new cols: ' , cols
         # print df.shape
@@ -73,13 +73,14 @@ class NeuralNetwork_:
 
     def add_prev_features(self, df ,train_month ):
         columns = df.columns
+        prev_columns = ['prev_'+str(c) for c in columns ]
 
-        cols = np.append(columns[:-1],  'prev_month')
-        cols = np.append(cols , columns[-1])
+        cols = np.append(prev_columns , columns )
         print 'new cols: ' , cols
+
         # print df.shape
-        test_data = np.empty((0, df.shape[1]+1))
-        train_data = np.empty((0, df.shape[1]+1))
+        test_data = np.empty((0, len(cols)))
+        train_data = np.empty((0, len(cols)))
         print 'train_data.shape: ' , train_data.shape
         tr_indices = []
         te_indices = []
@@ -89,15 +90,12 @@ class NeuralNetwork_:
                 prev_index = str(int(cnty))+'_'+str(int(month)-1)
                 prev_data = df.ix[prev_index].values
                 current_data = row.values
-                diff_data = current_data[:NUM_FEATURES] -  prev_data[:NUM_FEATURES]
-                other_data = current_data[NUM_FEATURES:]
-                diff_data = np.append(diff_data,other_data)
-                diff_data = np.append(diff_data, prev_data[len(prev_data)-1])
+                new_data = np.append(prev_data,current_data)
                 if month > train_month:
-                    test_data = np.vstack((test_data , diff_data))
+                    test_data = np.vstack((test_data , new_data))
                     te_indices.append(index)
                 else:
-                    train_data = np.vstack((train_data , diff_data))
+                    train_data = np.vstack((train_data , new_data))
                     tr_indices.append(index)
 
         train_df = pd.DataFrame(data = train_data	, index = tr_indices, columns = cols)
@@ -245,7 +243,7 @@ class NeuralNetwork_:
         p_month = []
         c_month = []
         for index, row in test_set.iterrows():
-            previous_month = row.prev_month
+            previous_month = row.prev_label
             current_month = row.label
             if previous_month is  None or current_month is  None or  math.isnan(previous_month) or math.isnan(current_month):
                 continue
@@ -306,12 +304,12 @@ if __name__ == "__main__":
 
 
     Network = NeuralNetwork_()
-    print 'dataframe_train before adding diff: ' , dataframe_train.shape
-    [train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
+    #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    [train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
 
 
-
-    mean = np.mean(train_set.label) - np.mean(train_set.prev_month)
+    mean = np.mean(train_set.label) - np.mean(train_set.prev_label)
     Network.compute_baseline(mean, test_set)
 
 
