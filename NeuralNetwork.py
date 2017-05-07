@@ -309,7 +309,7 @@ class NeuralNetwork_:
         p_month = []
         c_month = []
         for index, row in test_set.iterrows():
-            previous_month = float(row.prev_label)
+            previous_month = float(row.label_prev)
             current_month = float(row.label)
             if previous_month is  None or current_month is  None or  math.isnan(previous_month) or math.isnan(current_month):
                 continue
@@ -399,7 +399,7 @@ if __name__ == "__main__":
     print yTrain[100]
 
 
-    mean = np.mean(train_set.label) - np.mean(train_set.prev_label)
+    mean = np.mean(train_set.label) - np.mean(train_set.label_prev)
     print 'mean: ', mean
     Network.compute_baseline(mean, test_set)
 
