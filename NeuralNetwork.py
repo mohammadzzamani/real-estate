@@ -100,6 +100,8 @@ class NeuralNetwork_:
         # create model
         model = Sequential()
         model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
+        model.add(layers.core.Dropout(0.2))
+        model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
         model.add(Dense(output_dim = 5, init='normal' , activation = 'relu'))
         model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         model.add(Dense(1, init='normal'))
@@ -199,7 +201,7 @@ class NeuralNetwork_:
         mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
 
         mean_df = test_df.copy()
-        mean_df['pred'] = mean_df['label_pred'] + mean
+        mean_df['pred'] = mean_df['label_prev'] + mean
 
 
         print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
