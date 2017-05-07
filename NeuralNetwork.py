@@ -291,7 +291,8 @@ if __name__ == "__main__":
 
 
     print 'dataframe_train before: ' , dataframe_train.shape
-    dataframe_train = dataframe_train.dropna(how='any')
+    # dataframe_train = dataframe_train.dropna(how='any')
+    dataframe_train  = dataframe_train.dropna(subset=['label'], how = 'all')
     print 'dataframe_train after: ' , dataframe_train.shape
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
