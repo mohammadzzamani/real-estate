@@ -207,8 +207,8 @@ class NeuralNetwork_:
         print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
         print 'baseline1 (MSE): ', mean_squared_error(mean_df.label_prev, mean_df.label)
 
-        print 'baseline2 (MAE):  ', mean_absolute_error(test_df.pred, mean_df.label)
-        print 'baseline2 (MSE): ', mean_squared_error(test_df.pred, mean_df.label)
+        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.pred, mean_df.label)
+        print 'baseline2 (MSE): ', mean_squared_error(mean_df.pred, mean_df.label)
 
         print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred.value)) if x == y) / float(len(mean_df.label.values))
 
