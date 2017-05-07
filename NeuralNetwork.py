@@ -37,7 +37,7 @@ class NeuralNetwork_:
     def prev_cnty_month ( self, cnty_month):
         [cnty , month ]   = cnty_month.split('_')
         month = int(month)
-        prev_index = str(cnty)+'_'+str(month-shift)
+        prev_index = str(cnty)+'_'+str(month-1)
         return prev_index
 
 
