@@ -289,9 +289,6 @@ if __name__ == "__main__":
     print yTrain[100]
 
 
-
-
-    Network.compute_baseline( train_set, test_set)
     Network.compute_baseline_( train_set, test_set)
 
 
