@@ -198,8 +198,7 @@ class NeuralNetwork_:
 
         mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
 
-        mean_df = test_df.label_prev
-        mean_df['label'] = test_df.label
+        mean_df = test_df.copy
         mean_df['pred'] = mean_df.label_prev + mean
 
 
