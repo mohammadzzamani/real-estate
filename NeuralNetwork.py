@@ -101,11 +101,11 @@ class NeuralNetwork_:
             prev_index = str(int(cnty))+'_'+str(int(month)-1)
             #print cnty , ' , ', month
             if int(month) <> 0 and prev_index in df.index.values:
-                print cnty , ' , ', month
+                # print cnty , ' , ', month
                 prev_data = df.ix[prev_index].values
                 current_data = row.values
                 new_data = np.append(prev_data,current_data)
-                print 'month: ' , month, ' , ', train_month
+                # print 'month: ' , month, ' , ', train_month
                 if month > train_month:
                     test_data = np.vstack((test_data , new_data))
                     te_indices.append(index)
@@ -113,8 +113,8 @@ class NeuralNetwork_:
                     train_data = np.vstack((train_data , new_data))
                     tr_indices.append(index)
 
-                print ' train_size: ' , train_data.shape
-                print ' test_size: ' , test_data.shape
+        print ' train_size: ' , train_data.shape
+        print ' test_size: ' , test_data.shape
 
         train_df = pd.DataFrame(data = train_data       , index = tr_indices, columns = cols)
         test_df = pd.DataFrame(data = test_data       , index = te_indices, columns = cols)
@@ -164,13 +164,13 @@ class NeuralNetwork_:
     def baseline_model(self,xTrain, xTest, yTrain, yTest):
         # create model
         model = Sequential()
-        model.add(Dense(100, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
-        model.add(Dense(output_dim = 20, init='normal' , activation = 'relu'))
+        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
+        model.add(Dense(output_dim = 5, init='normal' , activation = 'relu'))
         model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         model.add(Dense(1, init='normal'))
         # Compile model
 
-        lr = 0.1
+        lr = 0.05
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
@@ -296,8 +296,8 @@ class NeuralNetwork_:
         yTest_c =  np.sign(yTest)
         yTrain_c = np.sign(yTrain)
 
-        print ' lr test accuracy: ' , sum(1 for x,y in zip(lr_pred_test,yTest) if x == y) / float(len(yTest))
-        print ' lr train accuracy: ' , sum(1 for x,y in zip(lr_pred_train,yTrain) if x == y) / float(len(yTrain))
+        print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test),np.sign(yTest)) if x == y) / float(len(yTest))
+        print ' lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train),np.sign(yTrain)) if x == y) / float(len(yTrain))
 
         print  'lr.coef_: '
         print lr.coef_
@@ -325,8 +325,8 @@ if __name__ == "__main__":
     Network = NeuralNetwork_()
     #dataframe_train = dataframe_train.ix[0:1000]
     print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
-    [train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
-    #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    [train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     print 'dataframe_train before adding prev_data: ' , train_set.shape , ' , ', test_set.shape
 
 
