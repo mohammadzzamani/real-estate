@@ -290,7 +290,14 @@ if __name__ == "__main__":
     dataframe_train = dataframe_train.set_index('cnty_month')
 
     print dataframe_train.ix['47139_14']
+    if '47139_14' in dataframe_train.index.tolist():
+        print 'yes'
+    else:
+        print 'no'
 
+    check_df = dataframe_train[dataframe_train['cnty'] == '47139']
+    print check_df
+    print check_df.index
     print 'dataframe_train before: ' , dataframe_train.shape
     # dataframe_train = dataframe_train.dropna(how='any')
     dataframe_train  = dataframe_train.dropna(subset=['label'], how = 'all')
