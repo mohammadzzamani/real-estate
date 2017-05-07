@@ -34,46 +34,7 @@ class NeuralNetwork_:
         return dataframe.ix[:, 0: ID_SIZE].values
 
 
-    def add_diff_features(self, df ,train_month ):
 
-        df.drop('cnty', axis=1, inplace=True)
-        df.drop('month', axis=1, inplace=True)
-
-        columns = df.columns
-
-        cols = np.append(columns[:-1],  'prev_label')
-        cols = np.append(cols , columns[-1])
-        print 'new cols: ' , cols
-        # print df.shape
-        test_data = np.empty((0, df.shape[1]+1))
-        train_data = np.empty((0, df.shape[1]+1))
-        print 'train_data.shape: ' , train_data.shape
-        tr_indices = []
-        te_indices = []
-        for index , row in df.iterrows():
-            [cnty , month ]   = index.split('_')
-            month = int(month)
-            if month <> 0:
-                prev_index = str(int(cnty))+'_'+str(int(month)-1)
-                prev_data = df.ix[prev_index].values
-                current_data = row.values
-                diff_data = current_data[:NUM_FEATURES] -  prev_data[:NUM_FEATURES]
-                other_data = current_data[NUM_FEATURES:]
-                diff_data = np.append(diff_data,other_data)
-                diff_data = np.append(diff_data, prev_data[len(prev_data)-1])
-                if month > train_month:
-                    test_data = np.vstack((test_data , diff_data))
-                    te_indices.append(index)
-                else:
-                    train_data = np.vstack((train_data , diff_data))
-                    tr_indices.append(index)
-
-        train_df = pd.DataFrame(data = train_data       , index = tr_indices, columns = cols)
-        test_df = pd.DataFrame(data = test_data       , index = te_indices, columns = cols)
-
-        train_df.reset_index(drop = True, inplace = True)
-        test_df.reset_index(drop = True, inplace = True)
-        return [train_df , test_df]
 
 
     def prev_cnty_month ( self, cnty_month ):
@@ -82,28 +43,18 @@ class NeuralNetwork_:
         prev_index = str(cnty)+'_'+str(month-1)
         return prev_index
 
-    def merge_with_prev(self, df, train_month ):
-        #pd.merge(df_a, df_b, on='subject_id', how='inner')
-
-        #df.drop('cnty', axis=1, inplace=True)
-        #df.drop('month', axis=1, inplace=True)
+    def merge_with_prev(self, df ):
 
         df_prev = df.copy()
-
-        #columns = df.columns
-        #prev_columns = ['prev_'+str(c) for c in columns ]
-        #df_prev.columns = prev_columns
-
-        #df_prev = df_prev[df_prev.month <> 0 ]
-        #df['month'] = df['month'].apply(lambda x: x - 1)
-        #df['cnty_month']  = df_prev.apply(lambda row: my_test(row['cnty'], row['month']), axis=1)
-        #print df_prev.ix[0:10]
-
-
-
         df_prev.index = df_prev.index.map(self.prev_cnty_month)
-
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
+
+        return new_df
+
+
+
+
+    def split_train_test(self, new_df , train_month ):
 
         test_df = new_df[new_df.month > train_month]
         train_df = new_df[new_df.month <= train_month]
@@ -124,51 +75,7 @@ class NeuralNetwork_:
 
         return train_df, test_df
 
-    def add_prev_features(self, df ,train_month ):
 
-        print 'train_month: ' , train_month
-        df.drop('cnty', axis=1, inplace=True)
-        df.drop('month', axis=1, inplace=True)
-        columns = df.columns
-
-        prev_columns = ['prev_'+str(c) for c in columns ]
-
-        cols = np.append(prev_columns , columns )
-        print 'new cols: ' , cols
-
-        # print df.shape
-        test_data = np.empty((0, len(cols)))
-        train_data = np.empty((0, len(cols)))
-        print 'train_data.shape: ' , train_data.shape
-        tr_indices = []
-        te_indices = []
-        for index , row in df.iterrows():
-            [cnty , month ]   = index.split('_')
-            month = int(month)
-            prev_index = str(int(cnty))+'_'+str(int(month)-1)
-            #print cnty , ' , ', month
-            if int(month) <> 0 and prev_index in df.index.values:
-                # print cnty , ' , ', month
-                prev_data = df.ix[prev_index].values
-                current_data = row.values
-                new_data = np.append(prev_data,current_data)
-                # print 'month: ' , month, ' , ', train_month
-                if month > train_month:
-                    test_data = np.vstack((test_data , new_data))
-                    te_indices.append(index)
-                else:
-                    train_data = np.vstack((train_data , new_data))
-                    tr_indices.append(index)
-
-        print ' train_size: ' , train_data.shape
-        print ' test_size: ' , test_data.shape
-
-        train_df = pd.DataFrame(data = train_data       , index = tr_indices, columns = cols)
-        test_df = pd.DataFrame(data = test_data       , index = te_indices, columns = cols)
-
-        train_df.reset_index(drop = True, inplace = True)
-        test_df.reset_index(drop = True, inplace = True)
-        return [train_df , test_df]
 
 
 
@@ -184,29 +91,10 @@ class NeuralNetwork_:
         return features
 
 
-    # Returns the labels as a numpy ndarray
-    def get_labels(self, dataframe):
-        return dataframe[dataframe.columns[-1]].values # - dataframe[dataframe.columns[-1]].values
 
 
-    # Standardize a given numpy ndarray (makes mean = 0)
-    # x = (x - mean) / variance
-    def standardize(self, values):
-        # Mean is computed column wise
-        mean = values.mean(axis = 0)
-        variance = values.var(axis = 0)
-        values = (values - mean) / variance
-        return values
 
 
-    # Normalizes the data (values reduced to 0 and 1)
-    # x = (x - min) / (max - min)
-    # Ideally: Use MixMaxScaler or any other normalizer provided by Pandas
-    def normalize(self, values):
-        minimum = values.min(axis = 0)
-        maximum = values.max(axis = 0)
-        values = -1 + 2 * (values - minimum) / (maximum - minimum)
-        return values
 
     def baseline_model(self,xTrain, xTest, yTrain, yTest):
         # create model
@@ -304,8 +192,35 @@ class NeuralNetwork_:
 
 
 
-    def compute_baseline(self, mean ,  test_set):
+
+    def compute_baseline_(self, train_df ,  test_df):
+        print 'compute_baseline_:'
+
+        mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
+
+        mean_df = test_df.label_prev
+        mean_df['label'] = test_df.label
+        mean_df['pred'] = mean_df.label_prev + mean
+
+
+        print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
+        print 'baseline1 (MSE): ', mean_squared_error(mean_df.label_prev, mean_df.label)
+
+        print 'baseline2 (MAE):  ', mean_absolute_error(test_df.pred, mean_df.label)
+        print 'baseline2 (MSE): ', mean_squared_error(test_df.pred, mean_df.label)
+
+        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred.value)) if x == y) / float(len(mean_df.label.values))
+
+
+
+
+
+
+    def compute_baseline(self, train_set ,  test_set):
         print 'compute_baseline:'
+        mean = np.mean(train_set.label) - np.mean(train_set.label_prev)
+        print 'mean: ', mean
+
         p_month = []
         c_month = []
         for index, row in test_set.iterrows():
@@ -374,11 +289,10 @@ if __name__ == "__main__":
     print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
     #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
-    [train_set , test_set] = Network.merge_with_prev(dataframe_train, 0.8 * TOTAL_MONTHS )
+    new_dataframe = Network.merge_with_prev(dataframe_train )
+    [train_set , test_set] = Network.split_train_test(new_dataframe,  0.8 * TOTAL_MONTHS)
 
     print 'dataframe_train before adding prev_data: ' , train_set.shape , ' , ', test_set.shape
-
-
 
 
 
@@ -399,14 +313,14 @@ if __name__ == "__main__":
     print yTrain[100]
 
 
-    mean = np.mean(train_set.label) - np.mean(train_set.label_prev)
-    print 'mean: ', mean
-    Network.compute_baseline(mean, test_set)
+
+
+    Network.compute_baseline(train_set, train_set, test_set)
+    Network.compute_baseline_(train_set, train_set, test_set)
 
 
     xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
     xTest, yTest = Util.remove_nan(xTest, yTest)
-
 
     yTest = yTest - xTest[:,-1]
     yTrain = yTrain - xTrain[:,-1]
