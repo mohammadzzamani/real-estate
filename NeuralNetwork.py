@@ -119,7 +119,7 @@ class NeuralNetwork_:
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
-        nb_epochs = 15
+        nb_epochs = 150
         for i in xrange(nb_epochs):
             lr = lr * decay
             adam.lr.set_value(lr)
@@ -135,25 +135,25 @@ class NeuralNetwork_:
 
                 testPredict = testPredict.reshape(testPredict.shape[0])
 
-                print 'yPrevTest'
-                print yPrevTest
-                x1 = np.sign(testPredict - yPrevTest)
-                x2 = np.sign(yTest- yPrevTest)
+                # print 'yPrevTest'
+                # print yPrevTest
+                # x1 = np.sign(testPredict - yPrevTest)
+                # x2 = np.sign(yTest- yPrevTest)
 
                 print 'testPredict'
-                print testPredict[:100]
+                print testPredict[:10]
                 print 'yTest'
-                print yTest[:100]
-                print ' yPrevTest'
-                print yPrevTest[:100]
-                print 's1:'
-                s1 = np.sign(testPredict - yPrevTest)
-                print s1[:100]
-                print 's2'
-                s2 = np.sign(yTest- yPrevTest)
-                print s2[:100]
+                print yTest[:10]
+                # print ' yPrevTest'
+                # print yPrevTest[:100]
+                # print 's1:'
+                # s1 = np.sign(testPredict - yPrevTest)
+                # print s1[:100]
+                # print 's2'
+                # s2 = np.sign(yTest- yPrevTest)
+                # print s2[:100]
 
-                print ' accuracy: ' , mean_absolute_error(x1, x2)
+                # print ' accuracy: ' , mean_absolute_error(x1, x2)
                 print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest- yPrevTest)) if x == y) / float(len(yTest))
                 # print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
 
