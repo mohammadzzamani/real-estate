@@ -144,8 +144,8 @@ class NeuralNetwork_:
                 print testPredict[:10]
                 print 'yTest'
                 print yTest[:10]
-                # print ' yPrevTest'
-                # print yPrevTest[:100]
+                print ' yPrevTest'
+                print yPrevTest[:10]
                 # print 's1:'
                 # s1 = np.sign(testPredict - yPrevTest)
                 # print s1[:100]
