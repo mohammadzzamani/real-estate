@@ -34,22 +34,23 @@ class NeuralNetwork_:
         return dataframe.ix[:, 0: ID_SIZE].values
 
 
-
-
-
-    def prev_cnty_month ( self, cnty_month ):
+    def prev_cnty_month ( self, cnty_month , shift):
         [cnty , month ]   = cnty_month.split('_')
         month = int(month)
-        prev_index = str(cnty)+'_'+str(month-1)
+        prev_index = str(cnty)+'_'+str(month-shift)
         return prev_index
+
 
     def merge_with_prev(self, df ):
 
         df_prev = df.copy()
-        df_prev.index = df_prev.index.map(self.prev_cnty_month)
+        df_prev.index = df_prev.index.map(self.prev_cnty_month, 1)
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
+        df_prev1 = df.copy()
+        df_prev1.index = df_prev1.index.map(self.prev_cnty_month, 1)
+        new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_1')
 
-        return new_df
+        return new_df1
 
 
 
@@ -100,10 +101,11 @@ class NeuralNetwork_:
         # create model
         model = Sequential()
         model.add(Dense(100, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
-        model.add(layers.core.Dropout(0.1))
+        model.add(layers.core.Dropout(0.2))
         model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
+        model.add(layers.core.Dropout(0.2))
         model.add(Dense(output_dim = 15, init='normal' , activation = 'relu'))
-        model.add(layers.core.Dropout(0.1))
+        model.add(layers.core.Dropout(0.2))
         model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         model.add(Dense(1, init='normal'))
         # Compile model
