@@ -150,7 +150,7 @@ class NeuralNetwork_:
                 s1 = np.sign(testPredict - yPrevTest)
                 print s1[:100]
                 print 's2'
-                s2 = np.sign(yTest, yPrevTest)
+                s2 = np.sign(yTest- yPrevTest)
                 print s2[:100]
 
                 print ' accuracy: ' , mean_absolute_error(x1, x2)
