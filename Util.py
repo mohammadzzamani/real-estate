@@ -86,6 +86,21 @@ def normalize_mean_variance_splitted(train, test):
     return [train, test]
 
 
+def normalize_each_county(dataset,num_of_months , num_of_counties ):
+
+    # num_of_months = 45
+    # num_of_features = 78
+    months = [ i for i in xrange(num_of_months)]
+
+
+    for i in xrange(num_of_counties):
+            values = [dataset[i,x] for x in xrange(num_of_months)]
+            new_values = normalize_min_max(values, int(num_of_months * 0.8))
+            dataset[i,:] = new_values
+
+    return dataset
+
+
 def normalize_each_county(df,num_of_months , num_of_features ):
     counties  = df.cnty.unique().tolist()
     # num_of_months = 45
