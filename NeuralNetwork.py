@@ -407,7 +407,7 @@ if __name__ == "__main__":
     #linear regression
     Network.linear_model( train_set, test_set)
     Network.linear_classifier('SGDClassifier', train_set, test_set)
-    Network.linear_classifier('svm', train_set, test_set)
+    # Network.linear_classifier('svm', train_set, test_set)
 
     '''
     svr_lin = SVR(kernel='linear', C=1e3)
