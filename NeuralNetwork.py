@@ -244,7 +244,11 @@ class NeuralNetwork_:
         print lr.coef_
 
 
-    def linear_model(self, xTrain, yTrain, xTest, yTest):
+    def linear_classifier(self, xTrain, yTrain, xTest, yTest):
+
+        # yTrain = np.sign(yTrain)
+        # ytest = np.sign(yTest)
+
         lr = linear_model.LinearRegression()
         lr.fit(xTrain, yTrain)
         lr_pred_test = lr.predict(xTest)
@@ -291,6 +295,8 @@ if __name__ == "__main__":
     Network = NeuralNetwork_()
     #dataframe_train = dataframe_train.ix[0:1000]
     print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
+    dataframe_train = dataframe_train.dropna(how='any')
+    print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
     #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     new_dataframe = Network.merge_with_prev(dataframe_train )
@@ -320,6 +326,7 @@ if __name__ == "__main__":
     Network.compute_baseline_( train_set, test_set)
 
 
+
     xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
     xTest, yTest = Util.remove_nan(xTest, yTest)
 
@@ -328,6 +335,8 @@ if __name__ == "__main__":
 
     xTrain = xTrain [: , :-1]
     xTest = xTest [: , : -1]
+
+
 
 
 
