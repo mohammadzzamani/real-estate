@@ -105,13 +105,13 @@ class NeuralNetwork_:
         print yPrevTest
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
+        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='linear'))
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
-        model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
+        # model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
-        model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
+        # model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         model.add(Dense(1, init='normal'))
         # Compile model
 
@@ -129,7 +129,7 @@ class NeuralNetwork_:
                 score = model.evaluate(xTest, yTest, batch_size = 5000)
                 print 'score: ' , score
 
-                testPredict = model.predict(xTest, batch_size = 5000, verbose = 1)
+                testPredict = model.predict(xTest, verbose = 1)
                 print 'Neural Network_i: ', i , ' , ' ,   mean_squared_error(yTest, testPredict)
                 print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
 
