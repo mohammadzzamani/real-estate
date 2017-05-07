@@ -198,8 +198,8 @@ class NeuralNetwork_:
 
         mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
 
-        mean_df = test_df.copy
-        mean_df['pred'] = mean_df.label_prev + mean
+        mean_df = test_df.copy()
+        mean_df['pred'] = mean_df['label_pred'] + mean
 
 
         print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
