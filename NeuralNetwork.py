@@ -76,6 +76,53 @@ class NeuralNetwork_:
         return [train_df , test_df]
 
 
+    def prev_cnty_month ( self, cnty_month ):
+        [cnty , month ]   = cnty_month.split('_')
+        month = int(month)
+        prev_index = str(cnty)+'_'+str(month-1)
+        return prev_index
+
+    def merge_with_prev(self, df, train_month ):
+        #pd.merge(df_a, df_b, on='subject_id', how='inner')
+
+        #df.drop('cnty', axis=1, inplace=True)
+        #df.drop('month', axis=1, inplace=True)
+
+        df_prev = df.copy()
+
+        #columns = df.columns
+        #prev_columns = ['prev_'+str(c) for c in columns ]
+        #df_prev.columns = prev_columns
+
+        #df_prev = df_prev[df_prev.month <> 0 ]
+        #df['month'] = df['month'].apply(lambda x: x - 1)
+        #df['cnty_month']  = df_prev.apply(lambda row: my_test(row['cnty'], row['month']), axis=1)
+        #print df_prev.ix[0:10]
+
+
+
+        df_prev.index = df_prev.index.map(self.prev_cnty_month)
+
+        new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
+
+        test_df = new_df[new_df.month > train_month]
+        train_df = new_df[new_df.month <= train_month]
+
+
+        train_df.drop('cnty', axis=1, inplace=True)
+        train_df.drop('month', axis=1, inplace=True)
+        train_df.drop('cnty_prev', axis=1, inplace=True)
+        train_df.drop('month_prev', axis=1, inplace=True)
+
+        test_df.drop('cnty', axis=1, inplace=True)
+        test_df.drop('month', axis=1, inplace=True)
+        test_df.drop('cnty_prev', axis=1, inplace=True)
+        test_df.drop('month_prev', axis=1, inplace=True)
+
+        print train_df.shape
+        print test_df.shape
+
+        return train_df, test_df
 
     def add_prev_features(self, df ,train_month ):
 
@@ -326,7 +373,9 @@ if __name__ == "__main__":
     #dataframe_train = dataframe_train.ix[0:1000]
     print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
     #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
-    [train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    [train_set , test_set] = Network.merge_with_prev(dataframe_train, 0.8 * TOTAL_MONTHS )
+
     print 'dataframe_train before adding prev_data: ' , train_set.shape , ' , ', test_set.shape
 
 
