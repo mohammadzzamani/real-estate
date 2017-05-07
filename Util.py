@@ -86,7 +86,7 @@ def normalize_mean_variance_splitted(train, test):
     return [train, test]
 
 
-def normalize_each_county(dataset,num_of_months , num_of_counties ):
+def normalize_each_county_ndarry(dataset,num_of_months , num_of_counties ):
 
     # num_of_months = 45
     # num_of_features = 78
