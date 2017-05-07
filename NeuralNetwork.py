@@ -99,10 +99,11 @@ class NeuralNetwork_:
     def baseline_model(self,xTrain, xTest, yTrain, yTest):
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
-        model.add(layers.core.Dropout(0.2))
-        model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
-        model.add(Dense(output_dim = 5, init='normal' , activation = 'relu'))
+        model.add(Dense(100, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
+        model.add(layers.core.Dropout(0.1))
+        model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
+        model.add(Dense(output_dim = 15, init='normal' , activation = 'relu'))
+        model.add(layers.core.Dropout(0.1))
         model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         model.add(Dense(1, init='normal'))
         # Compile model
@@ -174,7 +175,7 @@ class NeuralNetwork_:
 
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 5000, shuffle = True, validation_split = 0.1, verbose = 1)
 
-        # final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
+            # final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
             if i % 10 == 0:
                 testPredict = model.predict(xTest, batch_size = 5000, verbose = 1)
                 # testPredict = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
@@ -214,32 +215,6 @@ class NeuralNetwork_:
 
 
 
-
-
-
-    def compute_baseline(self, train_set ,  test_set):
-        print 'compute_baseline:'
-        mean = np.mean(train_set.label) - np.mean(train_set.label_prev)
-        print 'mean: ', mean
-
-        p_month = []
-        c_month = []
-        for index, row in test_set.iterrows():
-            previous_month = float(row.label_prev)
-            current_month = float(row.label)
-            if previous_month is  None or current_month is  None or  math.isnan(previous_month) or math.isnan(current_month):
-                continue
-            p_month.append(previous_month)
-            c_month.append(current_month)
-
-        dif = [c_month[i] - p_month[i] for i in xrange(len(c_month))]
-        m_month = [mean+i for i in p_month]
-
-        print 'baseline1 (MAE): ' , mean_absolute_error(p_month, c_month)
-        print 'baseline1 (MSE): ', mean_squared_error(p_month, c_month)
-        print 'baseline2 (MAE):  ', mean_absolute_error(m_month, c_month)
-        print 'baseline2 (MSE): ', mean_squared_error(m_month, c_month)
-        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in c_month]),np.sign(dif)) if x == y) / float(len(c_month))
 
     def linear_model(self, xTrain, yTrain, xTest, yTest):
         lr = linear_model.LinearRegression()
