@@ -315,8 +315,8 @@ if __name__ == "__main__":
 
 
 
-    Network.compute_baseline(train_set, train_set, test_set)
-    Network.compute_baseline_(train_set, train_set, test_set)
+    Network.compute_baseline( train_set, test_set)
+    Network.compute_baseline_( train_set, test_set)
 
 
     xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
