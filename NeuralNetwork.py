@@ -136,6 +136,15 @@ class NeuralNetwork_:
 
                 x1 = np.sign(testPredict - yPrevTest)
                 x2 = np.sign(yTest, yPrevTest)
+
+                print testPredict[:100]
+                print yTest[:100]
+                print yPrevTest[:100]
+                s1 = np.sign(testPredict - yPrevTest)
+                print s1[:100]
+                s2 = np.sign(yTest, yPrevTest)
+                print s2[:100]
+
                 print ' accuracy: ' , mean_absolute_error(x1, x2)
                 print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest, yPrevTest)) if x == y) / float(len(yTest))
                 # print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
