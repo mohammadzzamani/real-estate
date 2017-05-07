@@ -408,7 +408,10 @@ if __name__ == "__main__":
     #xTest = test_set.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES+1].values
     yTest = test_set.ix[:,-1].values
 
+    print 'columns: ' , test_set.columns
     yPrevTest = test_set.ix[:, NUM_FEATURES].values
+    print 'yPrevTest:::::::::::::::::::'
+    print yPrevTest
     yPrevTrain = train_set.ix[:,NUM_FEATURES].values
 
     print '0:'
