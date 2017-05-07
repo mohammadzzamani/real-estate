@@ -289,7 +289,7 @@ if __name__ == "__main__":
     dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
     dataframe_train = dataframe_train.set_index('cnty_month')
 
-    print dataframe_train.ix['47139_14']
+    
     if '47139_14' in dataframe_train.index.tolist():
         print 'yes'
     else:
