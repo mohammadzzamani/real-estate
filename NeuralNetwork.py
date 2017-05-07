@@ -205,8 +205,8 @@ class NeuralNetwork_:
         mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
 
         mean_df = test_df.copy()
-        print 'mean: ' , mean
-        mean_df['mean'] = mean
+        print 'avg: ' , mean
+        mean_df['avg'] = mean
 
         mean_df['diff'] = mean_df['label'] - mean_df['label_prev']
 
@@ -214,17 +214,17 @@ class NeuralNetwork_:
         print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
         print 'baseline1 (MSE): ', mean_squared_error(mean_df.label_prev, mean_df.label)
 
-        print mean_df.mean.shape
+        print mean_df.avg.shape
         print mean_df.diff.shape
-        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.mean, mean_df.diff)
-        print 'baseline2 (MSE): ', mean_squared_error(mean_df.mean, mean_df.diff)
+        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.avg, mean_df.diff)
+        print 'baseline2 (MSE): ', mean_squared_error(mean_df.avg, mean_df.diff)
 
 
         # lr_pred_test = np.sign(lr_pred_test - yPrevTest)
         # lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
 
         # print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred)) if x == y) / float(len(mean_df.label))
-        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.mean),np.sign(mean_df.diff)) if x == y) / float(len(mean_df.label))
+        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.avg),np.sign(mean_df.diff)) if x == y) / float(len(mean_df.label))
 
 
 
