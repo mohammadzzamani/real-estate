@@ -289,11 +289,15 @@ if __name__ == "__main__":
     dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
     dataframe_train = dataframe_train.set_index('cnty_month')
 
+    print dataframe_train.ix['47139_14']
 
     print 'dataframe_train before: ' , dataframe_train.shape
     # dataframe_train = dataframe_train.dropna(how='any')
     dataframe_train  = dataframe_train.dropna(subset=['label'], how = 'all')
+    dataframe_train = dataframe_train[np.isfinite(dataframe_train['label'])]
     print 'dataframe_train after: ' , dataframe_train.shape
+
+    print dataframe_train.ix['47139_14']
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
 
