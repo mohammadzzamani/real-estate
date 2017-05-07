@@ -137,11 +137,16 @@ class NeuralNetwork_:
                 x1 = np.sign(testPredict - yPrevTest)
                 x2 = np.sign(yTest, yPrevTest)
 
+                print 'testPredict'
                 print testPredict[:100]
+                print 'yTest'
                 print yTest[:100]
+                print ' yPrevTest'
                 print yPrevTest[:100]
+                print 's1:'
                 s1 = np.sign(testPredict - yPrevTest)
                 print s1[:100]
+                print 's2'
                 s2 = np.sign(yTest, yPrevTest)
                 print s2[:100]
 
