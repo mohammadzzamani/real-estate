@@ -119,7 +119,7 @@ class NeuralNetwork_:
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
-        nb_epochs = 500
+        nb_epochs = 5
         for i in xrange(nb_epochs):
             lr = lr * decay
             adam.lr.set_value(lr)
@@ -130,14 +130,13 @@ class NeuralNetwork_:
                 print 'score: ' , score
 
                 testPredict = model.predict(xTest, batch_size = 5000, verbose = 1)
-                print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
-                print 'Neural Network_i: ', mean_absolute_error(yTest, testPredict)
-                print type(testPredict)
-                print type(yPrevTest)
-                print type(yTest)
-                testPredict = testPredict.reshape(testPredict.shape[0])
-                print testPredict.shape, ' ,' , yPrevTest.shape, ' , ' , yTest.shape
+                print 'Neural Network_i: ', i , ' , ' ,   mean_squared_error(yTest, testPredict)
+                print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
 
+                testPredict = testPredict.reshape(testPredict.shape[0])
+
+                print 'yPrevTest'
+                print yPrevTest
                 x1 = np.sign(testPredict - yPrevTest)
                 x2 = np.sign(yTest- yPrevTest)
 
