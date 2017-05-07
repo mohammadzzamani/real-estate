@@ -139,7 +139,7 @@ class NeuralNetwork_:
                 print testPredict.shape, ' ,' , yPrevTest.shape, ' , ' , yTest.shape
 
                 x1 = np.sign(testPredict - yPrevTest)
-                x2 = np.sign(yTest, yPrevTest)
+                x2 = np.sign(yTest- yPrevTest)
 
                 print 'testPredict'
                 print testPredict[:100]
