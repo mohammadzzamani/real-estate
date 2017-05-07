@@ -128,8 +128,14 @@ class NeuralNetwork_:
                 testPredict = model.predict(xTest, batch_size = 5000, verbose = 1)
                 print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
                 print 'Neural Network_i: ', mean_absolute_error(yTest, testPredict)
-                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest, yPrevTest)) if x == y) / float(len(yTest))
-
+                print type(testPredict)
+                print type(yPrevTest)
+                print type(yTest)
+                x1 = np.sign(testPredict - yPrevTest)
+                x2 = np.sign(yTest, yPrevTest)
+                print ' accuracy: ' , mean_absolute_error(x1, x2)
+                # print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest, yPrevTest)) if x == y) / float(len(yTest))
+                # print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
 
     # Build the neural network
     def build_neural_network(self, xTrain, xTest, yTrain, yTest):
