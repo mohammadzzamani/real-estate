@@ -199,22 +199,29 @@ class NeuralNetwork_:
 
 
 
-    def compute_baseline_(self, train_df ,  test_df):
-        print 'compute_baseline_:'
+    def compute_baseline(self, train_df ,  test_df):
+        print 'compute_baseline:'
 
         mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
 
         mean_df = test_df.copy()
-        mean_df['pred'] = mean_df['label_prev'] + mean
+        mean_df['mean'] = mean
+
+        mean_df['diff'] = mean_df['label'] - mean_df['label_prev']
 
 
         print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
         print 'baseline1 (MSE): ', mean_squared_error(mean_df.label_prev, mean_df.label)
 
-        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.pred, mean_df.label)
-        print 'baseline2 (MSE): ', mean_squared_error(mean_df.pred, mean_df.label)
+        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.mean, mean_df.diff)
+        print 'baseline2 (MSE): ', mean_squared_error(mean_df.mean, mean_df.diff)
 
-        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred)) if x == y) / float(len(mean_df.label))
+
+        # lr_pred_test = np.sign(lr_pred_test - yPrevTest)
+        # lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
+
+        # print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred)) if x == y) / float(len(mean_df.label))
+        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.mean),np.sign(mean_df.diff)) if x == y) / float(len(mean_df.label))
 
 
 
@@ -386,7 +393,7 @@ if __name__ == "__main__":
     print yTrain[100]
 
 
-    Network.compute_baseline_( train_set, test_set)
+    Network.compute_baseline( train_set, test_set)
 
 
 
