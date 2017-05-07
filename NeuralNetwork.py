@@ -99,15 +99,19 @@ class NeuralNetwork_:
 
 
     def baseline_model(self,xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain):
+        print 'neural network model'
+
+        print 'yPrevTest'
+        print yPrevTest
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
-        model.add(layers.core.Dropout(0.2))
+        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='linear'))
+        # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
-        model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
-        model.add(layers.core.Dropout(0.2))
-        model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
+        # model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
+        # model.add(layers.core.Dropout(0.2))
+        # model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         model.add(Dense(1, init='normal'))
         # Compile model
 
@@ -115,7 +119,7 @@ class NeuralNetwork_:
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
-        nb_epochs = 500
+        nb_epochs = 15
         for i in xrange(nb_epochs):
             lr = lr * decay
             adam.lr.set_value(lr)
@@ -125,11 +129,33 @@ class NeuralNetwork_:
                 score = model.evaluate(xTest, yTest, batch_size = 5000)
                 print 'score: ' , score
 
-                testPredict = model.predict(xTest, batch_size = 5000, verbose = 1)
-                print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
-                print 'Neural Network_i: ', mean_absolute_error(yTest, testPredict)
-                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest, yPrevTest)) if x == y) / float(len(yTest))
+                testPredict = model.predict(xTest, verbose = 1)
+                print 'Neural Network_i: ', i , ' , ' ,   mean_squared_error(yTest, testPredict)
+                print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
 
+                testPredict = testPredict.reshape(testPredict.shape[0])
+
+                print 'yPrevTest'
+                print yPrevTest
+                x1 = np.sign(testPredict - yPrevTest)
+                x2 = np.sign(yTest- yPrevTest)
+
+                print 'testPredict'
+                print testPredict[:100]
+                print 'yTest'
+                print yTest[:100]
+                print ' yPrevTest'
+                print yPrevTest[:100]
+                print 's1:'
+                s1 = np.sign(testPredict - yPrevTest)
+                print s1[:100]
+                print 's2'
+                s2 = np.sign(yTest- yPrevTest)
+                print s2[:100]
+
+                print ' accuracy: ' , mean_absolute_error(x1, x2)
+                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest- yPrevTest)) if x == y) / float(len(yTest))
+                # print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
 
     # Build the neural network
     def build_neural_network(self, xTrain, xTest, yTrain, yTest):
@@ -205,23 +231,28 @@ class NeuralNetwork_:
         mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
 
         mean_df = test_df.copy()
-        mean_df['mean'] = mean
+        print 'avg: ' , mean
+        mean_df['avg'] = mean
 
-        mean_df['diff'] = mean_df['label'] - mean_df['label_prev']
+        diff  = mean_df['label'] - mean_df['label_prev']
 
 
         print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
         print 'baseline1 (MSE): ', mean_squared_error(mean_df.label_prev, mean_df.label)
 
-        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.mean, mean_df.diff)
-        print 'baseline2 (MSE): ', mean_squared_error(mean_df.mean, mean_df.diff)
+        print mean_df.avg.shape
+        print diff[:10]
+        print len(diff)
+        print diff.shape
+        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.avg, diff)
+        print 'baseline2 (MSE): ', mean_squared_error(mean_df.avg, diff)
 
 
         # lr_pred_test = np.sign(lr_pred_test - yPrevTest)
         # lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
 
         # print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred)) if x == y) / float(len(mean_df.label))
-        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.mean),np.sign(mean_df.diff)) if x == y) / float(len(mean_df.label))
+        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.avg),np.sign(diff)) if x == y) / float(len(mean_df.label))
 
 
 
@@ -317,8 +348,8 @@ class NeuralNetwork_:
         # yTest_c =  np.sign(yTest)
         # yTrain_c = np.sign(yTrain)
 
-        print  'clf.coef_: '
-        print clf.coef_
+        # print  'clf.coef_: '
+        # print clf.coef_
 
 
     def __init__(self):
@@ -380,7 +411,10 @@ if __name__ == "__main__":
     #xTest = test_set.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES+1].values
     yTest = test_set.ix[:,-1].values
 
+    print 'columns: ' , test_set.columns
     yPrevTest = test_set.ix[:, NUM_FEATURES].values
+    print 'yPrevTest:::::::::::::::::::'
+    print yPrevTest
     yPrevTrain = train_set.ix[:,NUM_FEATURES].values
 
     print '0:'
