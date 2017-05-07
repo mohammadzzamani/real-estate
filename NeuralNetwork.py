@@ -46,11 +46,11 @@ class NeuralNetwork_:
         df_prev = df.copy()
         df_prev.index = df_prev.index.map(self.prev_cnty_month)
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
-        df_prev1 = df.copy()
-        df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
-        new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_1')
+        # df_prev1 = df.copy()
+        # df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
+        # new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_1')
 
-        return new_df1
+        return new_df
 
 
 
