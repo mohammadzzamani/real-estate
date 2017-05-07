@@ -131,6 +131,7 @@ class NeuralNetwork_:
                 print type(testPredict)
                 print type(yPrevTest)
                 print type(yTest)
+                print testPredict.shape, ' ,' , yPrevTest.shape, ' , ' , yTest.shape
                 x1 = np.sign(testPredict - yPrevTest)
                 x2 = np.sign(yTest, yPrevTest)
                 print ' accuracy: ' , mean_absolute_error(x1, x2)
@@ -328,8 +329,8 @@ class NeuralNetwork_:
         # yTest_c =  np.sign(yTest)
         # yTrain_c = np.sign(yTrain)
 
-        print  'clf.coef_: '
-        print clf.coef_
+        # print  'clf.coef_: '
+        # print clf.coef_
 
 
     def __init__(self):
