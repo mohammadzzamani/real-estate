@@ -131,8 +131,8 @@ class NeuralNetwork_:
                 print type(testPredict)
                 print type(yPrevTest)
                 print type(yTest)
-                print testPredict.transpose().shape, ' ,' , yPrevTest.shape, ' , ' , yTest.shape
-                testPredict = testPredict.transpose()
+                print testPredict.reshape(testPredict.shape[0]), ' ,' , yPrevTest.shape, ' , ' , yTest.shape
+                testPredict = testPredict.reshape(testPredict.shape[0])
                 x1 = np.sign(testPredict - yPrevTest)
                 x2 = np.sign(yTest, yPrevTest)
                 print ' accuracy: ' , mean_absolute_error(x1, x2)
