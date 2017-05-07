@@ -14,6 +14,7 @@ import Util
 import DB_info
 from sklearn.svm import SVR
 from sklearn import linear_model
+from sklearn.svm import LinearSVC
 
 # DATABASE = 'mztwitter'
 # TRAIN_TABLE_NAME = 'NLP_features_msp'
@@ -216,6 +217,31 @@ class NeuralNetwork_:
         print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred)) if x == y) / float(len(mean_df.label))
 
 
+
+
+    def linear_model(self, xTrain, yTrain, xTest, yTest):
+        lr = linear_model.LinearRegression()
+        lr.fit(xTrain, yTrain)
+        lr_pred_test = lr.predict(xTest)
+        lr_pred_train = lr.predict(xTrain)
+
+        print 'Result_test: ', mean_squared_error(yTest, lr_pred_test)
+        print 'Result_train: ', mean_squared_error(yTrain, lr_pred_train)
+
+        print 'Result_test: ', mean_absolute_error(yTest, lr_pred_test)
+        print 'Result_train: ', mean_absolute_error(yTrain, lr_pred_train)
+
+        lr_pred_test = np.sign(lr_pred_test)
+        lr_pred_train = np.sign(lr_pred_train )
+
+        yTest_c =  np.sign(yTest)
+        yTrain_c = np.sign(yTrain)
+
+        print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test),np.sign(yTest)) if x == y) / float(len(yTest))
+        print ' lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train),np.sign(yTrain)) if x == y) / float(len(yTrain))
+
+        print  'lr.coef_: '
+        print lr.coef_
 
 
     def linear_model(self, xTrain, yTrain, xTest, yTest):
