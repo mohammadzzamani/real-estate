@@ -244,10 +244,22 @@ class NeuralNetwork_:
         print lr.coef_
 
 
-    def linear_classifier(self, xTrain, yTrain, xTest, yTest):
+    def linear_classifier(self, train_set, test_set):
 
         # yTrain = np.sign(yTrain)
         # ytest = np.sign(yTest)
+
+
+        xTrain = train_set.ix[:, :-1].values
+        yTrain = train_set.ix[:,-1].values
+        xTest = test_set.ix[:, :-1].values
+        yTest = test_set.ix[:,-1].values
+
+        # xPred = train_set.label_prev.ix[:].values
+        # yPred = test_set.label_prev.ix[:].values
+
+        yPrevTest = test_set.ix[:, NUM_FEATURES].values
+        yPrevTrain = train_set.ix[:,NUM_FEATURES].values
 
         lr = linear_model.LinearRegression()
         lr.fit(xTrain, yTrain)
@@ -260,14 +272,14 @@ class NeuralNetwork_:
         print 'Result_test: ', mean_absolute_error(yTest, lr_pred_test)
         print 'Result_train: ', mean_absolute_error(yTrain, lr_pred_train)
 
-        lr_pred_test = np.sign(lr_pred_test)
-        lr_pred_train = np.sign(lr_pred_train )
+        lr_pred_test = np.sign(lr_pred_test - yPrevTest)
+        lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
 
-        yTest_c =  np.sign(yTest)
-        yTrain_c = np.sign(yTrain)
+        # yTest_c =  np.sign(yTest)
+        # yTrain_c = np.sign(yTrain)
 
-        print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test),np.sign(yTest)) if x == y) / float(len(yTest))
-        print ' lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train),np.sign(yTrain)) if x == y) / float(len(yTrain))
+        print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
+        print ' lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
 
         print  'lr.coef_: '
         print lr.coef_
@@ -290,10 +302,10 @@ if __name__ == "__main__":
     dataframe_train = dataframe_train.set_index('cnty_month')
 
 
-    if '47139_14' in dataframe_train.index.tolist():
-        print 'yes'
-    else:
-        print 'no'
+    # if '47139_14' in dataframe_train.index.tolist():
+    #     print 'yes'
+    # else:
+    #     print 'no'
 
     # check_df = dataframe_train[dataframe_train['cnty'] == '47139']
     # print check_df
@@ -304,10 +316,10 @@ if __name__ == "__main__":
     dataframe_train = dataframe_train[np.isfinite(dataframe_train['label'])]
     print 'dataframe_train after: ' , dataframe_train.shape
 
-    if '47139_14' in dataframe_train.index.tolist():
-        print 'yes'
-    else:
-        print 'no'
+    # if '47139_14' in dataframe_train.index.tolist():
+    #     print 'yes'
+    # else:
+    #     print 'no'
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
 
@@ -346,14 +358,14 @@ if __name__ == "__main__":
 
 
 
-    xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
-    xTest, yTest = Util.remove_nan(xTest, yTest)
+    # xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
+    # xTest, yTest = Util.remove_nan(xTest, yTest)
 
-    yTest = yTest - xTest[:,-1]
-    yTrain = yTrain - xTrain[:,-1]
-
-    xTrain = xTrain [: , :-1]
-    xTest = xTest [: , : -1]
+    # yTest = yTest - xTest[:,-1]
+    # yTrain = yTrain - xTrain[:,-1]
+    #
+    # xTrain = xTrain [: , :-1]
+    # xTest = xTest [: , : -1]
 
 
 
@@ -362,7 +374,7 @@ if __name__ == "__main__":
 
     #linear regression
     Network.linear_model( xTrain, yTrain, xTest, yTest)
-
+    Network.linear_classifier( train_set, test_set)
 
     '''
     svr_lin = SVR(kernel='linear', C=1e3)
