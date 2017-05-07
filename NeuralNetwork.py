@@ -14,6 +14,7 @@ import Util
 import DB_info
 from sklearn.svm import SVR
 from sklearn import linear_model
+from sklearn.svm import LinearSVC
 
 # DATABASE = 'mztwitter'
 # TRAIN_TABLE_NAME = 'NLP_features_msp'
@@ -34,94 +35,49 @@ class NeuralNetwork_:
         return dataframe.ix[:, 0: ID_SIZE].values
 
 
-    def add_diff_features(self, df ,train_month ):
+    def prev_cnty_month ( self, cnty_month):
+        [cnty , month ]   = cnty_month.split('_')
+        month = int(month)
+        prev_index = str(cnty)+'_'+str(month-1)
+        return prev_index
 
-        df.drop('cnty', axis=1, inplace=True)
-        df.drop('month', axis=1, inplace=True)
 
-        columns = df.columns
+    def merge_with_prev(self, df ):
 
-        cols = np.append(columns[:-1],  'prev_label')
-        cols = np.append(cols , columns[-1])
-        print 'new cols: ' , cols
-        # print df.shape
-        test_data = np.empty((0, df.shape[1]+1))
-        train_data = np.empty((0, df.shape[1]+1))
-        print 'train_data.shape: ' , train_data.shape
-        tr_indices = []
-        te_indices = []
-        for index , row in df.iterrows():
-            [cnty , month ]   = index.split('_')
-            month = int(month)
-            if month <> 0:
-                prev_index = str(int(cnty))+'_'+str(int(month)-1)
-                prev_data = df.ix[prev_index].values
-                current_data = row.values
-                diff_data = current_data[:NUM_FEATURES] -  prev_data[:NUM_FEATURES]
-                other_data = current_data[NUM_FEATURES:]
-                diff_data = np.append(diff_data,other_data)
-                diff_data = np.append(diff_data, prev_data[len(prev_data)-1])
-                if month > train_month:
-                    test_data = np.vstack((test_data , diff_data))
-                    te_indices.append(index)
-                else:
-                    train_data = np.vstack((train_data , diff_data))
-                    tr_indices.append(index)
+        df_prev = df.copy()
+        df_prev.index = df_prev.index.map(self.prev_cnty_month)
+        new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
+        # df_prev1 = df.copy()
+        # df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
+        # new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_1')
 
-        train_df = pd.DataFrame(data = train_data       , index = tr_indices, columns = cols)
-        test_df = pd.DataFrame(data = test_data       , index = te_indices, columns = cols)
-
-        train_df.reset_index(drop = True, inplace = True)
-        test_df.reset_index(drop = True, inplace = True)
-        return [train_df , test_df]
+        return new_df
 
 
 
-    def add_prev_features(self, df ,train_month ):
 
-        print 'train_month: ' , train_month
-        df.drop('cnty', axis=1, inplace=True)
-        df.drop('month', axis=1, inplace=True)
-        columns = df.columns
+    def split_train_test(self, new_df , train_month ):
 
-        prev_columns = ['prev_'+str(c) for c in columns ]
+        test_df = new_df[new_df.month > train_month]
+        train_df = new_df[new_df.month <= train_month]
 
-        cols = np.append(prev_columns , columns )
-        print 'new cols: ' , cols
 
-        # print df.shape
-        test_data = np.empty((0, len(cols)))
-        train_data = np.empty((0, len(cols)))
-        print 'train_data.shape: ' , train_data.shape
-        tr_indices = []
-        te_indices = []
-        for index , row in df.iterrows():
-            [cnty , month ]   = index.split('_')
-            month = int(month)
-            prev_index = str(int(cnty))+'_'+str(int(month)-1)
-            #print cnty , ' , ', month
-            if int(month) <> 0 and prev_index in df.index.values:
-                # print cnty , ' , ', month
-                prev_data = df.ix[prev_index].values
-                current_data = row.values
-                new_data = np.append(prev_data,current_data)
-                # print 'month: ' , month, ' , ', train_month
-                if month > train_month:
-                    test_data = np.vstack((test_data , new_data))
-                    te_indices.append(index)
-                else:
-                    train_data = np.vstack((train_data , new_data))
-                    tr_indices.append(index)
+        train_df.drop('cnty', axis=1, inplace=True)
+        train_df.drop('month', axis=1, inplace=True)
+        train_df.drop('cnty_prev', axis=1, inplace=True)
+        train_df.drop('month_prev', axis=1, inplace=True)
 
-        print ' train_size: ' , train_data.shape
-        print ' test_size: ' , test_data.shape
+        test_df.drop('cnty', axis=1, inplace=True)
+        test_df.drop('month', axis=1, inplace=True)
+        test_df.drop('cnty_prev', axis=1, inplace=True)
+        test_df.drop('month_prev', axis=1, inplace=True)
 
-        train_df = pd.DataFrame(data = train_data       , index = tr_indices, columns = cols)
-        test_df = pd.DataFrame(data = test_data       , index = te_indices, columns = cols)
+        print train_df.shape
+        print test_df.shape
 
-        train_df.reset_index(drop = True, inplace = True)
-        test_df.reset_index(drop = True, inplace = True)
-        return [train_df , test_df]
+        return train_df, test_df
+
+
 
 
 
@@ -137,36 +93,25 @@ class NeuralNetwork_:
         return features
 
 
-    # Returns the labels as a numpy ndarray
-    def get_labels(self, dataframe):
-        return dataframe[dataframe.columns[-1]].values # - dataframe[dataframe.columns[-1]].values
 
 
-    # Standardize a given numpy ndarray (makes mean = 0)
-    # x = (x - mean) / variance
-    def standardize(self, values):
-        # Mean is computed column wise
-        mean = values.mean(axis = 0)
-        variance = values.var(axis = 0)
-        values = (values - mean) / variance
-        return values
 
 
-    # Normalizes the data (values reduced to 0 and 1)
-    # x = (x - min) / (max - min)
-    # Ideally: Use MixMaxScaler or any other normalizer provided by Pandas
-    def normalize(self, values):
-        minimum = values.min(axis = 0)
-        maximum = values.max(axis = 0)
-        values = -1 + 2 * (values - minimum) / (maximum - minimum)
-        return values
 
-    def baseline_model(self,xTrain, xTest, yTrain, yTest):
+    def baseline_model(self,xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain):
+        print 'neural network model'
+
+        print 'yPrevTest'
+        print yPrevTest
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
-        model.add(Dense(output_dim = 5, init='normal' , activation = 'relu'))
-        model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
+        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='relu'))
+        # model.add(layers.core.Dropout(0.2))
+        # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
+        # model.add(layers.core.Dropout(0.2))
+        # model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
+        # model.add(layers.core.Dropout(0.2))
+        # model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         model.add(Dense(1, init='normal'))
         # Compile model
 
@@ -174,7 +119,7 @@ class NeuralNetwork_:
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
-        nb_epochs = 500
+        nb_epochs = 150
         for i in xrange(nb_epochs):
             lr = lr * decay
             adam.lr.set_value(lr)
@@ -184,11 +129,33 @@ class NeuralNetwork_:
                 score = model.evaluate(xTest, yTest, batch_size = 5000)
                 print 'score: ' , score
 
-                testPredict = model.predict(xTest, batch_size = 5000, verbose = 1)
-                print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
-                print 'Neural Network_i: ', mean_absolute_error(yTest, testPredict)
-                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict),np.sign(yTest)) if x == y) / float(len(yTest))
+                testPredict = model.predict(xTest, verbose = 1)
+                print 'Neural Network_i: ', i , ' , ' ,   mean_squared_error(yTest, testPredict)
+                print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
 
+                testPredict = testPredict.reshape(testPredict.shape[0])
+
+                # print 'yPrevTest'
+                # print yPrevTest
+                # x1 = np.sign(testPredict - yPrevTest)
+                # x2 = np.sign(yTest- yPrevTest)
+
+                print 'testPredict'
+                print testPredict[:10]
+                print 'yTest'
+                print yTest[:10]
+                print ' yPrevTest'
+                print yPrevTest[:10]
+                # print 's1:'
+                # s1 = np.sign(testPredict - yPrevTest)
+                # print s1[:100]
+                # print 's2'
+                # s2 = np.sign(yTest- yPrevTest)
+                # print s2[:100]
+
+                # print ' accuracy: ' , mean_absolute_error(x1, x2)
+                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest- yPrevTest)) if x == y) / float(len(yTest))
+                # print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
 
     # Build the neural network
     def build_neural_network(self, xTrain, xTest, yTrain, yTest):
@@ -237,7 +204,7 @@ class NeuralNetwork_:
 
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 5000, shuffle = True, validation_split = 0.1, verbose = 1)
 
-        # final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
+            # final_model.fit([xTrain[:, :-1], xTrain[:,-1]], yTrain, nb_epoch = 1, batch_size = 100, shuffle = True, validation_split = 0.15)
             if i % 10 == 0:
                 testPredict = model.predict(xTest, batch_size = 5000, verbose = 1)
                 # testPredict = final_model.predict([xTest[:,:-1], xTest[:, -1]], batch_size = 100, verbose = 1)
@@ -257,28 +224,53 @@ class NeuralNetwork_:
 
 
 
-    def compute_baseline(self, mean ,  test_set):
+
+    def compute_baseline(self, train_df ,  test_df):
         print 'compute_baseline:'
-        p_month = []
-        c_month = []
-        for index, row in test_set.iterrows():
-            previous_month = float(row.prev_label)
-            current_month = float(row.label)
-            if previous_month is  None or current_month is  None or  math.isnan(previous_month) or math.isnan(current_month):
-                continue
-            p_month.append(previous_month)
-            c_month.append(current_month)
 
-        dif = [c_month[i] - p_month[i] for i in xrange(len(c_month))]
-        m_month = [mean+i for i in p_month]
+        mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
 
-        print 'baseline1 (MAE): ' , mean_absolute_error(p_month, c_month)
-        print 'baseline1 (MSE): ', mean_squared_error(p_month, c_month)
-        print 'baseline2 (MAE):  ', mean_absolute_error(m_month, c_month)
-        print 'baseline2 (MSE): ', mean_squared_error(m_month, c_month)
-        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in c_month]),np.sign(dif)) if x == y) / float(len(c_month))
+        mean_df = test_df.copy()
+        print 'avg: ' , mean
+        mean_df['avg'] = mean
 
-    def linear_model(self, xTrain, yTrain, xTest, yTest):
+        diff  = mean_df['label'] - mean_df['label_prev']
+
+
+        print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
+        print 'baseline1 (MSE): ', mean_squared_error(mean_df.label_prev, mean_df.label)
+
+        print mean_df.avg.shape
+        print diff[:10]
+        print len(diff)
+        print diff.shape
+        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.avg, diff)
+        print 'baseline2 (MSE): ', mean_squared_error(mean_df.avg, diff)
+
+
+        # lr_pred_test = np.sign(lr_pred_test - yPrevTest)
+        # lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
+
+        # print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred)) if x == y) / float(len(mean_df.label))
+        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.avg),np.sign(diff)) if x == y) / float(len(mean_df.label))
+
+
+
+
+    def linear_model(self, train_set, test_set):
+        print ' linear_model '
+        # yTrain = np.sign(yTrain)
+        # ytest = np.sign(yTest)
+
+
+        xTrain = train_set.ix[:, :-1].values
+        yTrain = train_set.ix[:,-1].values
+        xTest = test_set.ix[:, :-1].values
+        yTest = test_set.ix[:,-1].values
+
+        yPrevTest = test_set.ix[:, NUM_FEATURES].values
+        yPrevTrain = train_set.ix[:,NUM_FEATURES].values
+
         lr = linear_model.LinearRegression()
         lr.fit(xTrain, yTrain)
         lr_pred_test = lr.predict(xTest)
@@ -290,17 +282,74 @@ class NeuralNetwork_:
         print 'Result_test: ', mean_absolute_error(yTest, lr_pred_test)
         print 'Result_train: ', mean_absolute_error(yTrain, lr_pred_train)
 
-        lr_pred_test = np.sign(lr_pred_test)
-        lr_pred_train = np.sign(lr_pred_train )
+        lr_pred_test = np.sign(lr_pred_test - yPrevTest)
+        lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
 
-        yTest_c =  np.sign(yTest)
-        yTrain_c = np.sign(yTrain)
+        # yTest_c =  np.sign(yTest)
+        # yTrain_c = np.sign(yTrain)
 
-        print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test),np.sign(yTest)) if x == y) / float(len(yTest))
-        print ' lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train),np.sign(yTrain)) if x == y) / float(len(yTrain))
+        print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
+        print ' lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
 
         print  'lr.coef_: '
         print lr.coef_
+
+
+    def linear_classifier(self, type, train_set, test_set):
+        print ' linear_classifier '
+        # yTrain = np.sign(yTrain)
+        # ytest = np.sign(yTest)
+
+
+        xTrain = train_set.ix[:, :-1].values
+        yTrain = train_set.ix[:,-1].values
+        xTest = test_set.ix[:, :-1].values
+        yTest = test_set.ix[:,-1].values
+
+        # xPred = train_set.label_prev.ix[:].values
+        # yPred = test_set.label_prev.ix[:].values
+
+        yPrevTest = test_set.ix[:, NUM_FEATURES].values
+        yPrevTrain = train_set.ix[:,NUM_FEATURES].values
+
+
+        yTest = np.sign(yTest - yPrevTest)
+        yTrain = np.sign(yTrain - yPrevTrain)
+
+        # lr = linear_model.LinearRegression()
+        if type == 'SGDClassifier':
+            clf = linear_model.SGDClassifier()
+        elif type == 'svm':
+            clf = SVR(kernel='linear', C=1e3)
+            clf = SVR(kernel='linear', C=1e3)
+
+
+        clf.fit(xTrain, yTrain)
+        clf_pred_test = clf.predict(xTest)
+        clf_pred_train = clf.predict(xTrain)
+
+        print 'examples:'
+        print yTest[:10]
+        print clf_pred_test[:10]
+
+        print 'Result_test: ', mean_squared_error(yTest, clf_pred_test)
+        print 'Result_train: ', mean_squared_error(yTrain, clf_pred_train)
+
+        print 'Result_test: ', mean_absolute_error(yTest, clf_pred_test)
+        print 'Result_train: ', mean_absolute_error(yTrain, clf_pred_train)
+
+        print ' clf test accuracy: ' , sum(1 for x,y in zip(clf_pred_test,yTest ) if x == y) / float(len(yTest))
+        print ' clf train accuracy: ' , sum(1 for x,y in zip(clf_pred_train,yTrain ) if x == y) / float(len(yTrain))
+
+
+        clf_pred_test = np.sign(clf_pred_test - yPrevTest)
+        clf_pred_train = np.sign(clf_pred_train - yPrevTrain )
+
+        # yTest_c =  np.sign(yTest)
+        # yTrain_c = np.sign(yTrain)
+
+        # print  'clf.coef_: '
+        # print clf.coef_
 
 
     def __init__(self):
@@ -319,17 +368,39 @@ if __name__ == "__main__":
     dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
     dataframe_train = dataframe_train.set_index('cnty_month')
 
+
+    # if '47139_14' in dataframe_train.index.tolist():
+    #     print 'yes'
+    # else:
+    #     print 'no'
+
+    # check_df = dataframe_train[dataframe_train['cnty'] == '47139']
+    # print check_df
+    # print check_df.index
+    print 'dataframe_train before: ' , dataframe_train.shape
+    # dataframe_train = dataframe_train.dropna(how='any')
+    dataframe_train  = dataframe_train.dropna(subset=['label'], how = 'all')
+    dataframe_train = dataframe_train[np.isfinite(dataframe_train['label'])]
+    print 'dataframe_train after: ' , dataframe_train.shape
+
+    # if '47139_14' in dataframe_train.index.tolist():
+    #     print 'yes'
+    # else:
+    #     print 'no'
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
 
     Network = NeuralNetwork_()
     #dataframe_train = dataframe_train.ix[0:1000]
-    print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
+    # print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
+    # dataframe_train = dataframe_train.dropna(how='any')
+    # print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
     #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
-    [train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
-    print 'dataframe_train before adding prev_data: ' , train_set.shape , ' , ', test_set.shape
+    #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
+    new_dataframe = Network.merge_with_prev(dataframe_train )
+    [train_set , test_set] = Network.split_train_test(new_dataframe,  0.8 * TOTAL_MONTHS)
 
-
+    print 'dataframe_train after adding prev_data: ' , train_set.shape , ' , ', test_set.shape
 
 
 
@@ -339,6 +410,12 @@ if __name__ == "__main__":
     xTest = test_set.ix[:, :-1].values
     #xTest = test_set.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES+1].values
     yTest = test_set.ix[:,-1].values
+
+    print 'columns: ' , test_set.columns
+    yPrevTest = test_set.ix[:, NUM_FEATURES].values
+    print 'yPrevTest:::::::::::::::::::'
+    print yPrevTest
+    yPrevTrain = train_set.ix[:,NUM_FEATURES].values
 
     print '0:'
     print train_set.ix[0,:]
@@ -350,27 +427,28 @@ if __name__ == "__main__":
     print yTrain[100]
 
 
-    mean = np.mean(train_set.label) - np.mean(train_set.prev_label)
-    print 'mean: ', mean
-    Network.compute_baseline(mean, test_set)
+    Network.compute_baseline( train_set, test_set)
 
 
-    xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
-    xTest, yTest = Util.remove_nan(xTest, yTest)
+
+    # xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
+    # xTest, yTest = Util.remove_nan(xTest, yTest)
+
+    # yTest = yTest - xTest[:,-1]
+    # yTrain = yTrain - xTrain[:,-1]
+    #
+    # xTrain = xTrain [: , :-1]
+    # xTest = xTest [: , : -1]
 
 
-    yTest = yTest - xTest[:,-1]
-    yTrain = yTrain - xTrain[:,-1]
-
-    xTrain = xTrain [: , :-1]
-    xTest = xTest [: , : -1]
 
 
 
 
     #linear regression
-    Network.linear_model( xTrain, yTrain, xTest, yTest)
-
+    Network.linear_model( train_set, test_set)
+    Network.linear_classifier('SGDClassifier', train_set, test_set)
+    # Network.linear_classifier('svm', train_set, test_set)
 
     '''
     svr_lin = SVR(kernel='linear', C=1e3)
@@ -402,7 +480,7 @@ if __name__ == "__main__":
     print 'Result_train: ', mean_absolute_error(yTrain, y_rbf_train)
     '''
 
-    Network.baseline_model( xTrain, xTest, yTrain, yTest)
+    Network.baseline_model( xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain)
     #Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
 

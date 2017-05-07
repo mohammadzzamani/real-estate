@@ -10,12 +10,8 @@ def remove_nan(X, Y):
     shape1 = X.shape[1]
     for i in reversed(xrange(shape0)):
         remove = 0
-        #print 'i: ' ,i
-	for j in xrange(shape1):
-            #print 'j: ' , j
-	    #print X[i,j]
-	    #print type(X[i,j])
-	    if X[i,j] is None or math.isnan(X[i,j]):
+        for j in xrange(shape1):
+            if X[i,j] is None or math.isnan(X[i,j]):
                 remove = 1
         if remove == 1:
             X = np.delete(X, (i), axis=0)
@@ -44,14 +40,7 @@ def do_pca(trainX, trainY, testX, testY):
 def normalize_min_max(dataset, train_size, axis = 0):
     minimum = np.min(dataset[: train_size], axis = axis)
     maximum = np.max(dataset[: train_size], axis = axis)
-    #print 'min-max: ' , minimum,  ' , ', maximum
-    # print minimum[1:20]
-    # print maximum[1:20]
-    #print 'min: ' , minimum.shape, ', ', len(minimum), ', ', len(maximum)
-    #print 'Minimum: ', minimum, ', Maximum: ', maximum
-    # standard_deviation = np.std(dataset[1: train_size], axis = 0)
-    # print 'standard_deviation: ' , standard_deviation.shape
-    # print 'dataset: ' , dataset.shape
+
     dataset = ((dataset - minimum)* 100.0)/ (maximum-minimum)
     # dataset = (dataset - mean)/standard_deviation
     return dataset
@@ -64,9 +53,7 @@ def normalize_min_max_splitted(train, test):
     print 'maximum'
     # print maximum[1:20]
     print 'min: ' , minimum.shape
-    # standard_deviation = np.std(dataset[1: train_size], axis = 0)
-    # print 'standard_deviation: ' , standard_deviation.shape
-    # print 'dataset: ' , dataset.shape
+
     train = ((train - minimum)* 100.0)/ (maximum-minimum)
     test = ((test - minimum)* 100.0)/ (maximum-minimum)
     # dataset = (dataset - mean)/standard_deviation
@@ -83,19 +70,17 @@ def normalize_min_max_splitted(train, test):
 # MonthN ......
 def normalize_mean_variance(dataset, train_size):
     mean = np.mean(dataset[: train_size], axis = 0)
-    #print 'mean: ' , mean.shape
+
     standard_deviation = np.std(dataset[: train_size], axis = 0)
-    #print 'standard_deviation: ' , standard_deviation.shape
-    #print 'dataset: ' , dataset.shape
+
     dataset = (dataset - mean) * 10.0/standard_deviation
     return dataset
 
 def normalize_mean_variance_splitted(train, test):
     mean = np.mean(train, axis = 0)
-    #print 'mean: ' , mean.shape
+
     standard_deviation = np.std(train, axis = 0)
-    #print 'standard_deviation: ' , standard_deviation.shape
-    #print 'dataset: ' , train.shape
+
     train = (train - mean) * 10.0/standard_deviation
     test = (test - mean) * 10.0/standard_deviation
     return [train, test]
@@ -119,40 +104,36 @@ def normalize_each_county(df,num_of_months , num_of_features ):
                 idx = str(county) +'_'+str(month)
                 #print  ' cnty_month: ' , county , ' , ', month , ' ,',  idx, ' , ', feat
                 if idx in df.index:
-                	val = df.get_value(idx, feat)
-                	if val is None:
-				print county , ' , ', month
-		else:
-                	if county not in not_complete:
-				not_complete.append(county)
-		        val = None
-                        #print  ' cnty_month: ' , county , ' , ', month , ' ,',  idx, ' , ', feat
-                        #print 'val: ' , val
-                        br = 1
-                        break
+                    val = df.get_value(idx, feat)
+                    if val is None:
+                        print county , ' , ', month
+                else:
+                    if county not in not_complete:
+                        not_complete.append(county)
+                    val = None
+                    br = 1
+                    break
                 values.append(val)
 
-	    #print 'Len: ', len(values)
             if br == 0:
-            	new_values = normalize_mean_variance(values, int(num_of_months * 0.8))
-            	#print 'max, min: ' , np.max(new_values), ' , ', np.min(new_values)
-		for j in xrange(num_of_months):
-                	idx = str(county) +'_'+str(j)
-                	df.set_value(idx, feat , new_values[j])
-	    '''
+                # new_values = normalize_mean_variance(values, int(num_of_months * 0.8))
+                new_values = normalize_min_max(values, int(num_of_months * 0.8))
+                #print 'max, min: ' , np.max(new_values), ' , ', np.min(new_values)
+                for j in xrange(num_of_months):
+                    idx = str(county) +'_'+str(j)
+                    df.set_value(idx, feat , new_values[j])
+        '''
 	    if county == '33007':
                 print 'county: ' , county
                 print 'values:\n\n'
 		print values
 		print 'new_values:\n\n'
 		print new_values
-    	    '''
+    	'''
 
     print 'df.shape: ' , df.shape
     print 'note_complete: ' , not_complete
-    #x = df.ix[not_complete]
-    #print x.shape
-    #print x.index.values
+
     df = df[-df['cnty'].isin(not_complete)]
     print 'df.shape: ' , df.shape
     print 'len(not_complete) : ', len(not_complete)

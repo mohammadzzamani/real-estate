@@ -23,19 +23,7 @@ update NLP_train_features JOIN housing_outcomes ON NLP_train_features.cnty_month
 create table NLP_train_features_saf_temp as select NLP_train_features_saf.*, NLP_train_data.cnty, NLP_train_data.month_id from NLP_train_features_saf left join NLP_train_data on NLP_train_data.cnty_month = NLP_train_features_saf.cnty_month;
 
 
-alter table NLP_test_features_saf add column cnty varchar(20);
-alter table NLP_test_features_saf add column month int;
 
-update NLP_test_features_saf set month=cast(SUBSTRING_INDEX(cnty_month, '_', -1) as unsigned);
-update NLP_test_features_saf set cnty=SUBSTRING_INDEX(cnty_month, '_', 1);
-
-# To merge tables
- create table NLP_features_ip like NLP_train_features_ip;
-insert ignore into NLP_features_saf select * from NLP_test_features_saf;
-
-# Queries to add labels to feature tables.
-alter table NLP_features_ip add column ip float default NULL;
-update NLP_features_ip t join housing_outcomes s on t.cnty_month = s.cnty_month update t.ip = s.ip;
 
 
 
@@ -44,41 +32,72 @@ update NLP_features_ip t join housing_outcomes s on t.cnty_month = s.cnty_month 
 
 scripts/pre_process.py
 
-alter table NLP_test add column month_id int;
-alter table NLP_train add column month_id int;
-
-update NLP_test  set month_id = TIMESTAMPDIFF(MONTH, '2011-11-07', date(created_time));
-update NLP_train  set month_id = TIMESTAMPDIFF(MONTH, '2011-11-07', date(created_time));
+delete from final_train where cnty = 0;
+delete from final_test where cnty = 0;
 
 
-alter table NLP_test add column cnty_month varchar(15);
-alter table NLP_train add column cnty_month varchar(15);
+alter table map_test add column month_id int;
+update map_test  set month_id = TIMESTAMPDIFF(MONTH, '2011-11-01', date(created_time));
+alter table map_test add column cnty_month varchar(15);
+update map_test set cnty_month = CONCAT(cnty,'_',month_id);
+alter table map_test add index (cnty_month);
+alter table map_test add index (cnty);
 
-update NLP_test set cnty_month = CONCAT(cnty,'_',month_id);
-update NLP_train set cnty_month = CONCAT(cnty,'_',month_id);
+
+alter table map_train add column month_id int;
+update map_train  set month_id = TIMESTAMPDIFF(MONTH, '2011-11-01', date(created_time));
+alter table map_train add column cnty_month varchar(15);
+update map_train set cnty_month = CONCAT(cnty,'_',month_id);
+alter table map_train add index (cnty_month);
+alter table map_train add index (cnty);
 
 
-alter table NLP_test add index (cnty_month);
-alter table NLP_train add index (cnty_month);
+create table map_test0 like map_test;
+insert into map_test0 select t.* from  map_test t join housing_outcomes s on t.cnty_month = s.cnty_month;
+rename table map_test to map_test_0;
+rename table map_test0 to map_test;
 
-alter table NLP_test add index (cnty);
-alter table NLP_train add index (cnty);
+
+create table map_train0 like map_train;
+insert into map_train0 select t.* from  map_train t join housing_outcomes s on t.cnty_month = s.cnty_month;
+rename table map_train to map_train_0;
+rename table map_train0 to map_train;
 
 To check threshold : 
 select count(*) from (select count(*) as l from NLP_train group by cnty_month order by l desc) as t where l > 5000;
 
-./dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 400
+select count(1) from ( SELECT group_id, sum(value) as val FROM feat$3gram$final_train$cnty_month$16to16$0_025 GROUP BY group_id ) as s where s.val <= 200;
 
-./dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 400
+./dlatkInterface.py -d mztwitter -t map_test -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 200
+
+./dlatkInterface.py -d mztwitter -t map_train -c cnty_month --add_ngrams -n 1 2 3 --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 200
 
 # Incase we need to just combibe :
 ./dlatkInterface.py -d mztwitter -t new_train -c cnty_month -f 'feat$1gram$new_train$cnty_month$16to16' 'feat$2gram$new_train$cnty_month$16to16' 'feat$1gram$new_train$cnty_month$16to16' --feat_occ_filter --set_p_occ 0.01 --combine_feat_tables 1to3gram --group_freq_thresh 400
 
 
 
-./dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month --add_lex_table -l met_a30_2000_cp --weighted_lexicon
-./dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month --add_lex_table -l met_a30_2000_cp --weighted_lexicon
+./dlatkInterface.py -d mztwitter -t map_test -c cnty_month --axdd_lex_table -l met_a30_2000_cp --weighted_lexicon
+./dlatkInterface.py -d mztwitter -t map_train -c cnty_month --add_lex_table -l met_a30_2000_cp --weighted_lexicon
 
 
 python dlatkInterface.py -d mztwitter -t NLP_test_data_bigger -c cnty_month -f 'feat$1to3gram$NLP_test_data$cnty_month$16to16$0_01'  'feat$cat_met_a30_2000_cp_w$NLP_test_data$cnty_month$16to16' --group_freq_thresh 500 --outcome_table housing_outcomes --outcomes msp --predict_regression  --load_model --picklefile pickles/PCA_MSP.pickle
 python dlatkInterface.py -d mztwitter -t NLP_train_data_bigger -c cnty_month -f 'feat$1to3gram$NLP_train_data$cnty_month$16to16$0_01'  'feat$cat_met_a30_2000_cp_w$NLP_train_data$cnty_month$16to16' --group_freq_thresh 500 --outcome_table housing_outcomes --outcomes msp --train_regression --model ridgecv --save_model --picklefile pickles/PCA_MSP.pickle
+
+
+
+# To merge tables
+ create table NLP_features_ip like NLP_train_features_ip;
+ insert  into NLP_features_saf select * from NLP_train_features_saf;
+insert ignore into NLP_features_saf select * from NLP_test_features_saf;
+
+# Queries to add labels to feature tables.
+alter table NLP_features_ip add column ip float default NULL;
+update NLP_features_ip t join housing_outcomes s on t.cnty_month = s.cnty_month set t.label = s.ip;
+
+
+alter table NLP_features_saf add column cnty varchar(20);
+alter table NLP_features_saf add column month int;
+
+update NLP_features_saf set month=cast(SUBSTRING_INDEX(cnty_month, '_', -1) as unsigned);
+update NLP_features_saf set cnty=SUBSTRING_INDEX(cnty_month, '_', 1);
