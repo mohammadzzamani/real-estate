@@ -34,7 +34,7 @@ class NeuralNetwork_:
         return dataframe.ix[:, 0: ID_SIZE].values
 
 
-    def prev_cnty_month ( self, cnty_month , shift):
+    def prev_cnty_month ( self, cnty_month):
         [cnty , month ]   = cnty_month.split('_')
         month = int(month)
         prev_index = str(cnty)+'_'+str(month-shift)
@@ -44,10 +44,10 @@ class NeuralNetwork_:
     def merge_with_prev(self, df ):
 
         df_prev = df.copy()
-        df_prev.index = df_prev.index.map(self.prev_cnty_month, 1)
+        df_prev.index = df_prev.index.map(self.prev_cnty_month)
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
         df_prev1 = df.copy()
-        df_prev1.index = df_prev1.index.map(self.prev_cnty_month, 1)
+        df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
         new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_1')
 
         return new_df1
