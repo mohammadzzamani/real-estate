@@ -98,7 +98,7 @@ class NeuralNetwork_:
 
 
 
-    def baseline_model(self,xTrain, xTest, yTrain, yTest):
+    def baseline_model(self,xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain):
         # create model
         model = Sequential()
         model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))
@@ -128,7 +128,7 @@ class NeuralNetwork_:
                 testPredict = model.predict(xTest, batch_size = 5000, verbose = 1)
                 print 'Neural Network_i: ', mean_squared_error(yTest, testPredict)
                 print 'Neural Network_i: ', mean_absolute_error(yTest, testPredict)
-                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict),np.sign(yTest)) if x == y) / float(len(yTest))
+                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest, yPrevTest)) if x == y) / float(len(yTest))
 
 
     # Build the neural network
@@ -257,7 +257,7 @@ class NeuralNetwork_:
         print lr.coef_
 
 
-    def linear_classifier(self, train_set, test_set):
+    def linear_classifier(self, type, train_set, test_set):
         print ' linear_classifier '
         # yTrain = np.sign(yTrain)
         # ytest = np.sign(yTest)
@@ -279,7 +279,11 @@ class NeuralNetwork_:
         yTrain = np.sign(yTrain - yPrevTrain)
 
         # lr = linear_model.LinearRegression()
-        clf = linear_model.SGDClassifier()
+        if type == 'SGDClassifier':
+            clf = linear_model.SGDClassifier()
+        else:
+            clf = SVR(kernel='linear', C=1e3)
+
         clf.fit(xTrain, yTrain)
         clf_pred_test = clf.predict(xTest)
         clf_pred_train = clf.predict(xTrain)
@@ -367,6 +371,9 @@ if __name__ == "__main__":
     #xTest = test_set.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES+1].values
     yTest = test_set.ix[:,-1].values
 
+    yPrevTest = test_set.ix[:, NUM_FEATURES].values
+    yPrevTrain = train_set.ix[:,NUM_FEATURES].values
+
     print '0:'
     print train_set.ix[0,:]
     print xTrain[0]
@@ -397,7 +404,8 @@ if __name__ == "__main__":
 
     #linear regression
     Network.linear_model( train_set, test_set)
-    Network.linear_classifier( train_set, test_set)
+    Network.linear_classifier('linear_classifier', train_set, test_set)
+    Network.linear_classifier('svm', train_set, test_set)
 
     '''
     svr_lin = SVR(kernel='linear', C=1e3)
@@ -429,7 +437,7 @@ if __name__ == "__main__":
     print 'Result_train: ', mean_absolute_error(yTrain, y_rbf_train)
     '''
 
-    Network.baseline_model( xTrain, xTest, yTrain, yTest)
+    Network.baseline_model( xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain)
     #Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
 
