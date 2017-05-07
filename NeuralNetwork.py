@@ -23,7 +23,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 32
+NUM_FEATURES = 30
 TOTAL_MONTHS = 45
 
 MONTH = 'month'
@@ -289,15 +289,15 @@ if __name__ == "__main__":
     dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
     dataframe_train = dataframe_train.set_index('cnty_month')
 
-    
+
     if '47139_14' in dataframe_train.index.tolist():
         print 'yes'
     else:
         print 'no'
 
-    check_df = dataframe_train[dataframe_train['cnty'] == '47139']
-    print check_df
-    print check_df.index
+    # check_df = dataframe_train[dataframe_train['cnty'] == '47139']
+    # print check_df
+    # print check_df.index
     print 'dataframe_train before: ' , dataframe_train.shape
     # dataframe_train = dataframe_train.dropna(how='any')
     dataframe_train  = dataframe_train.dropna(subset=['label'], how = 'all')
