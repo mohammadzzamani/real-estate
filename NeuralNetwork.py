@@ -289,20 +289,24 @@ if __name__ == "__main__":
     dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
     dataframe_train = dataframe_train.set_index('cnty_month')
 
+
+    print 'dataframe_train before: ' , dataframe_train.shape
+    dataframe_train = dataframe_train.dropna(how='any')
+    print 'dataframe_train after: ' , dataframe_train.shape
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
 
     Network = NeuralNetwork_()
     #dataframe_train = dataframe_train.ix[0:1000]
-    print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
-    dataframe_train = dataframe_train.dropna(how='any')
-    print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
+    # print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
+    # dataframe_train = dataframe_train.dropna(how='any')
+    # print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
     #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     new_dataframe = Network.merge_with_prev(dataframe_train )
     [train_set , test_set] = Network.split_train_test(new_dataframe,  0.8 * TOTAL_MONTHS)
 
-    print 'dataframe_train before adding prev_data: ' , train_set.shape , ' , ', test_set.shape
+    print 'dataframe_train after adding prev_data: ' , train_set.shape , ' , ', test_set.shape
 
 
 
