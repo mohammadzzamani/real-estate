@@ -22,7 +22,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 34
+NUM_FEATURES = 32
 TOTAL_MONTHS = 45
 
 MONTH = 'month'
@@ -210,7 +210,7 @@ class NeuralNetwork_:
         print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.pred, mean_df.label)
         print 'baseline2 (MSE): ', mean_squared_error(mean_df.pred, mean_df.label)
 
-        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred.value)) if x == y) / float(len(mean_df.label.values))
+        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred)) if x == y) / float(len(mean_df.label))
 
 
 
