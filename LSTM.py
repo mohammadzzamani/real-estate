@@ -6,7 +6,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 from DB_wrapper import DB_wrapper
 from keras import optimizers
 from keras import layers
@@ -80,14 +80,6 @@ def get_county_month(dataset):
     dataset = dataset.astype('float32')
     return dataset
 
-
-
-
-
-
-
-
-
 def build_LSTM(trainX, trainY, testX, testY):
     print 'baseline: ', mean_squared_error(testY, testX[:, -1])
     batch_size = 25
@@ -103,7 +95,7 @@ def build_LSTM(trainX, trainY, testX, testY):
     model.add(Dense(1))
     lr = 0.005
     decay = 0.95
-    nb_epoch = 100
+    nb_epoch = 1
     adam = optimizers.adam(lr=lr)
     # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=adam)
@@ -140,9 +132,24 @@ def build_LSTM(trainX, trainY, testX, testY):
     testPredict = model.predict(testX, batch_size=batch_size, verbose = 1)
 
 
-    print 'baseline: ', mean_squared_error(testY, testX[:, -1])
-    print 'lstm: ' , mean_squared_error(testY, testPredict)
-    print 'avg(abs(.)): ', np.average(np.abs(testY))
+    yPrevTest = []
+
+    for i in range(0, testY.shape[0] - 1):
+         yPrevTest.append(testY[i])
+
+    print len(yPrevTest)    
+
+    testY = testY[1:]
+    testPredict = testPredict[1:]
+    
+    testPredict = testPredict.reshape(testPredict.shape[0])
+    yPrevTest = np.array(yPrevTest)
+
+#   print 'baseline: ', mean_squared_error(testY, testX[:, -1])
+    print 'lstm - MSE: ' , mean_squared_error(testY, testPredict)
+    print 'lstm - MAE: ' , mean_absolute_error(testY, testPredict)
+    print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(testY - yPrevTest)) if x == y) / float(len(testY))
+    #print 'avg(abs(.)): ', np.average(np.abs(testY))
 
 def get_train_and_test(dataset, train_size):
     # reshape into X=t and Y=t+1
