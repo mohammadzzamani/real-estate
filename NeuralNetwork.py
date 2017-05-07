@@ -23,7 +23,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 30
+NUM_FEATURES = 34
 TOTAL_MONTHS = 45
 
 MONTH = 'month'
@@ -281,8 +281,10 @@ class NeuralNetwork_:
         # lr = linear_model.LinearRegression()
         if type == 'SGDClassifier':
             clf = linear_model.SGDClassifier()
-        else:
+        elif type == 'svm':
             clf = SVR(kernel='linear', C=1e3)
+            clf = SVR(kernel='linear', C=1e3)
+
 
         clf.fit(xTrain, yTrain)
         clf_pred_test = clf.predict(xTest)
@@ -404,7 +406,7 @@ if __name__ == "__main__":
 
     #linear regression
     Network.linear_model( train_set, test_set)
-    Network.linear_classifier('linear_classifier', train_set, test_set)
+    Network.linear_classifier('SGDClassifier', train_set, test_set)
     Network.linear_classifier('svm', train_set, test_set)
 
     '''
