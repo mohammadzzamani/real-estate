@@ -304,7 +304,10 @@ if __name__ == "__main__":
     dataframe_train = dataframe_train[np.isfinite(dataframe_train['label'])]
     print 'dataframe_train after: ' , dataframe_train.shape
 
-    print dataframe_train.ix['47139_14']
+    if '47139_14' in dataframe_train.index.tolist():
+        print 'yes'
+    else:
+        print 'no'
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
 
