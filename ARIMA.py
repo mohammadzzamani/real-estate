@@ -5,6 +5,7 @@ from pandas import datetime
 from matplotlib import pyplot
 from statsmodels.tsa.arima_model import ARIMA
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error
 import Util
 import math
 
@@ -40,13 +41,63 @@ def remove_nan_arima(X):
     	for j in xrange(shape1):
     	    if X[i,j] is None or math.isnan(X[i,j]):
                 remove = 1
-                print "Here ", i
-                break
 
         if remove == 1:
             X = np.delete(X, (i), axis=0)
 
     return X
+
+def get_mean(dataset, train_size):
+    previous_month = list()
+    current_month = list()
+
+    for column in xrange(dataset.shape[1]):
+        train = dataset[: train_size, column]
+
+        for i in range(train_size - 2):
+            p = float(train[i + 1])
+            c = float(dataset[i + 2, column])
+
+            if p is None or c is None or math.isnan(p) or math.isnan(c):
+                continue
+
+            previous_month.append(p)
+            current_month.append(c)
+
+    mean = np.mean(previous_month) - np.mean(current_month)
+    print "Previous month mean: ", np.mean(previous_month)
+    print "Current month mean: ", np.mean(current_month)
+    return mean
+    
+
+def compute_baseline(dataset, train_size):
+    previous_month = list()
+    current_month = list()
+
+    for column in xrange(dataset.shape[0]):
+        test = dataset[train_size:, column]
+
+        for i in range(test.shape[0]):
+            previous = float(dataset[train_size + i - 1, column])
+            current = float(test[i])
+
+            if previous is None or current is None or math.isnan(previous) or math.isnan(current):
+                continue
+
+            previous_month.append(previous)
+            current_month.append(current)
+            #print "Previous: ", previous, ", Current: ", current
+    
+    differences = [current_month[i] - previous_month[i] for i in xrange(len(current_month))]
+    mean = get_mean(dataset, train_size)
+    m_month = [mean + i for i in previous_month]
+
+    print "Mean: ", mean
+    print "Baseline1 (MAE): ", mean_absolute_error(previous_month, current_month)
+    print "Baseline1 (MSE): ", mean_squared_error(previous_month, current_month)
+    print "Baseline2 (MAE): ", mean_absolute_error(m_month, current_month)
+    print "Baseline2 (MSE): ", mean_squared_error(m_month, current_month)
+    print 'Test Accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in current_month]), np.sign(differences)) if x == y) / float(len(current_month))
 
 
 # Get only county, month values
@@ -65,9 +116,10 @@ def build_ARIMA(dataset, train_size):
     # Write ARIMA code here
     predictions = list()
     observed_labels = list()
+    previous_labels = list()
 
     # Predict from 35th to 45th month for each county
-    for column in xrange(dataset.shape[1]):
+    for column in xrange(dataset.shape[0]):
         #print "Train Size: ", train_size, ", Column: ", column
         train, test = dataset[: train_size, column], dataset[train_size: , column]
         history = []
@@ -77,35 +129,46 @@ def build_ARIMA(dataset, train_size):
 
             history.append(train[i])
 
-        #print "Test: ", test
-        #print "Dataset: ", dataset.shape
-
-        #exit()
-        # Check for each month after 35th month in Test
+        print "Test shape: ", test.shape
         for t in xrange(test.shape[0]):
             try:
-                model = ARIMA(history, order = (5, 0, 0))
+                model = ARIMA(history, order = (3, 0, 0))
                 model_fit = model.fit(disp = 0)
                 output = model_fit.forecast()
                 yHat = output[0]
+                previous = dataset[train_size + t - 1, column]
 
-                if (test[t] != None and math.isnan(test[t]) == False):
+                if (test[t] != None and math.isnan(test[t]) == False and previous != None and math.isnan(previous) == False):
                     history.append(test[t])
                     predictions.append(yHat)
                     observed_labels.append(test[t])
-                    print ("(%d. %d) - Predicted: %f, Expected: %f" % (county, t, yHat, test[t]))
+                    previous_labels.append(previous)
+                    print ("(%d. %d) - Predicted: %f, Expected: %f" % (column, t, yHat, test[t]))
                 else:
                     print "Skipped: ", column, ", ", t
             except:
                 pass
 
+    print "---------- ARIMA ----------"
     error = mean_squared_error(observed_labels, predictions)
-    print ('Test MSE: %.6f' % error)
+    print ('Test(MSE): %.6f' % error)
+    error = mean_absolute_error(observed_labels, predictions)
+    print ('Test(MAE): %.6f' % error)
+    #print 'Test Accuracy: ' , sum(1 for x,y in zip(predictions, observed_labels) if x == y) / float(len(observed_labels))
 
+    predictions = np.asarray(predictions)
+    previous_labels = np.asarray(previous_labels)
+    observed_labels = np.asarray(observed_labels)
+
+    predictions = predictions.reshape(predictions.shape[0])
+    previous_labels = previous_labels.reshape(previous_labels.shape[0])
+    observed_labels = observed_labels.reshape(observed_labels.shape[0])
+
+    print 'Test Accuracy: ' , sum(1 for x, y in zip(np.sign(predictions - previous_labels), np.sign(observed_labels, previous_labels)) if x == y) / float(len(observed_labels))
 
 def build_arima_on_labels():
     db_wrapper = DB_wrapper()
-    dataframe = db_wrapper.retrieve_data(DB_info.SAF_TABLE) #get_dataframe()
+    dataframe = db_wrapper.retrieve_data(DB_info.MSP_LIMITED_TABLE) #get_dataframe()
     # dataset = get_county_month(dataframe.values)
     dataset = Util.normalize_min_max(get_county_month(dataframe.values), TRAIN_MONTHS)
 
@@ -113,6 +176,7 @@ def build_arima_on_labels():
     #dataset = remove_nan_arima(dataset)
 
     # Util.do_pca(trainX, trainY, testX, testY)
+    compute_baseline(dataset, TRAIN_MONTHS)
     build_ARIMA(dataset, TRAIN_MONTHS)
 
 
