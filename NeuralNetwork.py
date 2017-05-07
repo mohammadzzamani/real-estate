@@ -205,6 +205,7 @@ class NeuralNetwork_:
         mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
 
         mean_df = test_df.copy()
+        print 'mean: ' , mean
         mean_df['mean'] = mean
 
         mean_df['diff'] = mean_df['label'] - mean_df['label_prev']
@@ -213,6 +214,8 @@ class NeuralNetwork_:
         print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
         print 'baseline1 (MSE): ', mean_squared_error(mean_df.label_prev, mean_df.label)
 
+        print mean_df.mean.shape
+        print mean_df.diff.shape
         print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.mean, mean_df.diff)
         print 'baseline2 (MSE): ', mean_squared_error(mean_df.mean, mean_df.diff)
 
