@@ -9,6 +9,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 import Util
 import math
+import warnings
 
 # from sqlalchemy import create_engine
 # from sqlalchemy.engine.url import URL
@@ -116,6 +117,12 @@ def get_county_month(dataset):
     return dataset
 
 
+with warnings.catch_warnings():
+    print 'warning here'
+    warnings.filterwarnings("ignore")
+    # Line that is not converging
+
+
 def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
     # Write ARIMA code here
     predictions = list()
@@ -175,7 +182,7 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
             for i in xrange(10):
                 print "Predicted: ", predictions[len(predictions) - i - 1], ", Expected: ", observed_labels[len(observed_labels) - i - 1]
             
-            break
+            #break
 
 
 
