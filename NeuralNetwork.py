@@ -54,8 +54,7 @@ class NeuralNetwork_:
 
 
     def merge_with_prev(self, df ):
-        df.drop('cnty', axis=1, inplace=True)
-        df.drop('month', axis=1, inplace=True)
+
         df_prev = df.copy()
         df_prev.index = df_prev.index.map(self.prev_cnty_month)
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
@@ -84,8 +83,8 @@ class NeuralNetwork_:
         test_df.drop('cnty_prev', axis=1, inplace=True)
         test_df.drop('month_prev', axis=1, inplace=True)
 
-        print train_df.shape
-        print test_df.shape
+        print 'train_df.shape: ' , train_df.shape
+        print 'test_df.shape: ' ,test_df.shape
 
         return train_df, test_df
 
