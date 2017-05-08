@@ -36,7 +36,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 30
+NUM_FEATURES = 34
 TOTAL_MONTHS = 45
 
 MONTH = 'month'
@@ -455,6 +455,8 @@ if __name__ == "__main__":
     print 'dataframe_train after adding prev_data: ' , train_set.shape , ' , ', test_set.shape
 
 
+    test_set.drop('label_prev_2', axis=1, inplace=True)
+    train_set.drop('label_prev_2', axis=1, inplace=True)
 
     xTrain = train_set.ix[:, :-1].values
     #xTrain = train_set.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES+1].values
@@ -491,8 +493,7 @@ if __name__ == "__main__":
     # print test_set[test_set.cnty==32005].label_prev
     # print test_set[test_set.cnty==32005].label_prev_2
 
-    test_set.drop('label_prev_2', axis=1, inplace=True)
-    train_set.drop('label_prev_2', axis=1, inplace=True)
+
 
     Network.compute_baseline( train_set, test_set)
 
