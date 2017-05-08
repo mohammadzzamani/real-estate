@@ -60,11 +60,11 @@ class NeuralNetwork_:
         df_prev = df.copy()
         df_prev.index = df_prev.index.map(self.prev_cnty_month)
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
-        # df_prev1 = df_prev.copy()
-        # df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
-        # new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_prev_2')
+        df_prev1 = df_prev.copy()
+        df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
+        new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_prev_2')
 
-        return new_df
+        return new_df1
 
 
 
@@ -75,17 +75,17 @@ class NeuralNetwork_:
         train_df = new_df[new_df.month <= train_month]
         print new_df.columns
 
-        train_df.drop('cnty', axis=1, inplace=True)
-        train_df.drop('month', axis=1, inplace=True)
-        train_df.drop('cnty_prev', axis=1, inplace=True)
-        train_df.drop('month_prev', axis=1, inplace=True)
+        # train_df.drop('cnty', axis=1, inplace=True)
+        # train_df.drop('month', axis=1, inplace=True)
+        # train_df.drop('cnty_prev', axis=1, inplace=True)
+        # train_df.drop('month_prev', axis=1, inplace=True)
         # train_df.drop('cnty_prev_2', axis=1, inplace=True)
         # train_df.drop('month_prev_2', axis=1, inplace=True)
         #
-        test_df.drop('cnty', axis=1, inplace=True)
-        test_df.drop('month', axis=1, inplace=True)
-        test_df.drop('cnty_prev', axis=1, inplace=True)
-        test_df.drop('month_prev', axis=1, inplace=True)
+        # test_df.drop('cnty', axis=1, inplace=True)
+        # test_df.drop('month', axis=1, inplace=True)
+        # test_df.drop('cnty_prev', axis=1, inplace=True)
+        # test_df.drop('month_prev', axis=1, inplace=True)
         # test_df.drop('cnty_prev_2', axis=1, inplace=True)
         # test_df.drop('month_prev_2', axis=1, inplace=True)
 
@@ -266,7 +266,7 @@ class NeuralNetwork_:
 
 
     def linear_model(self, train_set, test_set):
-        print ' linear_model '
+        print ' ridge '
         # yTrain = np.sign(yTrain)
         # ytest = np.sign(yTest)
 
@@ -276,8 +276,8 @@ class NeuralNetwork_:
         xTest = test_set.ix[:, :-1].values
         yTest = test_set.ix[:,-1].values
 
-        yPrevTest = test_set.ix[:, NUM_FEATURES].values
-        yPrevTrain = train_set.ix[:,NUM_FEATURES].values
+        yPrevTest = test_set.ix[:, 2*NUM_FEATURES].values
+        yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
 
 
         cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
@@ -308,6 +308,8 @@ class NeuralNetwork_:
         print ridge.alpha_
 
 
+
+        print 'linear regression'
         lr = linear_model.LinearRegression()
         lr.fit(xTrain, yTrain)
         lr_pred_test = lr.predict(xTest)
@@ -346,8 +348,8 @@ class NeuralNetwork_:
         # xPred = train_set.label_prev.ix[:].values
         # yPred = test_set.label_prev.ix[:].values
 
-        yPrevTest = test_set.ix[:, NUM_FEATURES].values
-        yPrevTrain = train_set.ix[:,NUM_FEATURES].values
+        yPrevTest = test_set.ix[:, 2* NUM_FEATURES].values
+        yPrevTrain = train_set.ix[:, 2* NUM_FEATURES].values
 
 
         yTest = np.sign(yTest - yPrevTest)
@@ -461,10 +463,10 @@ if __name__ == "__main__":
     yTest = test_set.ix[:,-1].values
 
     print 'columns: ' , test_set.columns
-    yPrevTest = test_set.ix[:, NUM_FEATURES].values
+    yPrevTest = test_set.ix[:,2 * NUM_FEATURES].values
     print 'yPrevTest:::::::::::::::::::'
     print yPrevTest
-    yPrevTrain = train_set.ix[:,NUM_FEATURES].values
+    yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
 
     print '99:'
     print train_set.ix[99,:]
@@ -478,15 +480,15 @@ if __name__ == "__main__":
 
     print ' .. train .. '
 
-    # print train_set[train_set.cnty==32005].label
-    # print train_set[train_set.cnty==32005].label_prev
-    # print train_set[train_set.cnty==32005].label_prev_2
+    print train_set[train_set.cnty==32005].label
+    print train_set[train_set.cnty==32005].label_prev
+    print train_set[train_set.cnty==32005].label_prev_2
 
     print ' .. test ..'
 
-    # print test_set[test_set.cnty==32005].label
-    # print test_set[test_set.cnty==32005].label_prev
-    # print test_set[test_set.cnty==32005].label_prev_2
+    print test_set[test_set.cnty==32005].label
+    print test_set[test_set.cnty==32005].label_prev
+    print test_set[test_set.cnty==32005].label_prev_2
 
 
     Network.compute_baseline( train_set, test_set)
