@@ -356,9 +356,10 @@ class NeuralNetwork_:
         yTrain = np.sign(yTrain - yPrevTrain)
 
         # lr = linear_model.LinearRegression()
-        # if type == 'SGDClassifier':
-        clf = linear_model.SGDClassifier()
-        #elif type == 'svm':
+        if type == 'SGDClassifier':
+            clf = linear_model.SGDClassifier()
+        elif type == 'poly':
+            clf = SVR(kernel='poly', C=1e3, degree=2)
         #    clf = SVR(kernel='linear', C=1e3)
         #    clf = SVR(kernel='linear', C=1e3)
 
@@ -512,6 +513,8 @@ if __name__ == "__main__":
     #linear regression
     Network.linear_model( train_set, test_set)
     Network.linear_classifier('SGDClassifier', train_set, test_set)
+    Network.linear_classifier('poly', train_set, test_set)
+
     # Network.linear_classifier('svm', train_set, test_set)
 
     '''
