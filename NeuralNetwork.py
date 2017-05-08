@@ -470,10 +470,20 @@ if __name__ == "__main__":
     print train_set.ix[99,:]
     print xTrain[99]
     print yTrain[99]
+
     print '100:'
     print train_set.ix[100,:]
     print xTrain[100]
     print yTrain[100]
+
+    print train_set.label.ix[90:110]
+    print train_set.label_prev.ix[90:110]
+    print train_set.label_prev_2.ix[90:110]
+
+
+    print test_set.label.ix[90:110]
+    print test_set.label_prev.ix[90:110]
+    print test_set.label_prev_2.ix[90:110]
 
 
     Network.compute_baseline( train_set, test_set)
