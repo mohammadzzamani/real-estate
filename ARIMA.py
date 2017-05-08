@@ -130,6 +130,8 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
     previous_labels = list()
 
     # Predict from 35th to 45th month for each county
+    result_1 = 0
+    result_0 = 0
     for column in xrange(dataset.shape[1]):
         #print "Train Size: ", train_size, ", Column: ", column
         train, test = dataset[: train_size, column], dataset[train_size: , column]
@@ -140,8 +142,7 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
 
         #     history.append(train[i])
         history = train.tolist()
-        result_1 = 0
-        result_0 = 0
+
         for t in xrange(test.shape[0]):
             try:
                 model = ARIMA(history, order = order )
