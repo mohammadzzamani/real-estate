@@ -140,7 +140,8 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
 
         #     history.append(train[i])
         history = train.tolist()
-
+        result_1 = 0
+        result_0 = 0
         for t in xrange(test.shape[0]):
             try:
                 model = ARIMA(history, order = order )
@@ -166,9 +167,11 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
 
                     if np.sign(yHat - previous) == np.sign(test[t] - previous):
                         res = 1
+                        result_1 +=1
                     else:
                         res = 0
-                    print ' ... ' , column , ' , ', t , ' : ' , previous , ' , ', yHat , ' , ', test[t] , ' , ', res
+                        result_0+=1
+                    print ' ... ' , column , ' , ', t , ' : ' , previous , ' , ', yHat , ' , ', test[t] , ' , ', res , ' , ', result_0 , ' , ', result_1
             except:
                 pass
 
