@@ -101,3 +101,7 @@ alter table NLP_features_saf add column month int;
 
 update NLP_features_saf set month=cast(SUBSTRING_INDEX(cnty_month, '_', -1) as unsigned);
 update NLP_features_saf set cnty=SUBSTRING_INDEX(cnty_month, '_', 1);
+
+
+create table msp_limited like msp_interp;
+insert into msp_limited  select t.* from  msp_interp t join (select distinct(cnty) as cnty  from final_features_msp) as s on t.cnty = s.cnty ;
