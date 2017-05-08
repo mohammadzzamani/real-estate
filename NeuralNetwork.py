@@ -330,6 +330,26 @@ if __name__ == "__main__":
     Network.linear_model( train_set, test_set)
     Network.linear_classifier('SGDClassifier', train_set, test_set)
 
+    svr_lin = SVR(kernel='linear', C=1e3)
+    svr_lin.fit(xTrain, yTrain)
+    svr_lin_test = svr_lin.predict(xTest)
+    svr_lin_train = svr_lin.predict(xTrain)
+    print 'svr_lin_test: ', mean_absolute_error(yTest, svr_lin_test)
+    print 'svr_lin_train: ', mean_absolute_error(yTrain, svr_lin_train)
+ 
+    svr_poly = SVR(kernel='poly', C=1e3, degree=2)
+    svr_poly.fit(xTrain, yTrain)
+    svr_poly_test = svr_poly.predict(xTest)
+    svr_poly_train = svr_poly.predict(xTrain)
+    print 'svr_poly_test: ', mean_absolute_error(yTest, svr_poly_test)
+    print 'svr_poly_train: ', mean_absolute_error(yTrain, svr_poly_train)
+
+    svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
+    svr = svr_rbf.fit(xTrain, yTrain)
+    y_rbf_test = svr.predict(xTest)
+    y_rbf_train = svr.predict(xTrain)
+    #print 'coeff: ' , svr.coef_
+
     print 'Result_test: ', mean_squared_error(yTest, y_rbf_test)
     print 'Result_train: ', mean_squared_error(yTrain, y_rbf_train)
 
