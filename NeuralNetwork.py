@@ -50,7 +50,7 @@ class NeuralNetwork_:
     def prev_cnty_month ( self, cnty_month):
         [cnty , month ]   = cnty_month.split('_')
         month = int(month)
-        prev_index = str(cnty)+'_'+str(month+1)
+        prev_index = str(cnty)+'_'+str(month-1)
         return prev_index
 
 
@@ -307,6 +307,9 @@ class NeuralNetwork_:
         ridge_coef = ridge.coef_
         print 'ridge_coef: '
         print ridge_coef
+
+        print 'alpha: '
+        print ridge.alpha_
 
 
         lr = linear_model.LinearRegression()
