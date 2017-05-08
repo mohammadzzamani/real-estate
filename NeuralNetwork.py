@@ -376,7 +376,7 @@ if __name__ == "__main__":
     # get yTrain and yTest from these dataframes (get_labels())
     # build neural network (build_neural_network())
     arima_df = ARIMA.build_arima_on_labels(table = DB_info.TABLE, county_column_number = COUNTY_COLUMN_NUMBER, train_month = int(0.8 * TOTAL_MONTHS) , order = ( 3, 0 , 3) )
-
+    arima_df.to_csv('arima_df', sep='\t')
 
 
     db_wrapper = DB_wrapper()

@@ -125,6 +125,7 @@ with warnings.catch_warnings():
 
 def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
     # Write ARIMA code here
+    small_order = (2, 0 , 1)
     prediction_dataframe = pd.DataFrame()
     predictions = list()
     observed_labels = list()
@@ -147,10 +148,15 @@ def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
         for t in xrange(test.shape[0]):
             try:
                 model = ARIMA(history, order = order )
-                model_fit = model.fit(disp = 0, maxiter = 100)
+                model_fit = model.fit(disp = 0, maxiter = 50)
                 if not model_fit.mle_retvals['converged']:
-                    print 'not converged'
-                    continue
+                    print 'not converged first'
+                    model = ARIMA(history, order = small_order )
+                    model_fit = model.fit(disp = 0, maxiter = 100)
+                    if not model_fit.mle_retvals['converged']:
+                        print 'not converged second'
+                        continue
+                    
 
                 output = model_fit.forecast()
                 yHat = output[0]
