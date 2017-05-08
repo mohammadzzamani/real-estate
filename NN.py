@@ -266,7 +266,7 @@ class NN:
         print 'baseline3 (MSE): ', mean_squared_error(mean_df.label_prev_2, mean_df.label)
 
 
-    def linear_model(self, train_set, test_set):
+    def linear_model(self, train_set, test_set, num_of_features = NUM_FEATURES):
         print ' ridge '
         # yTrain = np.sign(yTrain)
         # ytest = np.sign(yTest)
@@ -277,8 +277,9 @@ class NN:
         xTest = test_set.ix[:, :-1].values
         yTest = test_set.ix[:,-1].values
 
-        yPrevTest = test_set.ix[:, 2*NUM_FEATURES].values
-        yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
+        print train_set.columns[num_of_features]
+        yPrevTest = test_set.ix[:, num_of_features].values
+        yPrevTrain = train_set.ix[:,num_of_features].values
 
 
         cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
@@ -495,11 +496,10 @@ if __name__ == "__main__":
     # print test_set[test_set.cnty==32005].label_prev_2
 
 
-    print train_set.columns[34]
-    print train_set.columns[68]
-    print train_set.columns[69]
-    print train_set.columns[102]
-    print train_set.columns[103]
+    print train_set.columns[0:35]
+    print train_set.columns[35:70]
+    print train_set.columns[70:]
+
     new_train = train_set[['label_prev_2', 'label_prev' , 'label']]
     new_test = test_set[['label_prev_2', 'label_prev' , 'label']]
     Network.compute_baseline( new_train, new_test, num_of_features = 1)
@@ -524,6 +524,7 @@ if __name__ == "__main__":
 
     #linear regression
     Network.linear_model( train_set, test_set)
+    Network.linear_model( new_train, new_test , num_of_features= 1)
     Network.linear_classifier('SGDClassifier', train_set, test_set)
     # Network.linear_classifier('poly', train_set, test_set)
 
