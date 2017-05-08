@@ -478,14 +478,14 @@ if __name__ == "__main__":
 
     print ' .. train .. '
 
-    print train_set[train_set.cnty==32005].label
-    print train_set[train_set.cnty==32005].label_prev
+    # print train_set[train_set.cnty==32005].label
+    # print train_set[train_set.cnty==32005].label_prev
     # print train_set[train_set.cnty==32005].label_prev_2
 
     print ' .. test ..'
 
-    print test_set[test_set.cnty==32005].label
-    print test_set[test_set.cnty==32005].label_prev
+    # print test_set[test_set.cnty==32005].label
+    # print test_set[test_set.cnty==32005].label_prev
     # print test_set[test_set.cnty==32005].label_prev_2
 
 
