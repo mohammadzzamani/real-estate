@@ -113,7 +113,7 @@ class NeuralNetwork_:
         print yPrevTest
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='relu'))
+        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='linear'))
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
