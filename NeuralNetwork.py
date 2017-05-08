@@ -375,7 +375,9 @@ if __name__ == "__main__":
     # get xTrain and xTest from these dataframes (get_features())
     # get yTrain and yTest from these dataframes (get_labels())
     # build neural network (build_neural_network())
-    ARIMA.build_arima_on_labels(table = DB_info.FEATURE_TABLE, county_column_number = COUNTY_COLUMN_NUMBER, train_month = TRAIN_MONTHS, order = ( 3, 0 , 2) ):
+    arima_df = ARIMA.build_arima_on_labels(table = DB_info.FEATURE_TABLE, county_column_number = COUNTY_COLUMN_NUMBER, train_month = int(0.8 * TOTAL_MONTHS) , order = ( 3, 0 , 3) )
+
+
 
     db_wrapper = DB_wrapper()
     dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
@@ -400,6 +402,9 @@ if __name__ == "__main__":
     #     print 'yes'
     # else:
     #     print 'no'
+
+
+
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
 
@@ -411,6 +416,11 @@ if __name__ == "__main__":
     #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     new_dataframe = Network.merge_with_prev(dataframe_train )
+
+    new_dataframe = arima_df.join(new_dataframe,  how='inner')
+    print 'new_dataframe.columns: ' , new_dataframe.columns
+    print 'new_dataframe.shape: ', new_dataframe.shape
+
     [train_set , test_set] = Network.split_train_test(new_dataframe,  0.8 * TOTAL_MONTHS)
 
     print 'dataframe_train after adding prev_data: ' , train_set.shape , ' , ', test_set.shape
