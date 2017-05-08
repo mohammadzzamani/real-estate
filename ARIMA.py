@@ -1,4 +1,5 @@
 from DB_wrapper import DB_wrapper
+import pandas as pd
 import random
 import numpy as np
 from pandas import datetime
@@ -20,20 +21,21 @@ import DB_info
 # So skip 8 initial columns + columns from 2008/07 to 2011/10 = 8 + 6 + 12*2 + 10 = 48 columns
 INIT_SKIP = 48
 MONTH_COLUMNS = 45
-TRAIN_MONTHS = 35
+TRAIN_MONTHS = 36
 # TEST_MONTHS = 9
 
 # After all months, comes county column which is column number 99 + 8 = 107
 #IP:
-# COUNTY_COLUMN_NUMBER = 113
+#COUNTY_COLUMN_NUMBER = 113
 #MSP:
-# COUNTY_COLUMN_NUMBER = 104
+COUNTY_COLUMN_NUMBER = 104
 #SAF:
-COUNTY_COLUMN_NUMBER = 107
+#COUNTY_COLUMN_NUMBER = 107
 LOOK_BACK = 30
 
 def remove_nan_arima(X):
     print 'remove_nan_arima'
+    print 'Before: ', X.shape
     shape0 = X.shape[0]
     shape1 = X.shape[1]
     for i in reversed(xrange(shape0)):
@@ -41,10 +43,12 @@ def remove_nan_arima(X):
     	for j in xrange(shape1):
     	    if X[i,j] is None or math.isnan(X[i,j]):
                 remove = 1
+                break
 
         if remove == 1:
             X = np.delete(X, (i), axis=0)
 
+    print 'Remove Nan - After: ', X.shape
     return X
 
 def get_mean(dataset, train_size):
@@ -55,16 +59,16 @@ def get_mean(dataset, train_size):
         train = dataset[: train_size, column]
 
         for i in range(train_size - 2):
-            p = float(train[i + 1])
-            c = float(dataset[i + 2, column])
+            p = float(train[i])
+            c = float(train[i + 1])
 
-            if p is None or c is None or math.isnan(p) or math.isnan(c):
-                continue
+            #if p is None or c is None or math.isnan(p) or math.isnan(c):
+            #    continue
 
             previous_month.append(p)
             current_month.append(c)
 
-    mean = np.mean(previous_month) - np.mean(current_month)
+    mean = np.mean(current_month) - np.mean(previous_month)
     print "Previous month mean: ", np.mean(previous_month)
     print "Current month mean: ", np.mean(current_month)
     return mean
@@ -74,20 +78,20 @@ def compute_baseline(dataset, train_size):
     previous_month = list()
     current_month = list()
 
-    for column in xrange(dataset.shape[0]):
+    for column in xrange(dataset.shape[1]):
         test = dataset[train_size:, column]
 
         for i in range(test.shape[0]):
             previous = float(dataset[train_size + i - 1, column])
             current = float(test[i])
 
-            if previous is None or current is None or math.isnan(previous) or math.isnan(current):
-                continue
+            #if previous is None or current is None or math.isnan(previous) or math.isnan(current):
+            #    continue
 
             previous_month.append(previous)
             current_month.append(current)
             #print "Previous: ", previous, ", Current: ", current
-    
+   
     differences = [current_month[i] - previous_month[i] for i in xrange(len(current_month))]
     mean = get_mean(dataset, train_size)
     m_month = [mean + i for i in previous_month]
@@ -119,35 +123,61 @@ def build_ARIMA(dataset, train_size):
     previous_labels = list()
 
     # Predict from 35th to 45th month for each county
-    for column in xrange(dataset.shape[0]):
+    for column in xrange(dataset.shape[1]):
         #print "Train Size: ", train_size, ", Column: ", column
         train, test = dataset[: train_size, column], dataset[train_size: , column]
         history = []
-        for i in range(len(train)):
-            if train[i] is None or math.isnan(train[i]):
-                continue
+        #for i in range(len(train)):
+        #    if train[i] is None or math.isnan(train[i]):
+        #        continue
 
-            history.append(train[i])
+        #     history.append(train[i])
+        history = train.tolist()
 
-        print "Test shape: ", test.shape
         for t in xrange(test.shape[0]):
             try:
-                model = ARIMA(history, order = (3, 0, 0))
+                model = ARIMA(history, order = (3, 0, 2))
                 model_fit = model.fit(disp = 0)
                 output = model_fit.forecast()
                 yHat = output[0]
                 previous = dataset[train_size + t - 1, column]
 
-                if (test[t] != None and math.isnan(test[t]) == False and previous != None and math.isnan(previous) == False):
-                    history.append(test[t])
+                #if (test[t] != None and math.isnan(test[t]) == False and previous != None and math.isnan(previous) == False):
+
+                history.append(test[t])
+                if yHat is not None and math.isnan(yHat) == False:
                     predictions.append(yHat)
                     observed_labels.append(test[t])
                     previous_labels.append(previous)
-                    print ("(%d. %d) - Predicted: %f, Expected: %f" % (column, t, yHat, test[t]))
-                else:
-                    print "Skipped: ", column, ", ", t
+                #print ("(%d. %d) - Predicted: %f, Expected: %f" % (column, t, yHat, test[t]))
+                #else:
+                #    print "Skipped: ", column, ", ", t
+
             except:
                 pass
+
+        if column % 15 == 0 and column <> 0:
+            pr = np.asarray(predictions)
+            pl = np.asarray(previous_labels)
+            ol = np.asarray(observed_labels)
+
+            pr = pr.reshape(pr.shape[0])
+            pl = pl.reshape(pl.shape[0])
+            ol = ol.reshape(ol.shape[0])
+            
+            print "County: ", column
+            error = mean_squared_error(ol, pr)
+            print ('Test(MSE): %.6f' % error)
+            error = mean_absolute_error(ol, pr)
+            print ('Test(MAE): %.6f' % error)
+            print 'Test Accuracy: ' , sum(1 for x, y in zip(np.sign(pr - pl), np.sign(ol - pl)) if x == y) / float(len(ol))
+
+            for i in xrange(10):
+                print "Predicted: ", predictions[len(predictions) - i - 1], ", Expected: ", observed_labels[len(observed_labels) - i - 1]
+            
+            break
+
+
 
     print "---------- ARIMA ----------"
     error = mean_squared_error(observed_labels, predictions)
@@ -164,20 +194,40 @@ def build_ARIMA(dataset, train_size):
     previous_labels = previous_labels.reshape(previous_labels.shape[0])
     observed_labels = observed_labels.reshape(observed_labels.shape[0])
 
-    print 'Test Accuracy: ' , sum(1 for x, y in zip(np.sign(predictions - previous_labels), np.sign(observed_labels, previous_labels)) if x == y) / float(len(observed_labels))
+    print 'Test Accuracy: ' , sum(1 for x, y in zip(np.sign(predictions - previous_labels), np.sign(observed_labels - previous_labels)) if x == y) / float(len(observed_labels))
+    return predictions
+
+
+def create_dataframe(counties, predictions):
+    res = pd.DataFrame()
+    idx = 0
+    print "Predictions: ", len(predictions)
+
+    for county in counties:
+        for i in range(TRAIN_MONTHS, MONTH_COLUMNS):
+            cnty_month = str(county) + '_' + str(i)
+            res = res.append({'cnty_month': cnty_month, 'arima': predictions[idx]}, ignore_index = True)
+            idx += 1
+
+    return res
+
 
 def build_arima_on_labels():
     db_wrapper = DB_wrapper()
     dataframe = db_wrapper.retrieve_data(DB_info.MSP_LIMITED_TABLE) #get_dataframe()
-    # dataset = get_county_month(dataframe.values)
-    dataset = Util.normalize_min_max(get_county_month(dataframe.values), TRAIN_MONTHS)
-
+    dataset = get_county_month(dataframe.values)
+    print "Column: ", COUNTY_COLUMN_NUMBER
     print "Dataset shape: ", dataset.shape
-    #dataset = remove_nan_arima(dataset)
-
+    dataset = Util.normalize_each_county_ndarry(np.transpose(dataset[1:, :]), MONTH_COLUMNS, dataset.shape[1])
+    dataset = np.transpose(remove_nan_arima(dataset))
+    
     # Util.do_pca(trainX, trainY, testX, testY)
     compute_baseline(dataset, TRAIN_MONTHS)
-    build_ARIMA(dataset, TRAIN_MONTHS)
+    predictions = build_ARIMA(dataset, TRAIN_MONTHS)
+    counties = dataframe.values[:, COUNTY_COLUMN_NUMBER].tolist()
+    county_predictions = create_dataframe(counties, predictions)
+    return county_predictions
+
 
 
 if __name__ == "__main__":
