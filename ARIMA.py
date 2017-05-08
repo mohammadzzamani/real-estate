@@ -116,7 +116,7 @@ def get_county_month(dataset):
     return dataset
 
 
-def build_ARIMA(dataset, train_size):
+def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
     # Write ARIMA code here
     predictions = list()
     observed_labels = list()
@@ -136,7 +136,7 @@ def build_ARIMA(dataset, train_size):
 
         for t in xrange(test.shape[0]):
             try:
-                model = ARIMA(history, order = (3, 0, 2))
+                model = ARIMA(history, order = order )
                 model_fit = model.fit(disp = 0)
                 output = model_fit.forecast()
                 yHat = output[0]
@@ -212,18 +212,20 @@ def create_dataframe(counties, predictions):
     return res
 
 
-def build_arima_on_labels():
+def build_arima_on_labels(table = DB_info.MSP_LIMITED_TABLE, county_column_number = COUNTY_COLUMN_NUMBER, train_month = TRAIN_MONTHS, order = ( 3, 0 , 2) ):
     db_wrapper = DB_wrapper()
-    dataframe = db_wrapper.retrieve_data(DB_info.MSP_LIMITED_TABLE) #get_dataframe()
+    dataframe = db_wrapper.retrieve_data(table ) #get_dataframe()
     dataset = get_county_month(dataframe.values)
+    COUNTY_COLUMN_NUMBER = county_column_number
     print "Column: ", COUNTY_COLUMN_NUMBER
     print "Dataset shape: ", dataset.shape
     dataset = Util.normalize_each_county_ndarry(np.transpose(dataset[1:, :]), MONTH_COLUMNS, dataset.shape[1])
     dataset = np.transpose(remove_nan_arima(dataset))
     
     # Util.do_pca(trainX, trainY, testX, testY)
+    TRAIN_MONTHS = train_month
     compute_baseline(dataset, TRAIN_MONTHS)
-    predictions = build_ARIMA(dataset, TRAIN_MONTHS)
+    predictions = build_ARIMA(dataset, TRAIN_MONTHS, order )
     counties = dataframe.values[:, COUNTY_COLUMN_NUMBER].tolist()
     county_predictions = create_dataframe(counties, predictions)
     return county_predictions
