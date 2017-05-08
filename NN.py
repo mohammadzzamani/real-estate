@@ -456,8 +456,8 @@ if __name__ == "__main__":
     print 'dataframe_train after adding prev_data: ' , train_set.shape , ' , ', test_set.shape
 
 
-    test_set.drop('label_prev_2', axis=1, inplace=True)
-    train_set.drop('label_prev_2', axis=1, inplace=True)
+    # test_set.drop('label_prev_2', axis=1, inplace=True)
+    # train_set.drop('label_prev_2', axis=1, inplace=True)
 
     xTrain = train_set.ix[:, :-1].values
     #xTrain = train_set.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES+1].values
@@ -497,9 +497,11 @@ if __name__ == "__main__":
 
     print train_set.columns[34]
     print train_set.columns[68]
+    print train_set.columns[69]
     print train_set.columns[102]
-    new_train = train_set[['cnty_month','label_prev_2', 'label_prev' , 'label']]
-    new_test = test_set[['cnty_month' ,'label_prev_2', 'label_prev' , 'label']]
+    print train_set.columns[103]
+    new_train = train_set[['label_prev_2', 'label_prev' , 'label']]
+    new_test = test_set[['label_prev_2', 'label_prev' , 'label']]
     Network.compute_baseline( new_train, new_test, num_of_features = 1)
 
     Network.compute_baseline( train_set, test_set)
