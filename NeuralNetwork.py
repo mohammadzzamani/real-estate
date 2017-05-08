@@ -51,7 +51,7 @@ class NeuralNetwork_:
     def prev_cnty_month ( self, cnty_month):
         [cnty , month ]   = cnty_month.split('_')
         month = int(month)
-        prev_index = str(cnty)+'_'+str(month+1)
+        prev_index = str(cnty)+'_'+str(month-1)
         return prev_index
 
 
@@ -60,11 +60,11 @@ class NeuralNetwork_:
         df_prev = df.copy()
         df_prev.index = df_prev.index.map(self.prev_cnty_month)
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
-        df_prev1 = df_prev.copy()
-        df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
-        new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_prev_2')
+        # df_prev1 = df_prev.copy()
+        # df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
+        # new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_prev_2')
 
-        return new_df1
+        return new_df
 
 
 
@@ -79,15 +79,15 @@ class NeuralNetwork_:
         train_df.drop('month', axis=1, inplace=True)
         train_df.drop('cnty_prev', axis=1, inplace=True)
         train_df.drop('month_prev', axis=1, inplace=True)
-        train_df.drop('cnty_prev_2', axis=1, inplace=True)
-        train_df.drop('month_prev_2', axis=1, inplace=True)
+        # train_df.drop('cnty_prev_2', axis=1, inplace=True)
+        # train_df.drop('month_prev_2', axis=1, inplace=True)
 
         test_df.drop('cnty', axis=1, inplace=True)
         test_df.drop('month', axis=1, inplace=True)
         test_df.drop('cnty_prev', axis=1, inplace=True)
         test_df.drop('month_prev', axis=1, inplace=True)
-        test_df.drop('cnty_prev_2', axis=1, inplace=True)
-        test_df.drop('month_prev_2', axis=1, inplace=True)
+        # test_df.drop('cnty_prev_2', axis=1, inplace=True)
+        # test_df.drop('month_prev_2', axis=1, inplace=True)
 
         print 'train_df.shape: ' , train_df.shape
         print 'test_df.shape: ' ,test_df.shape
@@ -276,8 +276,8 @@ class NeuralNetwork_:
         xTest = test_set.ix[:, :-1].values
         yTest = test_set.ix[:,-1].values
 
-        yPrevTest = test_set.ix[:, 2*NUM_FEATURES].values
-        yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
+        yPrevTest = test_set.ix[:, NUM_FEATURES].values
+        yPrevTrain = train_set.ix[:,NUM_FEATURES].values
 
 
         cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
@@ -348,8 +348,8 @@ class NeuralNetwork_:
         # xPred = train_set.label_prev.ix[:].values
         # yPred = test_set.label_prev.ix[:].values
 
-        yPrevTest = test_set.ix[:, 2* NUM_FEATURES].values
-        yPrevTrain = train_set.ix[:, 2* NUM_FEATURES].values
+        yPrevTest = test_set.ix[:,  NUM_FEATURES].values
+        yPrevTrain = train_set.ix[:,  NUM_FEATURES].values
 
 
         yTest = np.sign(yTest - yPrevTest)
@@ -466,28 +466,28 @@ if __name__ == "__main__":
     yTest = test_set.ix[:,-1].values
 
     print 'columns: ' , test_set.columns
-    yPrevTest = test_set.ix[:,2 * NUM_FEATURES].values
+    yPrevTest = test_set.ix[:,NUM_FEATURES].values
     print 'yPrevTest:::::::::::::::::::'
     print yPrevTest
-    yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
+    yPrevTrain = train_set.ix[:,NUM_FEATURES].values
 
-    print '99:'
-    print train_set.ix[99,:]
-    print xTrain[99]
-    print yTrain[99]
-
-    print '100:'
-    print train_set.ix[100,:]
-    print xTrain[100]
-    print yTrain[100]
-
-    print ' .. train .. '
+    # print '99:'
+    # print train_set.ix[99,:]
+    # print xTrain[99]
+    # print yTrain[99]
+    #
+    # print '100:'
+    # print train_set.ix[100,:]
+    # print xTrain[100]
+    # print yTrain[100]
+    #
+    # print ' .. train .. '
 
     # print train_set[train_set.cnty==32005].label
     # print train_set[train_set.cnty==32005].label_prev
     # print train_set[train_set.cnty==32005].label_prev_2
 
-    print ' .. test ..'
+    # print ' .. test ..'
 
     # print test_set[test_set.cnty==32005].label
     # print test_set[test_set.cnty==32005].label_prev
