@@ -164,6 +164,11 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
                 #else:
                 #    print "Skipped: ", column, ", ", t
 
+                if np.sign(yHat - previous) == np.sign(test[t] - previous):
+                    res = 1
+                else:
+                    res = 0
+                print ' ... ' , column , ' , ', t , ' : ' , previous , ' , ', yHat , ' , ', test[t] , ' , ', res
             except:
                 pass
 
