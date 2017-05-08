@@ -286,7 +286,7 @@ class NeuralNetwork_:
 
         cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
         ridge = RidgeCV()
-        ridge.set_params(**dict((k, v[0] if isinstance(v, list) else v) for k,v in cvParams.iteritems()))
+        ridge.set_params(**dict((k, v[0] if isinstance(v, list) else v) for k,v in cvParams['ridgecv'][0].iteritems()))
         ridge.fit(xTrain, yTrain)
         ridge_pred_test = ridge.predict(xTest)
         ridge_pred_train = ridge.predict(xTrain)
