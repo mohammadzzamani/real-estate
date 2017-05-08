@@ -16,6 +16,17 @@ from sklearn.svm import SVR
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
 
+import ARIMA
+
+
+# After all months, comes county column which is column number 99 + 8 = 107
+#IP:
+#COUNTY_COLUMN_NUMBER = 113
+#MSP:
+COUNTY_COLUMN_NUMBER = 104
+#SAF:
+#COUNTY_COLUMN_NUMBER = 107
+
 # DATABASE = 'mztwitter'
 # TRAIN_TABLE_NAME = 'NLP_features_msp'
 # TEST_TABLE_NAME = 'NLP_test_features_saf'
@@ -364,6 +375,8 @@ if __name__ == "__main__":
     # get xTrain and xTest from these dataframes (get_features())
     # get yTrain and yTest from these dataframes (get_labels())
     # build neural network (build_neural_network())
+    ARIMA.build_arima_on_labels(table = DB_info.FEATURE_TABLE, county_column_number = COUNTY_COLUMN_NUMBER, train_month = TRAIN_MONTHS, order = ( 3, 0 , 2) ):
+
     db_wrapper = DB_wrapper()
     dataframe_train = db_wrapper.retrieve_data(DB_info.FEATURE_TABLE) #get_dataframe(DATABASE, TRAIN_TABLE_NAME)
     dataframe_train = dataframe_train.set_index('cnty_month')
