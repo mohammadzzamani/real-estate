@@ -123,8 +123,9 @@ with warnings.catch_warnings():
     # Line that is not converging
 
 
-def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
+def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
     # Write ARIMA code here
+    prediction_dataframe = pd.DataFrame()
     predictions = list()
     observed_labels = list()
     previous_labels = list()
@@ -173,6 +174,8 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
                         res = 0
                         result_0+=1
                     print ' ... ' , column , ' , ', t , ' : ' , previous , ' , ', yHat , ' , ', test[t] , ' , ', res , ' , ', result_0 , ' , ', result_1
+                    cnty_month = str(counties[column]) + '_' + str(t)
+                    prediction_dataframe = prediction_dataframe.append({'cnty_month': cnty_month, 'arima': yHat}, ignore_index = True)
             except:
                 pass
 
@@ -195,10 +198,6 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
             for i in xrange(10):
                 print "Predicted: ", predictions[len(predictions) - i - 1], ", Expected: ", observed_labels[len(observed_labels) - i - 1]
             
-            #break
-
-
-
     print "---------- ARIMA ----------"
     error = mean_squared_error(observed_labels, predictions)
     print ('Test(MSE): %.6f' % error)
@@ -215,7 +214,7 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
     observed_labels = observed_labels.reshape(observed_labels.shape[0])
 
     print 'Test Accuracy: ' , sum(1 for x, y in zip(np.sign(predictions - previous_labels), np.sign(observed_labels - previous_labels)) if x == y) / float(len(observed_labels))
-    return predictions
+    return prediction_dataframe
 
 
 def create_dataframe(counties, predictions):
@@ -245,10 +244,10 @@ def build_arima_on_labels(table = DB_info.MSP_LIMITED_TABLE, county_column_numbe
     # Util.do_pca(trainX, trainY, testX, testY)
     TRAIN_MONTHS = train_month
     compute_baseline(dataset, TRAIN_MONTHS)
-    predictions = build_ARIMA(dataset, TRAIN_MONTHS, order )
     counties = dataframe.values[:, COUNTY_COLUMN_NUMBER].tolist()
-    county_predictions = create_dataframe(counties, predictions)
-    return county_predictions
+    prediction_dataframe = build_ARIMA(dataset, TRAIN_MONTHS, counties, order)
+
+    return prediction_dataframe
 
 
 
