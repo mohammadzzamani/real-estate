@@ -156,7 +156,7 @@ def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
                     if not model_fit.mle_retvals['converged']:
                         print 'not converged second'
                         continue
-                    
+
 
                 output = model_fit.forecast()
                 yHat = output[0]
@@ -179,7 +179,7 @@ def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
                     else:
                         res = 0
                         result_0+=1
-                    print ' ... ' , column , ' , ', t , ' : ' , previous , ' , ', yHat , ' , ', test[t] , ' , ', res , ' , ', result_0 , ' , ', result_1
+                    print ' ... ' , column , ' , ', counties[column] , ' , ',  t , ' : ' , previous , ' , ', yHat , ' , ', test[t] , ' , ', res , ' , ', result_0 , ' , ', result_1
                     cnty_month = str(counties[column]) + '_' + str(t)
                     prediction_dataframe = prediction_dataframe.append({'cnty_month': cnty_month, 'arima': yHat}, ignore_index = True)
             except:
