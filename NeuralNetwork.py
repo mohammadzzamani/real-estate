@@ -62,7 +62,7 @@ class NeuralNetwork_:
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
         df_prev1 = df_prev.copy()
         df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
-        new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_1')
+        new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_prev_2')
 
         return new_df1
 
@@ -79,15 +79,15 @@ class NeuralNetwork_:
         train_df.drop('month', axis=1, inplace=True)
         train_df.drop('cnty_prev', axis=1, inplace=True)
         train_df.drop('month_prev', axis=1, inplace=True)
-        train_df.drop('cnty_prev_1', axis=1, inplace=True)
-        train_df.drop('month_prev_1', axis=1, inplace=True)
+        train_df.drop('cnty_prev_2', axis=1, inplace=True)
+        train_df.drop('month_prev_2', axis=1, inplace=True)
 
         test_df.drop('cnty', axis=1, inplace=True)
         test_df.drop('month', axis=1, inplace=True)
         test_df.drop('cnty_prev', axis=1, inplace=True)
         test_df.drop('month_prev', axis=1, inplace=True)
-        test_df.drop('cnty_prev_1', axis=1, inplace=True)
-        test_df.drop('month_prev_1', axis=1, inplace=True)
+        test_df.drop('cnty_prev_2', axis=1, inplace=True)
+        test_df.drop('month_prev_2', axis=1, inplace=True)
 
         print 'train_df.shape: ' , train_df.shape
         print 'test_df.shape: ' ,test_df.shape
@@ -99,15 +99,6 @@ class NeuralNetwork_:
 
 
 
-    # Combines all feature differences with features
-    # and returns the combined features as numpy ndarray
-    # Eg: Input: Feat1, Feat2, .. Featn
-    # Output: Feat1, Feat2, ... Featn, Feat2-1, Feat3-2.. Featn-(n-1)
-    def get_features(self, dataframe):
-        # Extract the features as numpy ndarray
-        features = dataframe.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES]
-        print "Rows features: ", features.shape
-        return features
 
 
 
@@ -285,8 +276,8 @@ class NeuralNetwork_:
         xTest = test_set.ix[:, :-1].values
         yTest = test_set.ix[:,-1].values
 
-        yPrevTest = test_set.ix[:, NUM_FEATURES].values
-        yPrevTrain = train_set.ix[:,NUM_FEATURES].values
+        yPrevTest = test_set.ix[:, 2*NUM_FEATURES].values
+        yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
 
 
         cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
@@ -470,15 +461,15 @@ if __name__ == "__main__":
     yTest = test_set.ix[:,-1].values
 
     print 'columns: ' , test_set.columns
-    yPrevTest = test_set.ix[:, NUM_FEATURES].values
+    yPrevTest = test_set.ix[:,2 * NUM_FEATURES].values
     print 'yPrevTest:::::::::::::::::::'
     print yPrevTest
-    yPrevTrain = train_set.ix[:,NUM_FEATURES].values
+    yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
 
-    print '0:'
-    print train_set.ix[0,:]
-    print xTrain[0]
-    print yTrain[0]
+    print '99:'
+    print train_set.ix[99,:]
+    print xTrain[99]
+    print yTrain[99]
     print '100:'
     print train_set.ix[100,:]
     print xTrain[100]
