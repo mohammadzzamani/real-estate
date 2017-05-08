@@ -36,7 +36,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 32
+NUM_FEATURES = 30
 TOTAL_MONTHS = 45
 
 MONTH = 'month'
@@ -293,8 +293,8 @@ class NeuralNetwork_:
         print 'Result_test: ', mean_absolute_error(yTest, ridge_pred_test)
         print 'Result_train: ', mean_absolute_error(yTrain, ridge_pred_train)
 
-        lr_pred_test = np.sign(ridge_pred_test - yPrevTest)
-        lr_pred_train = np.sign(ridge_pred_train - yPrevTrain )
+        # lr_pred_test = np.sign(ridge_pred_test - yPrevTest)
+        # lr_pred_train = np.sign(ridge_pred_train - yPrevTrain )
 
 
         print ' ridge test accuracy: ' , sum(1 for x,y in zip(np.sign(ridge_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
@@ -321,8 +321,8 @@ class NeuralNetwork_:
         print 'Result_test: ', mean_absolute_error(yTest, lr_pred_test)
         print 'Result_train: ', mean_absolute_error(yTrain, lr_pred_train)
 
-        lr_pred_test = np.sign(lr_pred_test - yPrevTest)
-        lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
+        # lr_pred_test = np.sign(lr_pred_test - yPrevTest)
+        # lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
 
         # yTest_c =  np.sign(yTest)
         # yTrain_c = np.sign(yTrain)
