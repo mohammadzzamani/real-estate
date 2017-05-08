@@ -36,7 +36,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 34
+NUM_FEATURES = 32
 TOTAL_MONTHS = 45
 
 MONTH = 'month'
