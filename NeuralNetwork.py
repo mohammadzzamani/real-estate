@@ -356,11 +356,11 @@ class NeuralNetwork_:
         yTrain = np.sign(yTrain - yPrevTrain)
 
         # lr = linear_model.LinearRegression()
-        if type == 'SGDClassifier':
-            clf = linear_model.SGDClassifier()
-        elif type == 'svm':
-            clf = SVR(kernel='linear', C=1e3)
-            clf = SVR(kernel='linear', C=1e3)
+        # if type == 'SGDClassifier':
+        clf = linear_model.SGDClassifier()
+        #elif type == 'svm':
+        #    clf = SVR(kernel='linear', C=1e3)
+        #    clf = SVR(kernel='linear', C=1e3)
 
 
         clf.fit(xTrain, yTrain)
@@ -381,8 +381,8 @@ class NeuralNetwork_:
         print ' clf train accuracy: ' , sum(1 for x,y in zip(clf_pred_train,yTrain ) if x == y) / float(len(yTrain))
 
 
-        clf_pred_test = np.sign(clf_pred_test - yPrevTest)
-        clf_pred_train = np.sign(clf_pred_train - yPrevTrain )
+        # clf_pred_test = np.sign(clf_pred_test - yPrevTest)
+        # clf_pred_train = np.sign(clf_pred_train - yPrevTrain )
 
         # yTest_c =  np.sign(yTest)
         # yTrain_c = np.sign(yTrain)
