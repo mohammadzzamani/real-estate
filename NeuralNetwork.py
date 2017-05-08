@@ -15,6 +15,7 @@ import DB_info
 from sklearn.svm import SVR
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
+from sklearn.linear_model import RidgeCV
 
 import ARIMA
 
@@ -281,6 +282,32 @@ class NeuralNetwork_:
 
         yPrevTest = test_set.ix[:, NUM_FEATURES].values
         yPrevTrain = train_set.ix[:,NUM_FEATURES].values
+
+
+        cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
+        ridge = RidgeCV()
+        ridge.set_params(**dict((k, v[0] if isinstance(v, list) else v) for k,v in cvParams[0].iteritems()))
+        ridge.fit(xTrain, yTrain)
+        ridge_pred_test = ridge.predict(xTest)
+        ridge_pred_train = ridge.predict(xTrain)
+
+        print 'Result_test: ', mean_squared_error(yTest, ridge_pred_test)
+        print 'Result_train: ', mean_squared_error(yTrain, ridge_pred_train)
+
+        print 'Result_test: ', mean_absolute_error(yTest, ridge_pred_test)
+        print 'Result_train: ', mean_absolute_error(yTrain, ridge_pred_train)
+
+        lr_pred_test = np.sign(ridge_pred_test - yPrevTest)
+        lr_pred_train = np.sign(ridge_pred_train - yPrevTrain )
+
+
+        print ' ridge test accuracy: ' , sum(1 for x,y in zip(np.sign(ridge_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
+        print ' ridge train accuracy: ' , sum(1 for x,y in zip(np.sign(ridge_pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
+
+        ridge_coef = ridge.coef_
+        print 'ridge_coef: '
+        print ridge_coef
+
 
         lr = linear_model.LinearRegression()
         lr.fit(xTrain, yTrain)
