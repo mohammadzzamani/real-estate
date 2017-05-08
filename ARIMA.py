@@ -11,9 +11,6 @@ import Util
 import math
 import warnings
 
-# from sqlalchemy import create_engine
-# from sqlalchemy.engine.url import URL
-
 import DB_info
 
 # Initially 8 columns
@@ -139,12 +136,6 @@ def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
     for column in xrange(dataset.shape[1]):
         #print "Train Size: ", train_size, ", Column: ", column
         train, test = dataset[: train_size, column], dataset[train_size: , column]
-        history = []
-        #for i in range(len(train)):
-        #    if train[i] is None or math.isnan(train[i]):
-        #        continue
-
-        #     history.append(train[i])
         history = train.tolist()
 
         for t in xrange(test.shape[0]):
@@ -176,16 +167,11 @@ def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
                 yHat = output[0]
                 previous = dataset[train_size + t - 1, column]
 
-                #if (test[t] != None and math.isnan(test[t]) == False and previous != None and math.isnan(previous) == False):
-
                 history.append(test[t])
                 if yHat is not None and math.isnan(yHat) == False:
                     predictions.append(yHat)
                     observed_labels.append(test[t])
                     previous_labels.append(previous)
-                #print ("(%d. %d) - Predicted: %f, Expected: %f" % (column, t, yHat, test[t]))
-                #else:
-                #    print "Skipped: ", column, ", ", t
 
                     if np.sign(yHat - previous) == np.sign(test[t] - previous):
                         res = 1
@@ -251,7 +237,7 @@ def create_dataframe(counties, predictions):
 
 def build_arima_on_labels(table = DB_info.MSP_LIMITED_TABLE, county_column_number = COUNTY_COLUMN_NUMBER, train_month = TRAIN_MONTHS, order = ( 3, 0 , 2) ):
     db_wrapper = DB_wrapper()
-    dataframe = db_wrapper.retrieve_data(table ) #get_dataframe()
+    dataframe = db_wrapper.retrieve_data(table )
     dataset = get_county_month(dataframe.values)
     COUNTY_COLUMN_NUMBER = county_column_number
     print "Column: ", COUNTY_COLUMN_NUMBER
@@ -259,7 +245,6 @@ def build_arima_on_labels(table = DB_info.MSP_LIMITED_TABLE, county_column_numbe
     dataset = Util.normalize_each_county_ndarry(np.transpose(dataset[1:, :]), MONTH_COLUMNS, dataset.shape[1])
     dataset = np.transpose(remove_nan_arima(dataset))
     
-    # Util.do_pca(trainX, trainY, testX, testY)
     TRAIN_MONTHS = train_month
     compute_baseline(dataset, TRAIN_MONTHS)
     counties = dataframe.values[:, COUNTY_COLUMN_NUMBER].tolist()
