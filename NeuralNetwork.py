@@ -49,7 +49,7 @@ class NeuralNetwork_:
     def prev_cnty_month ( self, cnty_month):
         [cnty , month ]   = cnty_month.split('_')
         month = int(month)
-        prev_index = str(cnty)+'_'+str(month-1)
+        prev_index = str(cnty)+'_'+str(month+1)
         return prev_index
 
 
@@ -58,7 +58,7 @@ class NeuralNetwork_:
         df_prev = df.copy()
         df_prev.index = df_prev.index.map(self.prev_cnty_month)
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
-        # df_prev1 = df.copy()
+        # df_prev1 = df_prev.copy()
         # df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
         # new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_1')
 
@@ -375,8 +375,8 @@ if __name__ == "__main__":
     # get xTrain and xTest from these dataframes (get_features())
     # get yTrain and yTest from these dataframes (get_labels())
     # build neural network (build_neural_network())
-    arima_df = ARIMA.build_arima_on_labels(table = DB_info.TABLE, county_column_number = COUNTY_COLUMN_NUMBER, train_month = int(0.8 * TOTAL_MONTHS) , order = ( 4, 0 , 2) )
-    arima_df.to_csv('arima_df', sep='\t')
+    # arima_df = ARIMA.build_arima_on_labels(table = DB_info.TABLE, county_column_number = COUNTY_COLUMN_NUMBER, train_month = int(0.8 * TOTAL_MONTHS) , order = ( 4, 0 , 2) )
+    # arima_df.to_csv('arima_df', sep='\t')
 
 
     db_wrapper = DB_wrapper()
@@ -417,7 +417,7 @@ if __name__ == "__main__":
     #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     new_dataframe = Network.merge_with_prev(dataframe_train )
 
-    new_dataframe = arima_df.join(new_dataframe,  how='inner')
+    # new_dataframe = arima_df.join(new_dataframe,  how='inner')
     print 'new_dataframe.columns: ' , new_dataframe.columns
     print 'new_dataframe.shape: ', new_dataframe.shape
 
