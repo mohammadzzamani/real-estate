@@ -165,7 +165,6 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
                 #    print "Skipped: ", column, ", ", t
 
             except:
-
                 pass
 
         if column % 15 == 0 and column <> 0:
