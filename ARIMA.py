@@ -125,7 +125,8 @@ with warnings.catch_warnings():
 
 def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
     # Write ARIMA code here
-    small_order = (2, 0 , 2)
+    small_order = (2, 0 , 1)
+    print 'order: ' , order , ' , ', small_order
     prediction_dataframe = pd.DataFrame()
     predictions = list()
     observed_labels = list()
