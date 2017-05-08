@@ -75,19 +75,19 @@ class NeuralNetwork_:
         train_df = new_df[new_df.month <= train_month]
         print new_df.columns
 
-        train_df.drop('cnty', axis=1, inplace=True)
-        train_df.drop('month', axis=1, inplace=True)
-        train_df.drop('cnty_prev', axis=1, inplace=True)
-        train_df.drop('month_prev', axis=1, inplace=True)
-        train_df.drop('cnty_prev_2', axis=1, inplace=True)
-        train_df.drop('month_prev_2', axis=1, inplace=True)
-
-        test_df.drop('cnty', axis=1, inplace=True)
-        test_df.drop('month', axis=1, inplace=True)
-        test_df.drop('cnty_prev', axis=1, inplace=True)
-        test_df.drop('month_prev', axis=1, inplace=True)
-        test_df.drop('cnty_prev_2', axis=1, inplace=True)
-        test_df.drop('month_prev_2', axis=1, inplace=True)
+        # train_df.drop('cnty', axis=1, inplace=True)
+        # train_df.drop('month', axis=1, inplace=True)
+        # train_df.drop('cnty_prev', axis=1, inplace=True)
+        # train_df.drop('month_prev', axis=1, inplace=True)
+        # train_df.drop('cnty_prev_2', axis=1, inplace=True)
+        # train_df.drop('month_prev_2', axis=1, inplace=True)
+        #
+        # test_df.drop('cnty', axis=1, inplace=True)
+        # test_df.drop('month', axis=1, inplace=True)
+        # test_df.drop('cnty_prev', axis=1, inplace=True)
+        # test_df.drop('month_prev', axis=1, inplace=True)
+        # test_df.drop('cnty_prev_2', axis=1, inplace=True)
+        # test_df.drop('month_prev_2', axis=1, inplace=True)
 
         print 'train_df.shape: ' , train_df.shape
         print 'test_df.shape: ' ,test_df.shape
@@ -476,14 +476,17 @@ if __name__ == "__main__":
     print xTrain[100]
     print yTrain[100]
 
-    print train_set.label.ix[90:110]
-    print train_set.label_prev.ix[90:110]
-    print train_set.label_prev_2.ix[90:110]
+    print ' .. train .. '
 
+    print train_set[train_set.cnty=='32005'].label
+    print train_set[train_set.cnty=='32005'].label_prev
+    print train_set[train_set.cnty=='32005'].label_prev_2
 
-    print test_set.label.ix[90:110]
-    print test_set.label_prev.ix[90:110]
-    print test_set.label_prev_2.ix[90:110]
+    print ' .. test ..'
+
+    print test_set[test_set.cnty=='32005'].label
+    print test_set[test_set.cnty=='32005'].label_prev
+    print test_set[test_set.cnty=='32005'].label_prev_2
 
 
     Network.compute_baseline( train_set, test_set)
