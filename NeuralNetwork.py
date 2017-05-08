@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from DB_wrapper import  DB_wrapper
 from keras.layers.normalization import BatchNormalization
+
 import math
 import random
 import Util
@@ -50,7 +51,7 @@ class NeuralNetwork_:
     def prev_cnty_month ( self, cnty_month):
         [cnty , month ]   = cnty_month.split('_')
         month = int(month)
-        prev_index = str(cnty)+'_'+str(month-1)
+        prev_index = str(cnty)+'_'+str(month+1)
         return prev_index
 
 
@@ -59,11 +60,11 @@ class NeuralNetwork_:
         df_prev = df.copy()
         df_prev.index = df_prev.index.map(self.prev_cnty_month)
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
-        # df_prev1 = df_prev.copy()
-        # df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
-        # new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_1')
+        df_prev1 = df_prev.copy()
+        df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
+        new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_1')
 
-        return new_df
+        return new_df1
 
 
 
@@ -78,11 +79,15 @@ class NeuralNetwork_:
         train_df.drop('month', axis=1, inplace=True)
         train_df.drop('cnty_prev', axis=1, inplace=True)
         train_df.drop('month_prev', axis=1, inplace=True)
+        train_df.drop('cnty_prev_1', axis=1, inplace=True)
+        train_df.drop('month_prev_1', axis=1, inplace=True)
 
         test_df.drop('cnty', axis=1, inplace=True)
         test_df.drop('month', axis=1, inplace=True)
         test_df.drop('cnty_prev', axis=1, inplace=True)
         test_df.drop('month_prev', axis=1, inplace=True)
+        test_df.drop('cnty_prev_1', axis=1, inplace=True)
+        test_df.drop('month_prev_1', axis=1, inplace=True)
 
         print 'train_df.shape: ' , train_df.shape
         print 'test_df.shape: ' ,test_df.shape
