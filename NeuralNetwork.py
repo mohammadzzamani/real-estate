@@ -73,7 +73,7 @@ class NeuralNetwork_:
 
         test_df = new_df[new_df.month > train_month]
         train_df = new_df[new_df.month <= train_month]
-
+        print new_df.columns
 
         train_df.drop('cnty', axis=1, inplace=True)
         train_df.drop('month', axis=1, inplace=True)
