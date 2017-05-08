@@ -496,8 +496,8 @@ if __name__ == "__main__":
 
 
 
-    new_train = train_set[train_set['label_prev_2', 'label_prev' , 'label']]
-    new_test = test_set[test_set['label_prev_2', 'label_prev' , 'label']]
+    new_train = train_set[['label_prev_2', 'label_prev' , 'label']]
+    new_test = test_set[['label_prev_2', 'label_prev' , 'label']]
     Network.compute_baseline( new_train, new_test, num_of_features = 1)
 
     Network.compute_baseline( train_set, test_set)
