@@ -125,7 +125,8 @@ with warnings.catch_warnings():
 
 def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
     # Write ARIMA code here
-    small_order = (2, 0 , 1)
+    small_order = (3, 0 , 2)
+    smaller_order = (2, 0 , 1)
     print 'order: ' , order , ' , ', small_order
     prediction_dataframe = pd.DataFrame()
     predictions = list()
@@ -152,10 +153,22 @@ def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
                 model_fit = model.fit(disp = 0, maxiter = 50)
                 if not model_fit.mle_retvals['converged']:
                     print 'not converged first'
+                    raise Exception
+            except:
+                try:
                     model_small = ARIMA(history, order = small_order )
                     model_fit = model_small.fit(disp = 0, maxiter = 100)
                     if not model_fit.mle_retvals['converged']:
                         print 'not converged second'
+                        raise  Exception
+                except:
+                    try:
+                        model_smaller = ARIMA(history, order = smaller_order )
+                        model_fit = model_smaller.fit(disp = 0, maxiter = 100)
+                        if not model_fit.mle_retvals['converged']:
+                            print 'not converged third'
+                            continue
+                    except:
                         continue
 
 
@@ -183,8 +196,6 @@ def build_ARIMA(dataset, train_size, counties, order = (3, 0 , 2)):
                     print ' ... ' , column , ' , ', counties[column] , ' , ',  t , ' : ' , previous , ' , ', yHat , ' , ', test[t] , ' , ', res , ' , ', result_0 , ' , ', result_1
                     cnty_month = str(counties[column]) + '_' + str(t)
                     prediction_dataframe = prediction_dataframe.append({'cnty_month': cnty_month, 'arima': yHat}, ignore_index = True)
-            except:
-                pass
 
         if column % 15 == 0 and column <> 0:
             pr = np.asarray(predictions)
