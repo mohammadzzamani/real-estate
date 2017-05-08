@@ -60,11 +60,11 @@ class NeuralNetwork_:
         df_prev = df.copy()
         df_prev.index = df_prev.index.map(self.prev_cnty_month)
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
-        df_prev1 = df_prev.copy()
-        df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
-        new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_prev_2')
+        # df_prev1 = df_prev.copy()
+        # df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
+        # new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_prev_2')
 
-        return new_df1
+        return new_df
 
 
 
@@ -276,8 +276,8 @@ class NeuralNetwork_:
         xTest = test_set.ix[:, :-1].values
         yTest = test_set.ix[:,-1].values
 
-        yPrevTest = test_set.ix[:, 2*NUM_FEATURES].values
-        yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
+        yPrevTest = test_set.ix[:, NUM_FEATURES].values
+        yPrevTrain = train_set.ix[:,NUM_FEATURES].values
 
 
         cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
@@ -461,10 +461,10 @@ if __name__ == "__main__":
     yTest = test_set.ix[:,-1].values
 
     print 'columns: ' , test_set.columns
-    yPrevTest = test_set.ix[:,2 * NUM_FEATURES].values
+    yPrevTest = test_set.ix[:, NUM_FEATURES].values
     print 'yPrevTest:::::::::::::::::::'
     print yPrevTest
-    yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
+    yPrevTrain = train_set.ix[:,NUM_FEATURES].values
 
     print '99:'
     print train_set.ix[99,:]
