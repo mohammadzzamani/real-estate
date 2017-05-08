@@ -7,31 +7,19 @@ from sqlalchemy.engine.url import URL
 
 import DB_info
 
-
-
-
-
 class DB_wrapper:
 
     def __init__(self):
         self.connectMysqlDB()
 
-
-
     def connectMysqlDB(self):
                 myDB = URL(drivername='mysql', database=DB_info.DB, query={'read_default_file' : DB_info.CONF_FILE })
                 self.engine = create_engine(name_or_url=myDB)
-                # connection = engine.connect()
-                # conn = MySQLdb.connect(db_info.host, db_info.user, db_info.password, db_info.database)
-                # c = conn.cursor()
-                # return engine
-
 
     def retrieve_data(self, table):
                 print 'retrieve_data'
                 try:
                         connection = self.engine.connect()
-                        # self.cursor = self.connectMysqlDB(db_info)
                 except:
                         print("error while connecting to database:", sys.exc_info()[0])
                         raise
