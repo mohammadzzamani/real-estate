@@ -47,27 +47,13 @@ def create_dataset(dataset, start , end, num_of_counties):
 
     for j in xrange(num_of_counties):
 
-        X = [ dataset[i:(i+LOOK_BACK), j] for i in xrange(start, end)] # len(dataset[j])-LOOK_BACK-1)]
+        X = [ dataset[i:(i+LOOK_BACK), j] for i in xrange(start, end)]
         Y = [ dataset[ i + LOOK_BACK, j] for i  in xrange(start , end)]
 
-        # X = [ dataset[j,i:(i+LOOK_BACK)] for i in xrange(len(dataset[j])-LOOK_BACK-1)]
-        # Y = [ dataset[j, i + LOOK_BACK] for i  in xrange(len(dataset[j])-LOOK_BACK-1) ]
         dataX.extend(X)
         dataY.extend(Y)
-        # else:
-        #     testX.extend(X)
-        #     testY.extend(Y)
 
-    return np.array(dataX), np.array(dataY) #, np.array(testX) , np.array(testY)
-
-
-    # for i in range(len(dataset)-look_back-1):
-    #     a = dataset[i:(i+look_back), 0]
-    #     dataX.append(a)
-    #     dataY.append(dataset[i + look_back, 0])
-    #
-    # return np.array(dataX), np.array(dataY)
-
+    return np.array(dataX), np.array(dataY)
 
 # Get only county, month values
 def get_county_month(dataset):
@@ -80,24 +66,20 @@ def get_county_month(dataset):
     dataset = dataset.astype('float32')
     return dataset
 
+
 def build_LSTM(trainX, trainY, testX, testY):
     print 'baseline: ', mean_squared_error(testY, testX[:, -1])
     batch_size = 25
     model = Sequential()
     model.add(LSTM(20, batch_input_shape=(batch_size, LOOK_BACK, 1), return_sequences = True))
-    # model.add(BatchNormalization())
     model.add(layers.core.Dropout(0.2))
     model.add(LSTM(5,return_sequences=False))
     model.add(layers.core.Dropout(0.2))
-    # model.add(Dense(5))
-    # model.add(layers.core.Dropout(0.2))
-    # model.add(BatchNormalization())
     model.add(Dense(1))
     lr = 0.005
     decay = 0.95
     nb_epoch = 1
     adam = optimizers.adam(lr=lr)
-    # sgd = optimizers.SGD(lr=0.005, clipnorm=0.1)
     model.compile(loss='mean_squared_error', optimizer=adam)
 
     print "TrainX: ", trainX.shape
@@ -108,23 +90,16 @@ def build_LSTM(trainX, trainY, testX, testY):
     for i in range(nb_epoch):
         rd = random.random()
         if rd <0.95:
-            # adam.__setattr__('lr', lr)
             adam.lr.set_value(lr)
         else:
-            # adam.__setattr__('lr', lr*5)
             adam.lr.set_value(lr*2)
 
-        print 'i: ' , i , ' lr: ' , adam.lr.get_value() #adam.__getattribute__('lr') # adam.lr.get_value()
-        model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_split= 0.15 ) #validation_data=(testX, testY))
-        # model.reset_states()
+        print 'i: ' , i , ' lr: ' , adam.lr.get_value()
+        model.fit(trainX, trainY, nb_epoch= 1, batch_size=batch_size, verbose=1, shuffle=True, validation_split= 0.15 )
         if i % 5 == 0:
             testPredict = model.predict(testX, batch_size=batch_size, verbose = 1)
             print 'lstm_i: ' , mean_squared_error(testY, testPredict)
         lr *= decay
-
-    # for i in range(100):
-    #     model.fit(trainX, trainY, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
-    #     model.reset_states()
 
     # make predictions
     trainPredict = model.predict(trainX, batch_size=batch_size, verbose = 1)
@@ -145,16 +120,11 @@ def build_LSTM(trainX, trainY, testX, testY):
     testPredict = testPredict.reshape(testPredict.shape[0])
     yPrevTest = np.array(yPrevTest)
 
-#   print 'baseline: ', mean_squared_error(testY, testX[:, -1])
     print 'lstm - MSE: ' , mean_squared_error(testY, testPredict)
     print 'lstm - MAE: ' , mean_absolute_error(testY, testPredict)
     print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(testY - yPrevTest)) if x == y) / float(len(testY))
-    #print 'avg(abs(.)): ', np.average(np.abs(testY))
 
 def get_train_and_test(dataset, train_size):
-    # reshape into X=t and Y=t+1
-    # look_back = LOOK_BACK
-    # train, test = dataset[0: train_size, :], dataset[train_size: len(dataset), :]
 
     num_of_months = dataset.shape[0]-1
     num_of_counties = dataset.shape[1]
@@ -165,27 +135,17 @@ def get_train_and_test(dataset, train_size):
     print 'start: ' , (train_size - LOOK_BACK-1), ' , end: ', ( num_of_months - LOOK_BACK-1)
     testX, testY = create_dataset(dataset,  start= train_size - LOOK_BACK-1 , end = num_of_months - LOOK_BACK-1, num_of_counties = num_of_counties)
 
-    # trainX, trainY = create_dataset(train, look_back)
-    # testX, testY = create_dataset(test, look_back)
-
     print 'data:'
     print trainX[1680,:]
     print trainX[1681,:]
-    # trainX = trainX[:2000, :]
-    # testX = testX[0:100, :]
-    # trainY = trainY[:2000]
-    # testY = testY[0:100]
 
     print "TrainX: ", trainX.shape
     print "TestX: ", testX.shape
-    # reshape input to be [samples, time steps, features]
     trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
     testX = np.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 
-
     trainX, trainY = Util.remove_nan(trainX, trainY)
     testX, testY = Util.remove_nan(testX, testY)
-
 
     return trainX, trainY, testX, testY
 
@@ -193,15 +153,11 @@ def get_train_and_test(dataset, train_size):
 def build_lstm_on_labels():
     db_wrapper = DB_wrapper()
     dataframe = db_wrapper.retrieve_data(DB_info.SAF_TABLE) #get_dataframe()
-    # dataset = get_county_month(dataframe.values)
     dataset = Util.normalize_min_max(get_county_month(dataframe.values), TRAIN_MONTHS)
 
     print "Dataset shape: ", dataset.shape
-
-    # split into train and test sets
     trainX, trainY, testX, testY = get_train_and_test(dataset, TRAIN_MONTHS)
 
-    # Util.do_pca(trainX, trainY, testX, testY)
     build_LSTM(trainX, trainY, testX, testY)
 
 
