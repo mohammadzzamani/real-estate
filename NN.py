@@ -495,9 +495,11 @@ if __name__ == "__main__":
     # print test_set[test_set.cnty==32005].label_prev_2
 
 
-
-    new_train = train_set[['label_prev_2', 'label_prev' , 'label']]
-    new_test = test_set[['label_prev_2', 'label_prev' , 'label']]
+    print train_set.columns[34]
+    print train_set.columns[68]
+    print train_set.columns[102]
+    new_train = train_set[['cnty_month','label_prev_2', 'label_prev' , 'label']]
+    new_test = test_set[['cnty_month' ,'label_prev_2', 'label_prev' , 'label']]
     Network.compute_baseline( new_train, new_test, num_of_features = 1)
 
     Network.compute_baseline( train_set, test_set)
