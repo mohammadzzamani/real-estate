@@ -144,7 +144,11 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
         for t in xrange(test.shape[0]):
             try:
                 model = ARIMA(history, order = order )
-                model_fit = model.fit(disp = 0)
+                model_fit = model.fit(disp = 0, maxiter = 100)
+                if not model_fit.mle_retvals['converged']:
+                    print 'not converged'
+                    continue
+
                 output = model_fit.forecast()
                 yHat = output[0]
                 previous = dataset[train_size + t - 1, column]
@@ -161,6 +165,7 @@ def build_ARIMA(dataset, train_size, order = (3, 0 , 2)):
                 #    print "Skipped: ", column, ", ", t
 
             except:
+
                 pass
 
         if column % 15 == 0 and column <> 0:
