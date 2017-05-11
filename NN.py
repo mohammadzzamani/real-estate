@@ -240,21 +240,21 @@ class NN:
         print 'average: ' , mean
 
         mean_df = test_df.copy()
-        mean_df['avg_diff'] = mean
+        mean_df['avg_dif'] = mean
 
 
         print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
         print 'baseline1 (MSE): ', mean_squared_error(mean_df.label_prev, mean_df.label)
 
-        mean_df['diff']  = mean_df['label'] - mean_df['label_prev']
-        print 'mean_df.avg_diff.shape: ' , mean_df.avg_diff.shape
-        print 'mean_df.diff.shape: ' , mean_df.diff.shape
+        mean_df['dif']  = mean_df['label'] - mean_df['label_prev']
+        print 'mean_df.avg_dif.shape: ' , mean_df.avg_dif.shape
+        print 'mean_df.dif.shape: ' , mean_df.dif.shape
 
-        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.avg_diff, mean_df.diff)
-        print 'baseline2 (MSE): ', mean_squared_error(mean_df.avg_diff, mean_df.diff)
+        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.avg_dif, mean_df.dif)
+        print 'baseline2 (MSE): ', mean_squared_error(mean_df.avg_dif, mean_df.dif)
 
 
-        print 'baseline2 test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.avg_diff),np.sign(mean_df.diff)) if x == y) / float(len(mean_df.label))
+        print 'baseline2 test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.avg_dif),np.sign(mean_df.dif)) if x == y) / float(len(mean_df.label))
 
         print 'baseline3 (MAE): ' , mean_absolute_error(mean_df.label_prev_2, mean_df.label)
         print 'baseline3 (MSE): ', mean_squared_error(mean_df.label_prev_2, mean_df.label)
