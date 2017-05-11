@@ -420,9 +420,9 @@ if __name__ == "__main__":
 
     cnty_months = ['8013_'+str(i) for i in xrange(45)]
 
-    selected_df = train_set[train_set.cnty_month in cnty_months]
+    selected_df = train_set[train_set.index in cnty_months]
     selected_df.to_csv(r'train_8013.txt',  sep=',', mode='a', columns= train_set.columns)
-    selected_df = test_set[test_set.cnty_month in cnty_months]
+    selected_df = test_set[test_set.index in cnty_months]
     selected_df.to_csv(r'test_8013.txt', sep=',', mode='a', columns= test_set.columns)
 
     # test_set.drop('label_prev_2', axis=1, inplace=True)
