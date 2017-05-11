@@ -237,51 +237,52 @@ class NN:
         print 'compute_baseline:'
 
         mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
+        print 'average: ' , mean
 
         mean_df = test_df.copy()
-        print 'avg: ' , mean
-        mean_df['avg'] = mean
-
-        diff  = mean_df['label'] - mean_df['label_prev']
+        mean_df['avg_diff'] = mean
 
 
         print 'baseline1 (MAE): ' , mean_absolute_error(mean_df.label_prev, mean_df.label)
         print 'baseline1 (MSE): ', mean_squared_error(mean_df.label_prev, mean_df.label)
 
-        print mean_df.avg.shape
-        print diff[:10]
-        print len(diff)
-        print diff.shape
-        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.avg, diff)
-        print 'baseline2 (MSE): ', mean_squared_error(mean_df.avg, diff)
+        mean_df['diff']  = mean_df['label'] - mean_df['label_prev']
+        print 'mean_df.avg_diff.shape: ' , mean_df.avg_diff.shape
+        print 'mean_df.diff.shape: ' , mean_df.diff.shape
+
+        print 'baseline2 (MAE):  ', mean_absolute_error(mean_df.avg_diff, mean_df.diff)
+        print 'baseline2 (MSE): ', mean_squared_error(mean_df.avg_diff, mean_df.diff)
 
 
-        # lr_pred_test = np.sign(lr_pred_test - yPrevTest)
-        # lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
-
-        # print ' test accuracy: ' , sum(1 for x,y in zip(np.sign([mean for i in mean_df.label]),np.sign(mean_df.pred)) if x == y) / float(len(mean_df.label))
-        print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.avg),np.sign(diff)) if x == y) / float(len(mean_df.label))
+        print 'baseline2 test accuracy: ' , sum(1 for x,y in zip(np.sign(mean_df.avg_diff),np.sign(mean_df.diff)) if x == y) / float(len(mean_df.label))
 
         print 'baseline3 (MAE): ' , mean_absolute_error(mean_df.label_prev_2, mean_df.label)
         print 'baseline3 (MSE): ', mean_squared_error(mean_df.label_prev_2, mean_df.label)
 
 
     def linear_model(self, train_set, test_set, num_of_features = NUM_FEATURES):
-        print ' ridge '
-        # yTrain = np.sign(yTrain)
-        # ytest = np.sign(yTest)
-
+        print ' linear_model '
 
         xTrain = train_set.ix[:, :-1].values
         yTrain = train_set.ix[:,-1].values
         xTest = test_set.ix[:, :-1].values
         yTest = test_set.ix[:,-1].values
 
-        print train_set.columns[num_of_features]
+        print 'xTrain.shape : ' , xTrain.shape
+        print 'yTrain.shape: ' , yTrain.shape
+        print 'xTest.shape: ' , xTest.shape
+        print 'yTest.shape: ' , yTest.shape
+
+        print 'train_set.columns :'
+        for i in xrange(train_set.columns):
+            print 'i: ' , i , ' column: ' , train_set.columns[i]
+        print 'num_of_features ( yPrevIndex) : ' , num_of_features , 'column: ' , train_set.columns[num_of_features]
+
         yPrevTest = test_set.ix[:, num_of_features].values
         yPrevTrain = train_set.ix[:,num_of_features].values
 
 
+        print 'ridge-regression: '
         cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
         ridge = RidgeCV()
         ridge.set_params(**dict((k, v[0] if isinstance(v, list) else v) for k,v in cvParams['ridgecv'][0].iteritems()))
@@ -289,24 +290,21 @@ class NN:
         ridge_pred_test = ridge.predict(xTest)
         ridge_pred_train = ridge.predict(xTrain)
 
-        print 'Result_test: ', mean_squared_error(yTest, ridge_pred_test)
-        print 'Result_train: ', mean_squared_error(yTrain, ridge_pred_train)
+        print 'ridge_test MSE: ', mean_squared_error(yTest, ridge_pred_test)
+        print 'ridge_train MSE: ', mean_squared_error(yTrain, ridge_pred_train)
 
-        print 'Result_test: ', mean_absolute_error(yTest, ridge_pred_test)
-        print 'Result_train: ', mean_absolute_error(yTrain, ridge_pred_train)
-
-        # lr_pred_test = np.sign(ridge_pred_test - yPrevTest)
-        # lr_pred_train = np.sign(ridge_pred_train - yPrevTrain )
+        print 'ridge_test MAE: ', mean_absolute_error(yTest, ridge_pred_test)
+        print 'ridge_train MAE: ', mean_absolute_error(yTrain, ridge_pred_train)
 
 
-        print ' ridge test accuracy: ' , sum(1 for x,y in zip(np.sign(ridge_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
-        print ' ridge train accuracy: ' , sum(1 for x,y in zip(np.sign(ridge_pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
+        print 'ridge test accuracy: ' , sum(1 for x,y in zip(np.sign(ridge_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
+        print 'ridge train accuracy: ' , sum(1 for x,y in zip(np.sign(ridge_pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
 
         ridge_coef = ridge.coef_
         print 'ridge_coef: '
         print ridge_coef
 
-        print 'alpha: '
+        print 'ridge alpha: '
         print ridge.alpha_
 
 
@@ -317,20 +315,14 @@ class NN:
         lr_pred_test = lr.predict(xTest)
         lr_pred_train = lr.predict(xTrain)
 
-        print 'Result_test: ', mean_squared_error(yTest, lr_pred_test)
-        print 'Result_train: ', mean_squared_error(yTrain, lr_pred_train)
+        print 'linear_test MSE: ', mean_squared_error(yTest, lr_pred_test)
+        print 'linear_train MSE: ', mean_squared_error(yTrain, lr_pred_train)
 
-        print 'Result_test: ', mean_absolute_error(yTest, lr_pred_test)
-        print 'Result_train: ', mean_absolute_error(yTrain, lr_pred_train)
+        print 'linear_test MAE: ', mean_absolute_error(yTest, lr_pred_test)
+        print 'linear_train MAE: ', mean_absolute_error(yTrain, lr_pred_train)
 
-        # lr_pred_test = np.sign(lr_pred_test - yPrevTest)
-        # lr_pred_train = np.sign(lr_pred_train - yPrevTrain )
-
-        # yTest_c =  np.sign(yTest)
-        # yTrain_c = np.sign(yTrain)
-
-        print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
-        print ' lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
+        print 'lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
+        print 'lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
 
         print  'lr.coef_: '
         print lr.coef_
@@ -338,21 +330,15 @@ class NN:
 
     def linear_classifier(self, type, train_set, test_set):
         print ' linear_classifier '
-        # yTrain = np.sign(yTrain)
-        # ytest = np.sign(yTest)
-
 
         xTrain = train_set.ix[:, :-1].values
         yTrain = train_set.ix[:,-1].values
         xTest = test_set.ix[:, :-1].values
         yTest = test_set.ix[:,-1].values
 
-        # xPred = train_set.label_prev.ix[:].values
-        # yPred = test_set.label_prev.ix[:].values
 
         yPrevTest = test_set.ix[:, 2* NUM_FEATURES].values
         yPrevTrain = train_set.ix[:, 2* NUM_FEATURES].values
-
 
         yTest = np.sign(yTest - yPrevTest)
         yTrain = np.sign(yTrain - yPrevTrain)
@@ -370,28 +356,18 @@ class NN:
         clf_pred_test = clf.predict(xTest)
         clf_pred_train = clf.predict(xTrain)
 
-        print 'examples:'
-        print yTest[:10]
-        print clf_pred_test[:10]
+        # print 'examples:'
+        # print yTest[:10]
+        # print clf_pred_test[:10]
 
-        print 'Result_test: ', mean_squared_error(yTest, clf_pred_test)
-        print 'Result_train: ', mean_squared_error(yTrain, clf_pred_train)
+        print 'clf_test MSE: ', mean_squared_error(yTest, clf_pred_test)
+        print 'clf_train MSE: ', mean_squared_error(yTrain, clf_pred_train)
 
-        print 'Result_test: ', mean_absolute_error(yTest, clf_pred_test)
-        print 'Result_train: ', mean_absolute_error(yTrain, clf_pred_train)
+        print 'clf_test MAE: ', mean_absolute_error(yTest, clf_pred_test)
+        print 'clf_train MAE: ', mean_absolute_error(yTrain, clf_pred_train)
 
         print ' clf test accuracy: ' , sum(1 for x,y in zip(clf_pred_test,yTest ) if x == y) / float(len(yTest))
         print ' clf train accuracy: ' , sum(1 for x,y in zip(clf_pred_train,yTrain ) if x == y) / float(len(yTrain))
-
-
-        # clf_pred_test = np.sign(clf_pred_test - yPrevTest)
-        # clf_pred_train = np.sign(clf_pred_train - yPrevTrain )
-
-        # yTest_c =  np.sign(yTest)
-        # yTrain_c = np.sign(yTrain)
-
-        # print  'clf.coef_: '
-        # print clf.coef_
 
 
     def __init__(self):
@@ -406,6 +382,8 @@ if __name__ == "__main__":
     # get xTrain and xTest from these dataframes (get_features())
     # get yTrain and yTest from these dataframes (get_labels())
     # build neural network (build_neural_network())
+
+
     # arima_df = ARIMA.build_arima_on_labels(table = DB_info.TABLE, county_column_number = COUNTY_COLUMN_NUMBER, train_month = int(0.8 * TOTAL_MONTHS) , order = ( 4, 0 , 2) )
     # arima_df.to_csv('arima_df', sep='\t')
 
@@ -415,24 +393,11 @@ if __name__ == "__main__":
     dataframe_train = dataframe_train.set_index('cnty_month')
 
 
-    # if '47139_14' in dataframe_train.index.tolist():
-    #     print 'yes'
-    # else:
-    #     print 'no'
-
-    # check_df = dataframe_train[dataframe_train['cnty'] == '47139']
-    # print check_df
-    # print check_df.index
     print 'dataframe_train before: ' , dataframe_train.shape
     # dataframe_train = dataframe_train.dropna(how='any')
     dataframe_train  = dataframe_train.dropna(subset=['label'], how = 'all')
     dataframe_train = dataframe_train[np.isfinite(dataframe_train['label'])]
     print 'dataframe_train after: ' , dataframe_train.shape
-
-    # if '47139_14' in dataframe_train.index.tolist():
-    #     print 'yes'
-    # else:
-    #     print 'no'
 
 
 
@@ -440,12 +405,6 @@ if __name__ == "__main__":
 
 
     Network = NN()
-    #dataframe_train = dataframe_train.ix[0:1000]
-    # print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
-    # dataframe_train = dataframe_train.dropna(how='any')
-    # print 'dataframe_train before adding prev_data: ' , dataframe_train.shape
-    #[train_set , test_set] = Network.add_diff_features(dataframe_train, 0.8 * TOTAL_MONTHS )
-    #[train_set , test_set] = Network.add_prev_features(dataframe_train, 0.8 * TOTAL_MONTHS )
     new_dataframe = Network.merge_with_prev(dataframe_train )
 
     # new_dataframe = arima_df.join(new_dataframe,  how='inner')
@@ -453,25 +412,29 @@ if __name__ == "__main__":
     print 'new_dataframe.shape: ', new_dataframe.shape
 
     [train_set , test_set] = Network.split_train_test(new_dataframe,  0.8 * TOTAL_MONTHS)
-
-    print 'dataframe_train after adding prev_data: ' , train_set.shape , ' , ', test_set.shape
-
+    print 'train shape after split: ' , train_set.shape
+    print 'test shape after split : ' , test_set.shape
 
     # test_set.drop('label_prev_2', axis=1, inplace=True)
     # train_set.drop('label_prev_2', axis=1, inplace=True)
 
     xTrain = train_set.ix[:, :-1].values
-    #xTrain = train_set.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES+1].values
     yTrain = train_set.ix[:,-1].values
     xTest = test_set.ix[:, :-1].values
-    #xTest = test_set.ix[:, ID_SIZE: ID_SIZE + NUM_FEATURES+1].values
     yTest = test_set.ix[:,-1].values
 
-    print 'columns: ' , test_set.columns
-    yPrevTest = test_set.ix[:,2 * NUM_FEATURES].values
-    print 'yPrevTest:::::::::::::::::::'
+
+    print 'columns: '
+    for i in xrange(len(test_set.columns)):
+        print 'i: ' , i , ' , column name: ',  test_set.columns[i]
+
+    yPrevIndex = 2 * NUM_FEATURES
+    yPrevTest = test_set.ix[:,yPrevIndex].values
+    yPrevTrain = train_set.ix[:,yPrevIndex].values
+    print 'yPrevIndex: ' , yPrevIndex
+    print 'yPrevTest: '
     print yPrevTest
-    yPrevTrain = train_set.ix[:,2*NUM_FEATURES].values
+
 
     print '99:'
     print train_set.ix[99,:]
@@ -483,82 +446,33 @@ if __name__ == "__main__":
     print xTrain[100]
     print yTrain[100]
 
-    print ' .. train .. '
-
+    # print ' .. train .. '
     # print train_set[train_set.cnty==32005].label
     # print train_set[train_set.cnty==32005].label_prev
     # print train_set[train_set.cnty==32005].label_prev_2
 
-    print ' .. test ..'
-
+    # print ' .. test ..'
     # print test_set[test_set.cnty==32005].label
     # print test_set[test_set.cnty==32005].label_prev
     # print test_set[test_set.cnty==32005].label_prev_2
 
 
-    print train_set.columns[0:35]
-    print train_set.columns[35:70]
-    print train_set.columns[70:]
 
-    new_train = train_set[['label_prev_2', 'label_prev' , 'label']]
-    new_test = test_set[['label_prev_2', 'label_prev' , 'label']]
-    Network.compute_baseline( new_train, new_test, num_of_features = 1)
+    nl_train = train_set[['label_prev_2', 'label_prev' , 'label']]
+    nl_test = test_set[['label_prev_2', 'label_prev' , 'label']]
+    Network.compute_baseline( nl_train, nl_test, num_of_features = 1)
 
     Network.compute_baseline( train_set, test_set)
 
 
 
-    # xTrain, yTrain = Util.remove_nan(xTrain, yTrain)
-    # xTest, yTest = Util.remove_nan(xTest, yTest)
-
-    # yTest = yTest - xTest[:,-1]
-    # yTrain = yTrain - xTrain[:,-1]
-    #
-    # xTrain = xTrain [: , :-1]
-    # xTest = xTest [: , : -1]
-
-
-
-
-
-
     #linear regression
     Network.linear_model( train_set, test_set)
-    Network.linear_model( new_train, new_test , num_of_features= 1)
+    Network.linear_model( nl_train, nl_test , num_of_features= 1)
     Network.linear_classifier('SGDClassifier', train_set, test_set)
     # Network.linear_classifier('poly', train_set, test_set)
-
     # Network.linear_classifier('svm', train_set, test_set)
 
-    '''
-    svr_lin = SVR(kernel='linear', C=1e3)
-    svr_lin.fit(xTrain, yTrain)
-    svr_lin_test = svr_lin.predict(xTest)
-    svr_lin_train = svr_lin.predict(xTrain)
-    print 'svr_lin_test: ', mean_absolute_error(yTest, svr_lin_test)
-    print 'svr_lin_train: ', mean_absolute_error(yTrain, svr_lin_train)
-
-
-
-
-    svr_poly = SVR(kernel='poly', C=1e3, degree=2)
-    svr_poly.fit(xTrain, yTrain)
-    svr_poly_test = svr_poly.predict(xTest)
-    svr_poly_train = svr_poly.predict(xTrain)
-    print 'svr_poly_test: ', mean_absolute_error(yTest, svr_poly_test)
-    print 'svr_poly_train: ', mean_absolute_error(yTrain, svr_poly_train)
-
-    svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
-    svr = svr_rbf.fit(xTrain, yTrain)
-    y_rbf_test = svr.predict(xTest)
-    y_rbf_train = svr.predict(xTrain)
-    #print 'coeff: ' , svr.coef_
-    print 'Result_test: ', mean_squared_error(yTest, y_rbf_test)
-    print 'Result_train: ', mean_squared_error(yTrain, y_rbf_train)
-
-    print 'Result_test: ', mean_absolute_error(yTest, y_rbf_test)
-    print 'Result_train: ', mean_absolute_error(yTrain, y_rbf_train)
-    '''
 
     Network.baseline_model( xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain)
     #Network.build_neural_network(xTrain, xTest, yTrain, yTest)
