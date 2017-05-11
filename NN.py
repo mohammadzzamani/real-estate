@@ -274,7 +274,7 @@ class NN:
         print 'yTest.shape: ' , yTest.shape
 
         print 'train_set.columns :'
-        for i in xrange(train_set.columns):
+        for i in xrange(len(train_set.columns)):
             print 'i: ' , i , ' column: ' , train_set.columns[i]
         print 'num_of_features ( yPrevIndex) : ' , num_of_features , 'column: ' , train_set.columns[num_of_features]
 
