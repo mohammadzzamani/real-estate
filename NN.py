@@ -411,12 +411,16 @@ if __name__ == "__main__":
     print 'new_dataframe.columns: ' , new_dataframe.columns
     print 'new_dataframe.shape: ', new_dataframe.shape
 
-    selected_df = new_dataframe[new_dataframe.cnty == 8013]
-    selected_df.to_csv(r'data_8013.txt', header=None, index=None, sep=',', mode='a')
+
 
     [train_set , test_set] = Network.split_train_test(new_dataframe,  0.8 * TOTAL_MONTHS)
     print 'train shape after split: ' , train_set.shape
     print 'test shape after split : ' , test_set.shape
+
+    selected_df = train_set[train_set.cnty == 8013]
+    selected_df.to_csv(r'train_8013.txt',  sep=',', mode='a', columns= train_set.columns)
+    selected_df = test_set[test_set.cnty == 8013]
+    selected_df.to_csv(r'test_8013.txt', sep=',', mode='a', columns= test_set.columns)
 
     # test_set.drop('label_prev_2', axis=1, inplace=True)
     # train_set.drop('label_prev_2', axis=1, inplace=True)
