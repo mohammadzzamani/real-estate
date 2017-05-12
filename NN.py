@@ -105,7 +105,7 @@ class NN:
         print yPrevTest
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='relu'))
+        model.add(Dense(30, input_dim=len(xTrain[0]) , init='normal', activation='relu'))
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
@@ -119,7 +119,7 @@ class NN:
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
-        nb_epochs = 150
+        nb_epochs = 500
         for i in xrange(nb_epochs):
             lr = lr * decay
             adam.lr.set_value(lr)
