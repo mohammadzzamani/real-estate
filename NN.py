@@ -106,6 +106,9 @@ class NN:
 
         yTest = yTest - old_pred_test
         yTrain = yTrain - old_pred_train
+        
+        final_yTest = yTest + old_pred_test
+
 
         print 'yPrevTest'
         print yPrevTest
@@ -145,14 +148,25 @@ class NN:
                 testPredict = model.predict(xTest, verbose = 1)
                 testPred =  [ max( min(val, 150)  , -25 ) for val in testPredict]
                 # testPredict = testPred
-                print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPredict)
-                print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
-                print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPred)
-                print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPred)
-                # print 'Neural Network accuracy: ' , sum(1 for x,y in zip(testPredict,yTest ) if x == y) / float(len(yTest)) #.
 
-                testPredict = testPredict.reshape(testPredict.shape[0])  #*
-                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest- yPrevTest)) if x == y) / float(len(yTest))  #*
+
+
+                testPredict = testPredict.reshape(testPredict.shape[0]).tolist()
+                final_pred_test = testPredict + old_pred_test
+                print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(final_yTest, final_pred_test)
+                print 'Neural Network_i: ', i , ' , ', mean_absolute_error(final_yTest, final_pred_test)
+                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(final_pred_test - yPrevTest),np.sign(final_yTest- yPrevTest)) if x == y) / float(len(final_yTest))  #*
+
+
+
+                # print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPredict)
+                # print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
+                # print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPred)
+                # print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPred)
+                # # print 'Neural Network accuracy: ' , sum(1 for x,y in zip(testPredict,yTest ) if x == y) / float(len(yTest)) #.
+                #
+                # testPredict = testPredict.reshape(testPredict.shape[0])  #*
+                # print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest- yPrevTest)) if x == y) / float(len(yTest))  #*
                 # print 'yPrevTest'
                 # print yPrevTest
                 # x1 = np.sign(testPredict - yPrevTest)
@@ -306,6 +320,9 @@ class NN:
 
         yTest = yTest + old_pred_test
         pred_test = pred_test + old_pred_test
+
+        yTrain = yTrain +old_pred_train
+        pred_train = pred_train + old_pred_train
 
 
 
