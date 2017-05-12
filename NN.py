@@ -121,7 +121,8 @@ class NN:
         lr = 0.5
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
-        model.compile(loss = 'binary_crossentropy', optimizer = adam)
+        # model.compile(loss = 'binary_crossentropy', optimizer = adam)
+        model.compile(loss = 'mean_absolute_error', optimizer = adam)
         nb_epochs = 500
         for i in xrange(nb_epochs):
             lr = lr * decay
