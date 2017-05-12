@@ -457,8 +457,8 @@ if __name__ == "__main__":
     #   Network.linear_classifier('poly', train_set, test_set)
     #   Network.linear_classifier('svm', train_set, test_set)
 
-
-    Network.neural_net( train_set, test_set)
+    Network.neural_net( nl_train, nl_test)
+    # Network.neural_net( train_set, test_set)
     #   Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
 
