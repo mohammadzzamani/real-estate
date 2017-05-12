@@ -103,8 +103,8 @@ class NN:
 
         print 'yPrevTest'
         print yPrevTest
-        # yTest = np.sign(yTest - yPrevTest)
-        # yTrain = np.sign(yTrain - yPrevTrain)
+        yTest = np.sign(yTest - yPrevTest)
+        yTrain = np.sign(yTrain - yPrevTrain)
         # create model
         model = Sequential()
         model.add(Dense(30, input_dim=len(xTrain[0]) , init='normal', activation='relu'))
@@ -121,8 +121,8 @@ class NN:
         lr = 0.05
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
-        # model.compile(loss = 'binary_crossentropy', optimizer = adam)
-        model.compile(loss = 'mean_absolute_error', optimizer = adam)
+        model.compile(loss = 'binary_crossentropy', optimizer = adam)
+        # model.compile(loss = 'mean_absolute_error', optimizer = adam)
         nb_epochs = 500
         for i in xrange(nb_epochs):
 
@@ -136,8 +136,8 @@ class NN:
                 testPredict = model.predict(xTest, verbose = 1)
                 print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPredict)
                 print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
-                # print 'Neural Network accuracy: ' , sum(1 for x,y in zip(testPredict,yTest ) if x == y) / float(len(yTest))
-
+                print 'Neural Network accuracy: ' , sum(1 for x,y in zip(testPredict,yTest ) if x == y) / float(len(yTest))
+                # print 'Neural Network accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest- yPrevTest)) if x == y) / float(len(yTest))
                 testPredict = testPredict.reshape(testPredict.shape[0])
 
                 # print 'yPrevTest'
@@ -159,7 +159,7 @@ class NN:
                 # print s2[:100]
 
                 # print ' accuracy: ' , mean_absolute_error(x1, x2)
-                print ' test accuracy: ' , sum(1 for x,y in zip(np.sign(testPredict - yPrevTest),np.sign(yTest- yPrevTest)) if x == y) / float(len(yTest))
+
                 # print ' lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
 
     # Build the neural network
