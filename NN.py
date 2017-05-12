@@ -329,7 +329,7 @@ class NN:
         print "-- Created NeuralNetwork Object --"
 
 
-    def prepare_data(train_set, test_set):
+    def prepare_data(self, train_set, test_set):
         xTrain = train_set.ix[:, :-1].values
         yTrain = train_set.ix[:,-1].values
         xTest = test_set.ix[:, :-1].values
