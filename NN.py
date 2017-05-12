@@ -116,8 +116,8 @@ class NN:
         # model.add(layers.core.Dropout(0.2))
         model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))  #*
         # model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))  #.
-        model.add(Dense(1, init='normal', activation= 'softmax'))
-        # model.add(Dense(1, init='normal'))
+        # model.add(Dense(1, init='normal', activation= 'softmax')) #.
+        model.add(Dense(1, init='normal'))
         # Compile model
 
         lr = 0.05
