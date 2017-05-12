@@ -77,17 +77,17 @@ class NN:
 
         train_df.drop('cnty', axis=1, inplace=True)
         train_df.drop('month', axis=1, inplace=True)
-        train_df.drop('cnty_prev', axis=1, inplace=True)
-        train_df.drop('month_prev', axis=1, inplace=True)
-        train_df.drop('cnty_prev_2', axis=1, inplace=True)
-        train_df.drop('month_prev_2', axis=1, inplace=True)
+        # train_df.drop('cnty_prev', axis=1, inplace=True)
+        # train_df.drop('month_prev', axis=1, inplace=True)
+        # train_df.drop('cnty_prev_2', axis=1, inplace=True)
+        # train_df.drop('month_prev_2', axis=1, inplace=True)
 
         test_df.drop('cnty', axis=1, inplace=True)
         test_df.drop('month', axis=1, inplace=True)
-        test_df.drop('cnty_prev', axis=1, inplace=True)
-        test_df.drop('month_prev', axis=1, inplace=True)
-        test_df.drop('cnty_prev_2', axis=1, inplace=True)
-        test_df.drop('month_prev_2', axis=1, inplace=True)
+        # test_df.drop('cnty_prev', axis=1, inplace=True)
+        # test_df.drop('month_prev', axis=1, inplace=True)
+        # test_df.drop('cnty_prev_2', axis=1, inplace=True)
+        # test_df.drop('month_prev_2', axis=1, inplace=True)
 
         print 'train_df.shape: ' , train_df.shape
         print 'test_df.shape: ' ,test_df.shape
@@ -107,7 +107,7 @@ class NN:
         # yTrain = np.sign(yTrain - yPrevTrain)
         # create model
         model = Sequential()
-        model.add(Dense(30, input_dim=len(xTrain[0]) , init='normal', activation='relu'))
+        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='linear'))
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
@@ -118,7 +118,7 @@ class NN:
         model.add(Dense(1, init='normal'))
         # Compile model
 
-        lr = 0.5
+        lr = 0.05
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         # model.compile(loss = 'binary_crossentropy', optimizer = adam)
