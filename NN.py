@@ -103,6 +103,8 @@ class NN:
 
         print 'yPrevTest'
         print yPrevTest
+        yTest = np.sign(yTest - yPrevTest)
+        yTrain = np.sign(yTrain - yPrevTrain)
         # create model
         model = Sequential()
         model.add(Dense(30, input_dim=len(xTrain[0]) , init='normal', activation='relu'))
@@ -112,13 +114,13 @@ class NN:
         # model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
         model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
-        model.add(Dense(1, init='normal'))
+        model.add(Dense(1, init='softmax'))
         # Compile model
 
         lr = 0.5
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
-        model.compile(loss = 'mean_absolute_error', optimizer = adam)
+        model.compile(loss = 'binary_crossentropy', optimizer = adam)
         nb_epochs = 250
         for i in xrange(nb_epochs):
             lr = lr * decay
