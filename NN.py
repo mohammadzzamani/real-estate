@@ -119,7 +119,7 @@ class NN:
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
-        nb_epochs = 500
+        nb_epochs = 150
         for i in xrange(nb_epochs):
             lr = lr * decay
             adam.lr.set_value(lr)
