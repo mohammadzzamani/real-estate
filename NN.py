@@ -75,15 +75,15 @@ class NN:
         train_df = new_df[new_df.month <= train_month]
         print new_df.columns
 
-        # train_df.drop('cnty', axis=1, inplace=True)
-        # train_df.drop('month', axis=1, inplace=True)
+        train_df.drop('cnty', axis=1, inplace=True)
+        train_df.drop('month', axis=1, inplace=True)
         # train_df.drop('cnty_prev', axis=1, inplace=True)
         # train_df.drop('month_prev', axis=1, inplace=True)
         # train_df.drop('cnty_prev_2', axis=1, inplace=True)
         # train_df.drop('month_prev_2', axis=1, inplace=True)
 
-        # test_df.drop('cnty', axis=1, inplace=True)
-        # test_df.drop('month', axis=1, inplace=True)
+        test_df.drop('cnty', axis=1, inplace=True)
+        test_df.drop('month', axis=1, inplace=True)
         # test_df.drop('cnty_prev', axis=1, inplace=True)
         # test_df.drop('month_prev', axis=1, inplace=True)
         # test_df.drop('cnty_prev_2', axis=1, inplace=True)
