@@ -464,10 +464,10 @@ if __name__ == "__main__":
 
     #linear regression
     Network.linear_model( nl_train, nl_test , type = 'linear_regression')
-    # Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
+    Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
 
     Network.linear_model( train_set, test_set, type = 'linear_regression')
-    # Network.linear_model( train_set, test_set, type = 'ridge_regression')
+    Network.linear_model( train_set, test_set, type = 'ridge_regression')
 
     # Network.linear_classifier('SGDClassifier', train_set, test_set)
 
