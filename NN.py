@@ -106,8 +106,8 @@ class NN:
 
 
 
-    def baseline_model(self,xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain):
-        print 'neural network model'
+    def neural_net(self,xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain):
+        print  '<<<<<<<<<<<<<<<<<<<<<< neural_net  >>>>>>>>>>>>>>>>>>>>>>>> '
 
         print 'yPrevTest'
         print yPrevTest
@@ -233,8 +233,8 @@ class NN:
 
 
 
-    def compute_baseline(self, train_df ,  test_df, num_of_features = NUM_FEATURES):
-        print 'compute_baseline:'
+    def compute_baseline(self, train_df ,  test_df):
+        print ' <<<<<<<<<<<<<<<<<<<<<< compute_baseline  >>>>>>>>>>>>>>>>>>>>>>>>'
 
         mean = np.mean(train_df.label) - np.mean(train_df.label_prev)
         print 'average: ' , mean
@@ -260,8 +260,8 @@ class NN:
         print 'baseline3 (MSE): ', mean_squared_error(mean_df.label_prev_2, mean_df.label)
 
 
-    def linear_model(self, train_set, test_set, num_of_features = NUM_FEATURES):
-        print ' linear_model '
+    def linear_model(self, train_set, test_set, type = 'ridge_regression'):
+        print '          <<<<<<<<<<<<<<<<<<<<<< linear_model  >>>>>>>>>>>>>>>>>>>>>>>> '
 
         xTrain = train_set.ix[:, :-1].values
         yTrain = train_set.ix[:,-1].values
@@ -276,60 +276,50 @@ class NN:
         print 'train_set.columns :'
         for i in xrange(len(train_set.columns)):
             print 'i: ' , i , ' column: ' , train_set.columns[i]
-        print 'num_of_features ( yPrevIndex) : ' , num_of_features , 'column: ' , train_set.columns[num_of_features]
 
-        yPrevTest = test_set.ix[:, num_of_features].values
-        yPrevTrain = train_set.ix[:,num_of_features].values
+        yPrevIndex = train_set.columns.index('label_prev')
+        print ' yPrevIndex : ' , yPrevIndex , 'column_name: ' , train_set.columns[yPrevIndex]
 
-
-        print 'ridge-regression: '
-        cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
-        ridge = RidgeCV()
-        ridge.set_params(**dict((k, v[0] if isinstance(v, list) else v) for k,v in cvParams['ridgecv'][0].iteritems()))
-        ridge.fit(xTrain, yTrain)
-        ridge_pred_test = ridge.predict(xTest)
-        ridge_pred_train = ridge.predict(xTrain)
-
-        print 'ridge_test MSE: ', mean_squared_error(yTest, ridge_pred_test)
-        print 'ridge_train MSE: ', mean_squared_error(yTrain, ridge_pred_train)
-
-        print 'ridge_test MAE: ', mean_absolute_error(yTest, ridge_pred_test)
-        print 'ridge_train MAE: ', mean_absolute_error(yTrain, ridge_pred_train)
+        yPrevTest = test_set.ix[:, yPrevIndex].values
+        yPrevTrain = train_set.ix[:,yPrevIndex].values
 
 
-        print 'ridge test accuracy: ' , sum(1 for x,y in zip(np.sign(ridge_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
-        print 'ridge train accuracy: ' , sum(1 for x,y in zip(np.sign(ridge_pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
-
-        ridge_coef = ridge.coef_
-        print 'ridge_coef: '
-        print ridge_coef
-
-        print 'ridge alpha: '
-        print ridge.alpha_
-
+        if type == 'ridge_regression':
+            print '      <<< ridge-regression >>> '
+            cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
+            model = RidgeCV()
+            model.set_params(**dict((k, v[0] if isinstance(v, list) else v) for k,v in cvParams['ridgecv'][0].iteritems()))
+        else:
+            print '      <<< linear_regression >>>'
+            model = linear_model.LinearRegression()
 
 
-        print 'linear regression'
-        lr = linear_model.LinearRegression()
-        lr.fit(xTrain, yTrain)
-        lr_pred_test = lr.predict(xTest)
-        lr_pred_train = lr.predict(xTrain)
+        model.fit(xTrain, yTrain)
+        pred_test = model.predict(xTest)
+        pred_train = model.predict(xTrain)
 
-        print 'linear_test MSE: ', mean_squared_error(yTest, lr_pred_test)
-        print 'linear_train MSE: ', mean_squared_error(yTrain, lr_pred_train)
+        print 'test MSE: ', mean_squared_error(yTest, pred_test)
+        print 'train MSE: ', mean_squared_error(yTrain, pred_train)
 
-        print 'linear_test MAE: ', mean_absolute_error(yTest, lr_pred_test)
-        print 'linear_train MAE: ', mean_absolute_error(yTrain, lr_pred_train)
+        print 'test MAE: ', mean_absolute_error(yTest, pred_test)
+        print 'train MAE: ', mean_absolute_error(yTrain, pred_train)
 
-        print 'lr test accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
-        print 'lr train accuracy: ' , sum(1 for x,y in zip(np.sign(lr_pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
 
-        print  'lr.coef_: '
-        print lr.coef_
+        print 'test accuracy: ' , sum(1 for x,y in zip(np.sign(pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
+        print 'train accuracy: ' , sum(1 for x,y in zip(np.sign(pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
+
+        coef = model.coef_
+        print 'coef: '
+        print coef
+
+        if type == 'ridge_regression':
+            print 'best alpha: '
+            print model.alpha_
+
 
 
     def linear_classifier(self, type, train_set, test_set):
-        print ' linear_classifier '
+        print '      <<<<<<<<<<<<<<<<<<<<<< linear_classifier  >>>>>>>>>>>>>>>>>>>>>>>>'
 
         xTrain = train_set.ix[:, :-1].values
         yTrain = train_set.ix[:,-1].values
@@ -355,10 +345,6 @@ class NN:
         clf.fit(xTrain, yTrain)
         clf_pred_test = clf.predict(xTest)
         clf_pred_train = clf.predict(xTrain)
-
-        # print 'examples:'
-        # print yTest[:10]
-        # print clf_pred_test[:10]
 
         print 'clf_test MSE: ', mean_squared_error(yTest, clf_pred_test)
         print 'clf_train MSE: ', mean_squared_error(yTrain, clf_pred_train)
@@ -438,23 +424,23 @@ if __name__ == "__main__":
     for i in xrange(len(test_set.columns)):
         print 'i: ' , i , ' , column name: ',  test_set.columns[i]
 
-    yPrevIndex = 2 * NUM_FEATURES
-    yPrevTest = test_set.ix[:,yPrevIndex].values
+    yPrevIndex = train_set.columns.index('label_prev')
     yPrevTrain = train_set.ix[:,yPrevIndex].values
+    yPrevTest = test_set.ix[:,yPrevIndex].values
     print 'yPrevIndex: ' , yPrevIndex
-    print 'yPrevTest: '
-    print yPrevTest
+    # print 'yPrevTest: '
+    # print yPrevTest
 
 
-    print '99:'
-    print train_set.ix[99,:]
-    print xTrain[99]
-    print yTrain[99]
-
-    print '100:'
-    print train_set.ix[100,:]
-    print xTrain[100]
-    print yTrain[100]
+    # print '99:'
+    # print train_set.ix[99,:]
+    # print xTrain[99]
+    # print yTrain[99]
+    #
+    # print '100:'
+    # print train_set.ix[100,:]
+    # print xTrain[100]
+    # print yTrain[100]
 
     # print ' .. train .. '
     # print train_set[train_set.cnty==32005].label
@@ -477,14 +463,19 @@ if __name__ == "__main__":
 
 
     #linear regression
-    Network.linear_model( train_set, test_set)
-    Network.linear_model( nl_train, nl_test , num_of_features= 1)
-    Network.linear_classifier('SGDClassifier', train_set, test_set)
-    # Network.linear_classifier('poly', train_set, test_set)
-    # Network.linear_classifier('svm', train_set, test_set)
+    Network.linear_model( nl_train, nl_test , type = 'linear_regression')
+    # Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
+
+    Network.linear_model( train_set, test_set, type = 'linear_regression')
+    # Network.linear_model( train_set, test_set, type = 'ridge_regression')
+
+    # Network.linear_classifier('SGDClassifier', train_set, test_set)
+
+    #   Network.linear_classifier('poly', train_set, test_set)
+    #   Network.linear_classifier('svm', train_set, test_set)
 
 
-    Network.baseline_model( xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain)
-    #Network.build_neural_network(xTrain, xTest, yTrain, yTest)
+    # Network.neural_net( xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain)
+    #   Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
 
