@@ -151,19 +151,20 @@ class NN:
                 # x1 = np.sign(testPredict - yPrevTest)
                 # x2 = np.sign(yTest- yPrevTest)
 
-                # a = []
-                # a.append(yPrevTest.tolist())
-                # a.append(yTest)
-                # a.append(testPredict.tolist())
-                # a  = np.transpose(a)
-                # print a[:20,:]
+                a = []
+                a.append(yPrevTest.tolist())
+                a.append(yTest)
+                a.append(testPred)
+                a  = np.transpose(a)
+                print a[:25,:]
+                print a[25:50,:]
 
-                print 'testPredict'
-                print testPredict[:10]
-                print 'yTest'
-                print yTest[:10]
-                print ' yPrevTest'
-                print yPrevTest[:10]
+                # print 'testPredict'
+                # print testPredict[:10]
+                # print 'yTest'
+                # print yTest[:10]
+                # print ' yPrevTest'
+                # print yPrevTest[:10]
 
                 # print 's1:'
                 # s1 = np.sign(testPredict - yPrevTest)
