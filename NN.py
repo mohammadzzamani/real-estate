@@ -59,9 +59,11 @@ class NN:
 
         df_prev = df.copy()
         df_prev.index = df_prev.index.map(self.prev_cnty_month)
+        df_prev = df_prev[['label']]
         new_df = df_prev.join(df,  how='inner', lsuffix='_prev')
         df_prev1 = df_prev.copy()
         df_prev1.index = df_prev1.index.map(self.prev_cnty_month)
+        df_prev1 = df_prev1[['label']]
         new_df1 = df_prev1.join(new_df,  how='inner', lsuffix='_prev_2')
 
         return new_df1
@@ -395,7 +397,7 @@ if __name__ == "__main__":
     print 'dataframe_train after: ' , dataframe_train.shape
 
 
-    dataframe_train = dataframe_train[dataframe_train.cnty == 8013]
+    # dataframe_train = dataframe_train[dataframe_train.cnty == 8013]
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
 
