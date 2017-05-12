@@ -113,7 +113,7 @@ class NN:
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
-        model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
+        # model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         # model.add(Dense(1, init='normal', activation= 'softmax'))
         model.add(Dense(1, init='normal'))
         # Compile model
@@ -437,18 +437,18 @@ if __name__ == "__main__":
 
     nl_train = train_set[['label_prev_2', 'label_prev' , 'label']]
     nl_test = test_set[['label_prev_2', 'label_prev' , 'label']]
-    Network.compute_baseline( nl_train, nl_test)
-
-    Network.compute_baseline( train_set, test_set)
-
-
-
-    #linear regression
-    Network.linear_model( nl_train, nl_test , type = 'linear_regression')
-    Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
-
-    Network.linear_model( train_set, test_set, type = 'linear_regression')
-    Network.linear_model( train_set, test_set, type = 'ridge_regression')
+    # Network.compute_baseline( nl_train, nl_test)
+    #
+    # Network.compute_baseline( train_set, test_set)
+    #
+    #
+    #
+    # #linear regression
+    # Network.linear_model( nl_train, nl_test , type = 'linear_regression')
+    # Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
+    #
+    # Network.linear_model( train_set, test_set, type = 'linear_regression')
+    # Network.linear_model( train_set, test_set, type = 'ridge_regression')
 
     # Network.linear_classifier('SGDClassifier', train_set, test_set)
 
