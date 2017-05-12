@@ -107,7 +107,7 @@ class NN:
         # yTrain = np.sign(yTrain - yPrevTrain)
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='linear'))
+        model.add(Dense(30, input_dim=len(xTrain[0]) , init='normal', activation='linear'))
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
@@ -125,14 +125,14 @@ class NN:
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
         nb_epochs = 500
         for i in xrange(nb_epochs):
-            lr = lr * decay
+
             adam.lr.set_value(lr)
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 5000, shuffle = True, validation_split = 0.1, verbose = 1)
 
             if i %10 == 0:
                 score = model.evaluate(xTest, yTest, batch_size = 5000)
                 print 'score: ' , score
-
+                lr = lr * decay
                 testPredict = model.predict(xTest, verbose = 1)
                 print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPredict)
                 print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
