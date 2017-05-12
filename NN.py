@@ -36,7 +36,7 @@ ID_SIZE = 0
 
 # Change this depending on whatever is the number of features
 # in the dataframe.
-NUM_FEATURES = 34
+NUM_FEATURES = 32
 TOTAL_MONTHS = 45
 
 MONTH = 'month'
@@ -452,18 +452,18 @@ if __name__ == "__main__":
 
     nl_train = train_set[['label_prev_2', 'label_prev' , 'label']]
     nl_test = test_set[['label_prev_2', 'label_prev' , 'label']]
-    # Network.compute_baseline( nl_train, nl_test)
-    #
-    # Network.compute_baseline( train_set, test_set)
-    #
-    #
-    #
-    # #linear regression
-    # Network.linear_model( nl_train, nl_test , type = 'linear_regression')
-    # Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
-    #
-    # Network.linear_model( train_set, test_set, type = 'linear_regression')
-    # Network.linear_model( train_set, test_set, type = 'ridge_regression')
+    Network.compute_baseline( nl_train, nl_test)
+
+    Network.compute_baseline( train_set, test_set)
+
+
+
+    #linear regression
+    Network.linear_model( nl_train, nl_test , type = 'linear_regression')
+    Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
+
+    Network.linear_model( train_set, test_set, type = 'linear_regression')
+    Network.linear_model( train_set, test_set, type = 'ridge_regression')
 
     # Network.linear_classifier('SGDClassifier', train_set, test_set)
 
