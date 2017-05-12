@@ -395,7 +395,7 @@ if __name__ == "__main__":
     print 'dataframe_train after: ' , dataframe_train.shape
 
 
-
+    dataframe_train = dataframe_train[dataframe_train.cnty == 8013]
     dataframe_train = Util.normalize_each_county(dataframe_train, TOTAL_MONTHS,  NUM_FEATURES)
 
 
