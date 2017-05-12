@@ -99,9 +99,13 @@ class NN:
 
 
 
-    def neural_net(self,train_set, test_set):
+    def neural_net(self,train_set, test_set , old_pred_train , old_pred_test):
         print  '<<<<<<<<<<<<<<<<<<<<<< neural_net  >>>>>>>>>>>>>>>>>>>>>>>> '
-        xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = Network.prepare_data(train_set, test_set)
+        xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = Network.prepare_data(train_set, test_set, remove_prev_label= True)
+
+
+        yTest = yTest - old_pred_test
+        yTrain = yTrain - old_pred_train
 
         print 'yPrevTest'
         print yPrevTest
@@ -543,22 +547,23 @@ if __name__ == "__main__":
     Network.compute_baseline( train_set, test_set)
 
 
+    Network.linear_model( train_set, test_set, type = 'linear_regression')
+    Network.linear_model( train_set, test_set, type = 'ridge_regression')
 
     #linear regression
     Network.linear_model( nl_train, nl_test , type = 'linear_regression')
     pred_train , pred_test  = Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
 
-    Network.pre_linear_model( train_set, test_set , pred_train , pred_test , type = 'ridge_regression' )
+    # Network.pre_linear_model( train_set, test_set , pred_train , pred_test , type = 'ridge_regression' )
 
-    Network.linear_model( train_set, test_set, type = 'linear_regression')
-    Network.linear_model( train_set, test_set, type = 'ridge_regression')
+
 
     # Network.linear_classifier('SGDClassifier', train_set, test_set)
 
     #   Network.linear_classifier('poly', train_set, test_set)
     #   Network.linear_classifier('svm', train_set, test_set)
 
-    # Network.neural_net( nl_train, nl_test)
+    Network.neural_net( nl_train, nl_test, pred_train , pred_test)
 
     # Network.neural_net( train_set, test_set)
     #   Network.build_neural_network(xTrain, xTest, yTrain, yTest)
