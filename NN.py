@@ -97,17 +97,9 @@ class NN:
 
 
 
-
-
-
-
-
-
-
-
-
-    def neural_net(self,xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain):
+    def neural_net(self,train_set, test_set):
         print  '<<<<<<<<<<<<<<<<<<<<<< neural_net  >>>>>>>>>>>>>>>>>>>>>>>> '
+        xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = Network.prepare_data(train_set, test_set)
 
         print 'yPrevTest'
         print yPrevTest
@@ -263,25 +255,9 @@ class NN:
     def linear_model(self, train_set, test_set, type = 'ridge_regression'):
         print '          <<<<<<<<<<<<<<<<<<<<<< linear_model  >>>>>>>>>>>>>>>>>>>>>>>> '
 
-        xTrain = train_set.ix[:, :-1].values
-        yTrain = train_set.ix[:,-1].values
-        xTest = test_set.ix[:, :-1].values
-        yTest = test_set.ix[:,-1].values
 
-        print 'xTrain.shape : ' , xTrain.shape
-        print 'yTrain.shape: ' , yTrain.shape
-        print 'xTest.shape: ' , xTest.shape
-        print 'yTest.shape: ' , yTest.shape
+        xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = self.prepare_data(train_set,test_set)
 
-        print 'train_set.columns :'
-        for i in xrange(len(train_set.columns)):
-            print 'i: ' , i , ' column: ' , train_set.columns[i]
-
-        yPrevIndex = train_set.columns.tolist().index('label_prev')
-        print ' yPrevIndex : ' , yPrevIndex , 'column_name: ' , train_set.columns[yPrevIndex]
-
-        yPrevTest = test_set.ix[:, yPrevIndex].values
-        yPrevTrain = train_set.ix[:,yPrevIndex].values
 
 
         if type == 'ridge_regression':
@@ -321,14 +297,7 @@ class NN:
     def linear_classifier(self, type, train_set, test_set):
         print '      <<<<<<<<<<<<<<<<<<<<<< linear_classifier  >>>>>>>>>>>>>>>>>>>>>>>>'
 
-        xTrain = train_set.ix[:, :-1].values
-        yTrain = train_set.ix[:,-1].values
-        xTest = test_set.ix[:, :-1].values
-        yTest = test_set.ix[:,-1].values
-
-
-        yPrevTest = test_set.ix[:, 2* NUM_FEATURES].values
-        yPrevTrain = train_set.ix[:, 2* NUM_FEATURES].values
+        xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = self.prepare_data(train_set, test_set)
 
         yTest = np.sign(yTest - yPrevTest)
         yTrain = np.sign(yTrain - yPrevTrain)
@@ -360,7 +329,27 @@ class NN:
         print "-- Created NeuralNetwork Object --"
 
 
+    def prepare_data(train_set, test_set):
+        xTrain = train_set.ix[:, :-1].values
+        yTrain = train_set.ix[:,-1].values
+        xTest = test_set.ix[:, :-1].values
+        yTest = test_set.ix[:,-1].values
 
+        print 'xTrain.shape : ' , xTrain.shape
+        print 'yTrain.shape: ' , yTrain.shape
+        print 'xTest.shape: ' , xTest.shape
+        print 'yTest.shape: ' , yTest.shape
+
+        print 'columns: '
+        for i in xrange(len(train_set.columns)):
+            print 'i: ' , i , ' , column_name: ',  test_set.columns[i]
+
+        yPrevIndex = train_set.columns.tolist().index('label_prev')
+        yPrevTrain = train_set.ix[:,yPrevIndex].values
+        yPrevTest = test_set.ix[:,yPrevIndex].values
+        print ' yPrevIndex : ' , yPrevIndex , 'column_name: ' , train_set.columns[yPrevIndex]
+
+        return xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex
 
 
 if __name__ == "__main__":
@@ -414,20 +403,7 @@ if __name__ == "__main__":
     # test_set.drop('label_prev_2', axis=1, inplace=True)
     # train_set.drop('label_prev_2', axis=1, inplace=True)
 
-    xTrain = train_set.ix[:, :-1].values
-    yTrain = train_set.ix[:,-1].values
-    xTest = test_set.ix[:, :-1].values
-    yTest = test_set.ix[:,-1].values
 
-
-    print 'columns: '
-    for i in xrange(len(test_set.columns)):
-        print 'i: ' , i , ' , column name: ',  test_set.columns[i]
-
-    yPrevIndex = train_set.columns.tolist().index('label_prev')
-    yPrevTrain = train_set.ix[:,yPrevIndex].values
-    yPrevTest = test_set.ix[:,yPrevIndex].values
-    print 'yPrevIndex: ' , yPrevIndex
     # print 'yPrevTest: '
     # print yPrevTest
 
@@ -475,7 +451,7 @@ if __name__ == "__main__":
     #   Network.linear_classifier('svm', train_set, test_set)
 
 
-    # Network.neural_net( xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain)
+    Network.neural_net( train_set, test_set)
     #   Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
 
