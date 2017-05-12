@@ -111,7 +111,7 @@ class NN:
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
-        # model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
+        model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         model.add(Dense(1, init='normal'))
         # Compile model
 
@@ -130,7 +130,7 @@ class NN:
                 print 'score: ' , score
 
                 testPredict = model.predict(xTest, verbose = 1)
-                print 'Neural Network_i: ', i , ' , ' ,   mean_squared_error(yTest, testPredict)
+                print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPredict)
                 print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
 
                 testPredict = testPredict.reshape(testPredict.shape[0])
