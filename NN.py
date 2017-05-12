@@ -147,9 +147,10 @@ class NN:
                 # x1 = np.sign(testPredict - yPrevTest)
                 # x2 = np.sign(yTest- yPrevTest)
 
-                a = yPrevTest
+                a = []
+                a.append(yPrevTest.tolist())
                 a.append(yTest)
-                a.append(testPredict)
+                a.append(testPredict.tolist())
                 a  = np.transpose(a)
                 print a[:20,:]
                 # print 'testPredict'
