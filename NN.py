@@ -106,7 +106,7 @@ class NN:
 
         yTest = yTest - old_pred_test
         yTrain = yTrain - old_pred_train
-        
+
         final_yTest = yTest + old_pred_test
 
 
@@ -180,12 +180,20 @@ class NN:
                 # print a[:25,:]
                 # print a[25:50,:]
 
-                print 'testPredict'
-                print testPredict[:10]
-                print 'yTest'
-                print yTest[:10]
-                print ' yPrevTest'
-                print yPrevTest[:10]
+                a = []
+                a.append(yPrevTest.tolist())
+                a.append(final_yTest)
+                a.append(final_pred_test)
+                a  = np.transpose(a)
+                print a[:25,:]
+                print a[25:50,:]
+
+                # print 'testPredict'
+                # print testPredict[:10]
+                # print 'yTest'
+                # print yTest[:10]
+                # print ' yPrevTest'
+                # print yPrevTest[:10]
 
                 # print 's1:'
                 # s1 = np.sign(testPredict - yPrevTest)
