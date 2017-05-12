@@ -113,7 +113,7 @@ class NN:
         # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
-        # model.add(layers.core.Dropout(0.2))
+        model.add(layers.core.Dropout(0.2))
         model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))  #*
         # model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))  #.
         # model.add(Dense(1, init='normal', activation= 'softmax')) #.
