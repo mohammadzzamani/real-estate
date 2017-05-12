@@ -136,7 +136,7 @@ class NN:
                 print 'score: ' , score
                 lr = lr * decay
                 testPredict = model.predict(xTest, verbose = 1)
-                testPred =  [ max( min(val, 140)  , -20 ) for val in testPredict]
+                testPred =  [ max( min(val, 150)  , -25 ) for val in testPredict]
                 # testPredict = testPred
                 print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPredict)
                 print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
