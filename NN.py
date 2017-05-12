@@ -107,15 +107,14 @@ class NN:
         # yTrain = np.sign(yTrain - yPrevTrain) #.
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='linear'))  #*
+        model.add(Dense(30, input_dim=len(xTrain[0]) , init='normal', activation='relu'))  #*
         # model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='tanh'))  #.
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
-        model.add(layers.core.Dropout(0.1))
-        model.add(Dense(output_dim = 5, init='normal' , activation = 'relu'))  #*
-        model.add(layers.core.Dropout(0.1))
+        # model.add(layers.core.Dropout(0.1))
+        model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))  #*
         # model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))  #.
         # model.add(Dense(1, init='normal', activation= 'softmax')) #.
         model.add(Dense(1, init='normal'))
@@ -152,20 +151,20 @@ class NN:
                 # x1 = np.sign(testPredict - yPrevTest)
                 # x2 = np.sign(yTest- yPrevTest)
 
-                a = []
-                a.append(yPrevTest.tolist())
-                a.append(yTest)
-                a.append(testPred)
-                a  = np.transpose(a)
-                print a[:25,:]
-                print a[25:50,:]
+                # a = []
+                # a.append(yPrevTest.tolist())
+                # a.append(yTest)
+                # a.append(testPred)
+                # a  = np.transpose(a)
+                # print a[:25,:]
+                # print a[25:50,:]
 
-                # print 'testPredict'
-                # print testPredict[:10]
-                # print 'yTest'
-                # print yTest[:10]
-                # print ' yPrevTest'
-                # print yPrevTest[:10]
+                print 'testPredict'
+                print testPredict[:10]
+                print 'yTest'
+                print yTest[:10]
+                print ' yPrevTest'
+                print yPrevTest[:10]
 
                 # print 's1:'
                 # s1 = np.sign(testPredict - yPrevTest)
