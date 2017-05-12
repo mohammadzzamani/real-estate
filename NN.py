@@ -115,25 +115,23 @@ class NN:
         model.add(Dense(1, init='normal'))
         # Compile model
 
-        lr = 0.1
+        lr = 0.05
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
-        nb_epochs = 500
+        nb_epochs = 150
         for i in xrange(nb_epochs):
-
+            lr = lr * decay
             adam.lr.set_value(lr)
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 5000, shuffle = True, validation_split = 0.1, verbose = 1)
 
             if i %10 == 0:
-                lr = lr * decay
                 score = model.evaluate(xTest, yTest, batch_size = 5000)
                 print 'score: ' , score
 
                 testPredict = model.predict(xTest, verbose = 1)
-                print 'i: ' , i , ' lr: ' , lr
-                print 'Neural Network_i:   ' ,   mean_squared_error(yTest, testPredict)
-                print 'Neural Network_i:   ', mean_absolute_error(yTest, testPredict)
+                print 'Neural Network_i: ', i , ' , ' ,   mean_squared_error(yTest, testPredict)
+                print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
 
                 testPredict = testPredict.reshape(testPredict.shape[0])
 
