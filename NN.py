@@ -274,6 +274,49 @@ class NN:
         print 'baseline3 (MAE): ' , mean_absolute_error(mean_df.label_prev_2, mean_df.label)
         print 'baseline3 (MSE): ', mean_squared_error(mean_df.label_prev_2, mean_df.label)
 
+    def pre_linear_model( self, train_set, test_set , pred_train , pred_test , type = 'ridge_regression' ):
+        print '          <<<<<<<<<<<<<<<<<<<<<< pre_linear_model  >>>>>>>>>>>>>>>>>>>>>>>> '
+
+        xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = self.prepare_data(train_set,test_set)
+
+        yTest = yTest - pred_test
+        yTrain = yTrain - pred_train
+
+        if type == 'ridge_regression':
+            print '      <<< ridge-regression >>> '
+            cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
+            model = RidgeCV()
+            model.set_params(**dict((k, v[0] if isinstance(v, list) else v) for k,v in cvParams['ridgecv'][0].iteritems()))
+        else:
+            print '      <<< linear_regression >>>'
+            model = linear_model.LinearRegression()
+
+
+        model.fit(xTrain, yTrain)
+        pred_test = model.predict(xTest)
+        pred_train = model.predict(xTrain)
+
+        print 'test MSE: ', mean_squared_error(yTest, pred_test)
+        print 'train MSE: ', mean_squared_error(yTrain, pred_train)
+
+        print 'test MAE: ', mean_absolute_error(yTest, pred_test)
+        print 'train MAE: ', mean_absolute_error(yTrain, pred_train)
+
+
+        print 'test accuracy: ' , sum(1 for x,y in zip(np.sign(pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
+        print 'train accuracy: ' , sum(1 for x,y in zip(np.sign(pred_train - yPrevTrain),np.sign(yTrain - yPrevTrain)) if x == y) / float(len(yTrain))
+
+        coef = model.coef_
+        print 'coef: '
+        print coef
+
+        if type == 'ridge_regression':
+            print 'best alpha: '
+            print model.alpha_
+
+        return pred_train, pred_test
+
+
 
     def linear_model(self, train_set, test_set, type = 'ridge_regression'):
         print '          <<<<<<<<<<<<<<<<<<<<<< linear_model  >>>>>>>>>>>>>>>>>>>>>>>> '
@@ -314,6 +357,8 @@ class NN:
         if type == 'ridge_regression':
             print 'best alpha: '
             print model.alpha_
+
+        return pred_train, pred_test
 
 
 
@@ -412,7 +457,7 @@ if __name__ == "__main__":
     selected_df = new_dataframe[new_dataframe.cnty == 8013]
     selected_df.to_csv(r'data_8013.csv',  sep=',', mode='a', columns= new_dataframe.columns)
 
-    [train_set , test_set] = Network.split_train_test(new_dataframe,  int(0.96 * TOTAL_MONTHS))
+    [train_set , test_set] = Network.split_train_test(new_dataframe,  int(0.8 * TOTAL_MONTHS))
     print 'train shape after split: ' , train_set.shape
     print 'test shape after split : ' , test_set.shape
 
@@ -463,7 +508,9 @@ if __name__ == "__main__":
 
     #linear regression
     Network.linear_model( nl_train, nl_test , type = 'linear_regression')
-    Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
+    pred_train , pred_test  = Network.linear_model( nl_train, nl_test , type = 'ridge_regression')
+
+    Network.pre_linear_model( train_set, test_set , pred_train , pred_test , type = 'ridge_regression' )
 
     Network.linear_model( train_set, test_set, type = 'linear_regression')
     Network.linear_model( train_set, test_set, type = 'ridge_regression')
@@ -473,7 +520,8 @@ if __name__ == "__main__":
     #   Network.linear_classifier('poly', train_set, test_set)
     #   Network.linear_classifier('svm', train_set, test_set)
 
-    Network.neural_net( nl_train, nl_test)
+    # Network.neural_net( nl_train, nl_test)
+    
     # Network.neural_net( train_set, test_set)
     #   Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
