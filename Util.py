@@ -132,7 +132,7 @@ def normalize_each_county(df,num_of_months , num_of_features ):
 
             if br == 0:
                 # new_values = normalize_mean_variance(values, int(num_of_months * 0.8))
-                #new_values = normalize_mean_variance(values, int(num_of_months * 0.8))
+                # new_values = normalize_mean_variance(values, int(num_of_months * 0.8))
                 new_values = normalize_min_max(values, int(num_of_months * 0.8))
                 #print 'max, min: ' , np.max(new_values), ' , ', np.min(new_values)
                 for j in xrange(num_of_months):
