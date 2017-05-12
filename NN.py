@@ -129,7 +129,7 @@ class NN:
         for i in xrange(nb_epochs):
 
             adam.lr.set_value(lr)
-            model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 2000, shuffle = True, validation_split = 0.2, verbose = 1)
+            model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 5000, shuffle = True, validation_split = 0.2, verbose = 1)
 
             if i %10 == 0:
                 score = model.evaluate(xTest, yTest, batch_size = 5000)
