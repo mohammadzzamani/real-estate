@@ -280,12 +280,7 @@ class NN:
         print '          <<<<<<<<<<<<<<<<<<<<<< pre_linear_model  >>>>>>>>>>>>>>>>>>>>>>>> '
 
 
-        train_set.drop('label_prev', axis=1, inplace=True)
-        train_set.drop('label_prev_2', axis=1, inplace=True)
-        test_set.drop('label_prev', axis=1, inplace=True)
-        test_set.drop('label_prev_2', axis=1, inplace=True)
-
-        xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = self.prepare_data(train_set,test_set)
+        xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = self.prepare_data(train_set,test_set, remove_prev_label= True)
 
         yTest = yTest - old_pred_test
         yTrain = yTrain - old_pred_train
@@ -423,7 +418,21 @@ class NN:
         print "-- Created NeuralNetwork Object --"
 
 
-    def prepare_data(self, train_set, test_set):
+    def prepare_data(self, train_set, test_set, remove_prev_label = False):
+
+        yPrevIndex = train_set.columns.tolist().index('label_prev')
+        yPrevTrain = train_set.ix[:,yPrevIndex].values
+        yPrevTest = test_set.ix[:,yPrevIndex].values
+        print ' yPrevIndex : ' , yPrevIndex , 'column_name: ' , train_set.columns[yPrevIndex]
+
+        if remove_prev_label:
+            if 'label_prev' in train_set.columns.tolist():
+                train_set.drop('label_prev' , axis = 1 , inplace = True)
+                test_set.drop('label_prev' , axis = 1 , inplace = True)
+            if 'label_prev_2' in train_set.columns.tolist():
+                train_set.drop('label_prev_2' , axis = 1 , inplace = True)
+                test_set.drop('label_prev_2' , axis = 1 , inplace = True)
+
         xTrain = train_set.ix[:, :-1].values
         yTrain = train_set.ix[:,-1].values
         xTest = test_set.ix[:, :-1].values
@@ -438,10 +447,7 @@ class NN:
         for i in xrange(len(train_set.columns)):
             print 'i: ' , i , ' , column_name: ',  test_set.columns[i]
 
-        yPrevIndex = train_set.columns.tolist().index('label_prev')
-        yPrevTrain = train_set.ix[:,yPrevIndex].values
-        yPrevTest = test_set.ix[:,yPrevIndex].values
-        print ' yPrevIndex : ' , yPrevIndex , 'column_name: ' , train_set.columns[yPrevIndex]
+
 
         return xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex
 
