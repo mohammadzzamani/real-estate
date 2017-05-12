@@ -134,6 +134,7 @@ class NN:
                 testPredict = model.predict(xTest, verbose = 1)
                 print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPredict)
                 print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
+                print 'Neural Network accuracy: ' , sum(1 for x,y in zip(testPredict,yTest ) if x == y) / float(len(yTest))
 
                 testPredict = testPredict.reshape(testPredict.shape[0])
 
