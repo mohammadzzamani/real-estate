@@ -274,13 +274,21 @@ class NN:
         print 'baseline3 (MAE): ' , mean_absolute_error(mean_df.label_prev_2, mean_df.label)
         print 'baseline3 (MSE): ', mean_squared_error(mean_df.label_prev_2, mean_df.label)
 
-    def pre_linear_model( self, train_set, test_set , pred_train , pred_test , type = 'ridge_regression' ):
+
+
+    def pre_linear_model( self, train_set, test_set , old_pred_train , old_pred_test , type = 'ridge_regression' ):
         print '          <<<<<<<<<<<<<<<<<<<<<< pre_linear_model  >>>>>>>>>>>>>>>>>>>>>>>> '
+
+
+        train_set.drop('label_prev', axis=1, inplace=True)
+        train_set.drop('label_prev2', axis=1, inplace=True)
+        test_set.drop('label_prev', axis=1, inplace=True)
+        test_set.drop('label_prev2', axis=1, inplace=True)
 
         xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = self.prepare_data(train_set,test_set)
 
-        yTest = yTest - pred_test
-        yTrain = yTrain - pred_train
+        yTest = yTest - old_pred_test
+        yTrain = yTrain - old_pred_train
 
         if type == 'ridge_regression':
             print '      <<< ridge-regression >>> '
@@ -296,11 +304,20 @@ class NN:
         pred_test = model.predict(xTest)
         pred_train = model.predict(xTrain)
 
+
+        yTest = yTest + old_pred_test
+        pred_test = pred_test + old_pred_test
+
+
+
         print 'test MSE: ', mean_squared_error(yTest, pred_test)
         print 'train MSE: ', mean_squared_error(yTrain, pred_train)
 
         print 'test MAE: ', mean_absolute_error(yTest, pred_test)
         print 'train MAE: ', mean_absolute_error(yTrain, pred_train)
+
+
+
 
 
         print 'test accuracy: ' , sum(1 for x,y in zip(np.sign(pred_test - yPrevTest),np.sign(yTest - yPrevTest)) if x == y) / float(len(yTest))
@@ -313,6 +330,15 @@ class NN:
         if type == 'ridge_regression':
             print 'best alpha: '
             print model.alpha_
+
+
+        a = []
+        a.append(yPrevTest.tolist())
+        a.append(yTest)
+        a.append(pred_test)
+        a  = np.transpose(a)
+        print a[:25,:]
+        print a[25:50,:]
 
         return pred_train, pred_test
 
@@ -521,7 +547,7 @@ if __name__ == "__main__":
     #   Network.linear_classifier('svm', train_set, test_set)
 
     # Network.neural_net( nl_train, nl_test)
-    
+
     # Network.neural_net( train_set, test_set)
     #   Network.build_neural_network(xTrain, xTest, yTrain, yTest)
     print "--- Completed ---"
