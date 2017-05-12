@@ -105,13 +105,13 @@ class NN:
         print yPrevTest
         # create model
         model = Sequential()
-        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='linear'))
+        model.add(Dense(20, input_dim=len(xTrain[0]) , init='normal', activation='relu'))
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 30, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
         # model.add(Dense(output_dim = 10, init='normal' , activation = 'relu'))
         # model.add(layers.core.Dropout(0.2))
-        # model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
+        model.add(Dense(output_dim = 5, init='normal' , activation = 'linear'))
         model.add(Dense(1, init='normal'))
         # Compile model
 
@@ -387,7 +387,7 @@ if __name__ == "__main__":
     print 'new_dataframe.shape: ', new_dataframe.shape
 
     selected_df = new_dataframe[new_dataframe.cnty == 8013]
-    selected_df.to_csv(r'data_8013.txt',  sep=',', mode='a', columns= new_dataframe.columns)
+    selected_df.to_csv(r'data_8013.csv',  sep=',', mode='a', columns= new_dataframe.columns)
 
     [train_set , test_set] = Network.split_train_test(new_dataframe,  0.8 * TOTAL_MONTHS)
     print 'train shape after split: ' , train_set.shape
@@ -396,9 +396,9 @@ if __name__ == "__main__":
     cnty_months = ['8013_'+str(i) for i in xrange(45)]
 
     selected_df = train_set.ix[cnty_months]
-    selected_df.to_csv(r'train_8013.txt',  sep=',', mode='a', columns= train_set.columns)
+    selected_df.to_csv(r'train_8013.csv',  sep=',', mode='a', columns= train_set.columns)
     selected_df = test_set.ix[cnty_months]
-    selected_df.to_csv(r'test_8013.txt', sep=',', mode='a', columns= test_set.columns)
+    selected_df.to_csv(r'test_8013.csv', sep=',', mode='a', columns= test_set.columns)
 
     # test_set.drop('label_prev_2', axis=1, inplace=True)
     # train_set.drop('label_prev_2', axis=1, inplace=True)
