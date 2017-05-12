@@ -115,7 +115,7 @@ class NN:
         model.add(Dense(1, init='normal'))
         # Compile model
 
-        lr = 1
+        lr = 0.1
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_absolute_error', optimizer = adam)
