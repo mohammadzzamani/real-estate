@@ -287,7 +287,7 @@ class NN:
 
         if type == 'ridge_regression':
             print '      <<< ridge-regression >>> '
-            cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000])}]}
+            cvParams = {'ridgecv': [{'alphas': np.array([1, .1, .01, .001, .0001, 10, 100, 1000, 10000, 100000, 100000, 1000000, 10000000, 100000000, 1000000000 ])}]}
             model = RidgeCV()
             model.set_params(**dict((k, v[0] if isinstance(v, list) else v) for k,v in cvParams['ridgecv'][0].iteritems()))
         else:
@@ -425,18 +425,24 @@ class NN:
         yPrevTest = test_set.ix[:,yPrevIndex].values
         print ' yPrevIndex : ' , yPrevIndex , 'column_name: ' , train_set.columns[yPrevIndex]
 
+
+        new_train_set = train_set
+        new_test_set = test_set
         if remove_prev_label:
             if 'label_prev' in train_set.columns.tolist():
-                train_set.drop('label_prev' , axis = 1 , inplace = True)
-                test_set.drop('label_prev' , axis = 1 , inplace = True)
+                new_train_set = train_set.drop('label_prev' , axis = 1 )
+                new_test_set = test_set.drop('label_prev' , axis = 1)
             if 'label_prev_2' in train_set.columns.tolist():
-                train_set.drop('label_prev_2' , axis = 1 , inplace = True)
-                test_set.drop('label_prev_2' , axis = 1 , inplace = True)
+                new_train_set = train_set.drop('label_prev_2' , axis = 1 )
+                new_test_set  = test_set.drop('label_prev_2' , axis = 1 )
 
-        xTrain = train_set.ix[:, :-1].values
-        yTrain = train_set.ix[:,-1].values
-        xTest = test_set.ix[:, :-1].values
-        yTest = test_set.ix[:,-1].values
+
+
+
+        xTrain = new_train_set.ix[:, :-1].values
+        yTrain = new_train_set.ix[:,-1].values
+        xTest = new_test_set.ix[:, :-1].values
+        yTest = new_test_set.ix[:,-1].values
 
         print 'xTrain.shape : ' , xTrain.shape
         print 'yTrain.shape: ' , yTrain.shape
@@ -444,8 +450,8 @@ class NN:
         print 'yTest.shape: ' , yTest.shape
 
         print 'columns: '
-        for i in xrange(len(train_set.columns)):
-            print 'i: ' , i , ' , column_name: ',  test_set.columns[i]
+        for i in xrange(len(new_test_set.columns)):
+            print 'i: ' , i , ' , column_name: ',  new_test_set.columns[i]
 
 
 
