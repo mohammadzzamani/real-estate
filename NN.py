@@ -277,7 +277,7 @@ class NN:
         for i in xrange(len(train_set.columns)):
             print 'i: ' , i , ' column: ' , train_set.columns[i]
 
-        yPrevIndex = train_set.columns.index('label_prev')
+        yPrevIndex = train_set.columns.tolist().index('label_prev')
         print ' yPrevIndex : ' , yPrevIndex , 'column_name: ' , train_set.columns[yPrevIndex]
 
         yPrevTest = test_set.ix[:, yPrevIndex].values
@@ -424,7 +424,7 @@ if __name__ == "__main__":
     for i in xrange(len(test_set.columns)):
         print 'i: ' , i , ' , column name: ',  test_set.columns[i]
 
-    yPrevIndex = train_set.columns.index('label_prev')
+    yPrevIndex = train_set.columns.tolist().index('label_prev')
     yPrevTrain = train_set.ix[:,yPrevIndex].values
     yPrevTest = test_set.ix[:,yPrevIndex].values
     print 'yPrevIndex: ' , yPrevIndex
