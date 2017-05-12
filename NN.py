@@ -131,7 +131,7 @@ class NN:
             model.fit(xTrain, yTrain, nb_epoch = 1, batch_size = 500, shuffle = True, validation_split = 0.1, verbose = 1)
 
             if i %10 == 0:
-                score = model.evaluate(xTest, yTest) #, batch_size = 5000)
+                score = model.evaluate(xTest, yTest, batch_size = 5000)
                 print 'score: ' , score
                 lr = lr * decay
                 testPredict = model.predict(xTest, verbose = 1)
