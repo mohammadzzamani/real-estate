@@ -136,8 +136,12 @@ class NN:
                 print 'score: ' , score
                 lr = lr * decay
                 testPredict = model.predict(xTest, verbose = 1)
+                testPred =  [ max( min(val, 140)  , -20 ) for val in testPredict]
+                # testPredict = testPred
                 print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPredict)
                 print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
+                print 'Neural Network_i: ', i , ' , ' ,  lr , ' , ' ,   mean_squared_error(yTest, testPred)
+                print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPred)
                 # print 'Neural Network accuracy: ' , sum(1 for x,y in zip(testPredict,yTest ) if x == y) / float(len(yTest)) #.
 
                 testPredict = testPredict.reshape(testPredict.shape[0])  #*
@@ -147,18 +151,20 @@ class NN:
                 # x1 = np.sign(testPredict - yPrevTest)
                 # x2 = np.sign(yTest- yPrevTest)
 
-                a = []
-                a.append(yPrevTest.tolist())
-                a.append(yTest)
-                a.append(testPredict.tolist())
-                a  = np.transpose(a)
-                print a[:20,:]
-                # print 'testPredict'
-                # print testPredict[:10]
-                # print 'yTest'
-                # print yTest[:10]
-                # print ' yPrevTest'
-                # print yPrevTest[:10]
+                # a = []
+                # a.append(yPrevTest.tolist())
+                # a.append(yTest)
+                # a.append(testPredict.tolist())
+                # a  = np.transpose(a)
+                # print a[:20,:]
+
+                print 'testPredict'
+                print testPredict[:10]
+                print 'yTest'
+                print yTest[:10]
+                print ' yPrevTest'
+                print yPrevTest[:10]
+
                 # print 's1:'
                 # s1 = np.sign(testPredict - yPrevTest)
                 # print s1[:100]
