@@ -77,14 +77,14 @@ class NN:
         train_df = new_df[new_df.month <= train_month]
         print new_df.columns
 
-        # train_df.drop('cnty', axis=1, inplace=True)
+        train_df.drop('cnty', axis=1, inplace=True)
         train_df.drop('month', axis=1, inplace=True)
         # train_df.drop('cnty_prev', axis=1, inplace=True)
         # train_df.drop('month_prev', axis=1, inplace=True)
         # train_df.drop('cnty_prev_2', axis=1, inplace=True)
         # train_df.drop('month_prev_2', axis=1, inplace=True)
 
-        # test_df.drop('cnty', axis=1, inplace=True)
+        test_df.drop('cnty', axis=1, inplace=True)
         test_df.drop('month', axis=1, inplace=True)
         # test_df.drop('cnty_prev', axis=1, inplace=True)
         # test_df.drop('month_prev', axis=1, inplace=True)
@@ -281,9 +281,9 @@ class NN:
 
 
         train_set.drop('label_prev', axis=1, inplace=True)
-        train_set.drop('label_prev2', axis=1, inplace=True)
+        train_set.drop('label_prev_2', axis=1, inplace=True)
         test_set.drop('label_prev', axis=1, inplace=True)
-        test_set.drop('label_prev2', axis=1, inplace=True)
+        test_set.drop('label_prev_2', axis=1, inplace=True)
 
         xTrain, xTest, yTrain, yTest, yPrevTest, yPrevTrain, yPrevIndex = self.prepare_data(train_set,test_set)
 
