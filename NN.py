@@ -115,7 +115,7 @@ class NN:
         model.add(Dense(1, init='normal'))
         # Compile model
 
-        lr = 0.05
+        lr = 1
         decay = 0.975
         adam = optimizers.adam(lr = lr, decay = decay)
         model.compile(loss = 'mean_squared_error', optimizer = adam)
@@ -131,8 +131,9 @@ class NN:
                 print 'score: ' , score
 
                 testPredict = model.predict(xTest, verbose = 1)
-                print 'Neural Network_i: ', i , ' , ' ,   mean_squared_error(yTest, testPredict)
-                print 'Neural Network_i: ', i , ' , ', mean_absolute_error(yTest, testPredict)
+                print 'i: ' , i , ' lr: ' , lr
+                print 'Neural Network_i:   ' ,   mean_squared_error(yTest, testPredict)
+                print 'Neural Network_i:   ', mean_absolute_error(yTest, testPredict)
 
                 testPredict = testPredict.reshape(testPredict.shape[0])
 
